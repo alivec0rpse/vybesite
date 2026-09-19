@@ -1,0 +1,10 @@
+# https://vybe.net.in/robots.txt
+User-agent: *
+Allow: /
+
+# Build tooling and sources are not content.
+Disallow: /src/
+Disallow: /tools/
+Disallow: /node_modules/
+
+Sitemap: https://vybe.net.in/sitemap.xml

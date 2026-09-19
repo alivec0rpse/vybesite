@@ -1,0 +1,246 @@
+/* =========================================================================
+   Vybe Technologies — single stylesheet.
+   Self-hosted variable fonts, so the page makes zero third-party requests
+   and nothing render-blocking sits on another origin's latency.
+   ========================================================================= */
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(/assets/fonts/inter-var.woff2) format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 600 800;
+  font-display: swap;
+  src: url(/assets/fonts/plus-jakarta-sans-var.woff2) format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Subset to only the icons this site actually uses: 200KB -> 7KB.
+   Regenerate with `node tools/gen-fonts.mjs` after adding a new icon. */
+@font-face {
+  font-family: 'Material Symbols Outlined';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url(/assets/fonts/material-symbols-subset.woff2) format('woff2');
+}
+
+@tailwind base;
+@tailwind components;
+
+@layer components {
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+  }
+
+  /* Backgrounds */
+  .bg-grid-faint {
+    background-size: 30px 30px;
+    background-image:
+      linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+  }
+
+  /* Replaces a 175KB remote texture that was rendered at 3% opacity. */
+  .bg-noise-faint {
+    background-image: radial-gradient(rgba(27, 28, 27, 0.5) 1px, transparent 1px);
+    background-size: 4px 4px;
+  }
+
+  /* Glassmorphism */
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+  }
+  .glass-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  /* Smooth reveal on scroll */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.5, 0, 0, 1), transform 0.8s cubic-bezier(0.5, 0, 0, 1);
+  }
+  .reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .animate-orb {
+    animation: orb-float 18s ease-in-out infinite;
+  }
+  .orb-delay-1 { animation-delay: -6s; }
+  .orb-delay-2 { animation-delay: -12s; }
+
+  .animate-float-badge { animation: float-badge 4s ease-in-out infinite; }
+  .animate-float-badge-delayed { animation: float-badge 5s ease-in-out infinite; animation-delay: 1.5s; }
+
+  /* Staggered animation offsets. These were inline `style="animation-delay:…"`
+     attributes in the original, which the production Content-Security-Policy
+     (style-src 'self', no 'unsafe-inline') silently drops. */
+  .anim-delay-500 { animation-delay: 0.5s; }
+  .anim-delay-1000 { animation-delay: 1s; }
+
+  /* Same story: an inline data-URI background on the IT page. */
+  .bg-dot-white {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.9) 1.5px, transparent 1.5px);
+    background-size: 24px 24px;
+    background-repeat: repeat;
+  }
+
+  /* Long-form legal documents */
+  .legal-content h2 {
+    color: #1e293b;
+    font-weight: 800;
+    font-size: 1.25rem;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    scroll-margin-top: 6rem;
+  }
+  .legal-content h3 {
+    color: #334155;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+  .legal-content p {
+    color: #475569;
+    line-height: 1.75;
+    margin-bottom: 1rem;
+  }
+  .legal-content ul {
+    color: #475569;
+    list-style-type: disc;
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .legal-content li {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+  }
+  .legal-content a {
+    color: #e31837;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .legal-content code {
+    background: #f1f5f9;
+    padding: 0.1em 0.4em;
+    border-radius: 0.25rem;
+    font-size: 0.9em;
+  }
+
+  /* Page enters with a short fade. Content is already in the DOM and painted,
+     so this never delays first contentful paint the way the old JS loader did. */
+  .page-enter {
+    animation: fadeInPage 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+@tailwind utilities;
+
+/* -------------------------------------------------------------------------
+   Base + keyframes
+   ------------------------------------------------------------------------- */
+
+body {
+  background-color: #f8fafc;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Keyboard users need to see where they are. The original stripped outlines
+   with focus:outline-none and put nothing back. */
+:focus-visible {
+  outline: 3px solid #e31837;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.dark-section :focus-visible {
+  outline-color: #ffffff;
+}
+
+@keyframes fadeInPage {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes orb-float {
+  0% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+  33% { transform: translate(40px, -60px) scale(1.1); opacity: 0.5; }
+  66% { transform: translate(-30px, 30px) scale(0.9); opacity: 0.3; }
+  100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+}
+
+@keyframes float-badge {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-15px) rotate(2deg); }
+}
+
+/* Respect the OS-level motion preference. Required for WCAG 2.3.3 and it
+   stops the canvas/orb animations burning battery for users who opted out. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Skip link — visible only once focused. */
+.skip-link {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translate(-50%, -120%);
+  z-index: 100;
+  background: #0f172a;
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0 0 0.75rem 0.75rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  transition: transform 0.2s ease;
+}
+.skip-link:focus {
+  transform: translate(-50%, 0);
+}
+
+@media print {
+  header, footer, canvas, .no-print { display: none !important; }
+  body { background: #fff; }
+}

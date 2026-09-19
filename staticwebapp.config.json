@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json.schemastore.org/staticwebapp.config.json",
+
+  "routes": [
+    {
+      "route": "/assets/fonts/*",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable",
+        "Access-Control-Allow-Origin": "*"
+      }
+    },
+    {
+      "route": "/assets/*",
+      "headers": { "Cache-Control": "public, max-age=31536000, immutable" }
+    },
+    {
+      "route": "/sitemap.xml",
+      "headers": { "Cache-Control": "public, max-age=3600" }
+    },
+    {
+      "route": "/robots.txt",
+      "headers": { "Cache-Control": "public, max-age=3600" }
+    },
+
+    { "route": "/src/*", "statusCode": 404 },
+    { "route": "/tools/*", "statusCode": 404 },
+    { "route": "/node_modules/*", "statusCode": 404 },
+    { "route": "/shots/*", "statusCode": 404 },
+    { "route": "/build.js", "statusCode": 404 },
+    { "route": "/tailwind.config.js", "statusCode": 404 },
+    { "route": "/package*.json", "statusCode": 404 },
+
+    { "route": "/privacy_policy.html", "redirect": "/privacy-policy/", "statusCode": 301 },
+    { "route": "/refund_policy.html", "redirect": "/refund-policy/", "statusCode": 301 },
+    { "route": "/T&C.html", "redirect": "/terms/", "statusCode": 301 },
+    { "route": "/tc.html", "redirect": "/terms/", "statusCode": 301 },
+    { "route": "/terms.html", "redirect": "/terms/", "statusCode": 301 },
+
+    { "route": "/erp", "redirect": "/erp/", "statusCode": 301 },
+    { "route": "/erp.html", "redirect": "/erp/", "statusCode": 301 },
+    { "route": "/cms", "redirect": "/cms/", "statusCode": 301 },
+    { "route": "/cms.html", "redirect": "/cms/", "statusCode": 301 },
+    { "route": "/it-solutions", "redirect": "/it-solutions/", "statusCode": 301 },
+    { "route": "/it", "redirect": "/it-solutions/", "statusCode": 301 },
+    { "route": "/cloud", "redirect": "/cloud/", "statusCode": 301 },
+    { "route": "/cloud.html", "redirect": "/cloud/", "statusCode": 301 },
+    { "route": "/privacy-policy", "redirect": "/privacy-policy/", "statusCode": 301 },
+    { "route": "/terms", "redirect": "/terms/", "statusCode": 301 },
+    { "route": "/refund-policy", "redirect": "/refund-policy/", "statusCode": 301 },
+    { "route": "/shipping-policy", "redirect": "/shipping-policy/", "statusCode": 301 },
+    { "route": "/shipping", "redirect": "/shipping-policy/", "statusCode": 301 },
+    { "route": "/index.html", "redirect": "/", "statusCode": 301 },
+
+    {
+      "route": "/*",
+      "headers": { "Cache-Control": "public, max-age=0, must-revalidate" }
+    }
+  ],
+
+  "navigationFallback": {
+    "rewrite": "/404.html",
+    "exclude": ["/assets/*", "/*.xml", "/*.txt", "/*.ico", "/*.webmanifest", "/*.png", "/*.webp"]
+  },
+
+  "responseOverrides": {
+    "404": { "rewrite": "/404.html", "statusCode": 404 }
+  },
+
+  "globalHeaders": {
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+    "Permissions-Policy": "geolocation=(), microphone=(), camera=(), interest-cohort=()",
+    "X-Frame-Options": "SAMEORIGIN",
+    "Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; form-action 'self'; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests"
+  },
+
+  "mimeTypes": {
+    ".json": "application/json",
+    ".webmanifest": "application/manifest+json",
+    ".woff2": "font/woff2",
+    ".webp": "image/webp",
+    ".xml": "application/xml",
+    ".ico": "image/x-icon"
+  }
+}
