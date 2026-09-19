@@ -1,10 +1,6 @@
 # vybe.net.in
 
-Static marketing site for Vybe Technologies. Hosted on **Azure Static Web Apps**.
-
-The site used to be a single-page app: five sections behind one URL, swapped by
-`showPage()`. Google could only ever index one page. It is now a real
-multi-page static site generated from that same source content.
+Static site for Vybe Technologies. Hosted on **Azure Static Web Apps**.
 
 ## Layout
 
