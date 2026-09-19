@@ -76,6 +76,12 @@ for (const entry of fs.readdirSync(ROOT, { withFileTypes: true })) {
   files++;
 }
 
+// The IndexNow key file has to be reachable at the site root or the engines
+// reject every submission with a 403. It is named for the key it holds, so it
+// is matched by pattern rather than listed above.
+const hasIndexNowKey = fs.readdirSync(DIST).some((f) => /^[a-f0-9]{8,128}\.txt$/i.test(f));
+if (!hasIndexNowKey) console.warn('stage: no IndexNow key file in dist/ — submissions will 403');
+
 const missing = REQUIRED.filter((f) => !fs.existsSync(path.join(DIST, f)));
 if (missing.length) {
   console.error(`stage: missing from dist/ — ${missing.join(', ')}`);

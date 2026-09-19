@@ -25,6 +25,11 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
+        with:
+          # tools/indexnow.mjs diffs .lastmod.json against HEAD to work out
+          # which pages actually changed. A depth-1 clone still has HEAD, but
+          # two commits give it something to fall back on if a build is rerun.
+          fetch-depth: 2
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -64,3 +69,14 @@ jobs:
             --env production \
             --swa-config-location ./dist \
             --no-use-keychain
+
+      - name: Ping IndexNow
+        # After the deploy, never before: the engines fetch the URL as soon as
+        # they are told about it, and pointing them at the old content is worse
+        # than staying quiet. Submits only the pages whose content hash moved.
+        #
+        # continue-on-error because this is a hint, not a gate. The pages are
+        # already live and the sitemap still lists them; a 429 from a search
+        # engine is not a reason to mark a good deploy as failed.
+        continue-on-error: true
+        run: npm run indexnow

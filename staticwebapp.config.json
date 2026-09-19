@@ -81,6 +81,7 @@
     ".woff2": "font/woff2",
     ".webp": "image/webp",
     ".xml": "application/xml",
+    ".txt": "text/plain",
     ".ico": "image/x-icon"
   }
 }
