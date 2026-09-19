@@ -20,6 +20,30 @@
     onScroll();
   }
 
+  /* ------------------------------------------------- reading progress bar */
+  // Set through the CSSOM rather than a style attribute: the production CSP is
+  // style-src 'self' with no 'unsafe-inline', which drops style attributes but
+  // does not restrict scripted CSSOM writes.
+  var bar = document.getElementById('scroll-progress');
+  if (bar) {
+    var barTicking = false;
+    var paintBar = function () {
+      var max = document.documentElement.scrollHeight - window.innerHeight;
+      var ratio = max > 0 ? window.scrollY / max : 0;
+      bar.style.transform = 'scaleX(' + (ratio < 0 ? 0 : ratio > 1 ? 1 : ratio) + ')';
+      barTicking = false;
+    };
+    var queueBar = function () {
+      if (!barTicking) {
+        barTicking = true;
+        requestAnimationFrame(paintBar);
+      }
+    };
+    window.addEventListener('scroll', queueBar, { passive: true });
+    window.addEventListener('resize', queueBar, { passive: true });
+    paintBar();
+  }
+
   /* ------------------------------------------------------ mobile menu ux */
   // The menu itself is pure CSS (<details>). This only adds the dismissals
   // people expect: click-away and Escape.
@@ -65,6 +89,96 @@
         }
       }
     });
+  }
+
+  /* ------------------------------------------------------- counting stats */
+  // The finished value is already rendered in the HTML. This only replaces it
+  // with a lower number and walks it back up, so a reader with JS off, with
+  // reduced motion on, or with the stat already scrolled past never sees
+  // anything but the real figure.
+  var figures = document.querySelectorAll('.stat-figure[data-count-to]');
+  if (figures.length && !reducedMotion && 'IntersectionObserver' in window) {
+    var countUp = function (el) {
+      var parts = /^([^\d-]*)(-?[\d.]+)(.*)$/.exec(el.getAttribute('data-count-to') || '');
+      if (!parts) return;
+
+      var prefix = parts[1];
+      var target = parseFloat(parts[2]);
+      var suffix = parts[3];
+      var dot = parts[2].indexOf('.');
+      var places = dot < 0 ? 0 : parts[2].length - dot - 1;
+
+      var duration = 1400;
+      var start = 0;
+      var step = function (now) {
+        if (!start) start = now;
+        var t = Math.min((now - start) / duration, 1);
+        // easeOutExpo: fast off the mark, long settle. Reads as a counter
+        // landing on a figure rather than a linear ramp.
+        var eased = t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+        el.textContent = prefix + (target * eased).toFixed(places) + suffix;
+        if (t < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    };
+
+    var statObserver = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            statObserver.unobserve(entry.target);
+            countUp(entry.target);
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+    for (var f = 0; f < figures.length; f++) statObserver.observe(figures[f]);
+  }
+
+  /* --------------------------------------------- prefetch on hover intent */
+  // Our pages are small and fully static, so the next one can be in cache
+  // before the click lands. Gated on Save-Data and 2g so it never spends
+  // someone's metered data on a page they only pointed at.
+  var conn = navigator.connection;
+  var frugal = !!conn && (conn.saveData || /(^|-)2g$/.test(conn.effectiveType || ''));
+
+  if (!frugal && document.createElement('link').relList.supports('prefetch')) {
+    var prefetched = {};
+    var prefetch = function (href) {
+      var url;
+      try {
+        url = new URL(href, location.href);
+      } catch (e) {
+        return;
+      }
+      if (url.origin !== location.origin) return;
+      if (url.pathname === location.pathname) return;
+      if (prefetched[url.pathname]) return;
+      prefetched[url.pathname] = true;
+
+      var link = document.createElement('link');
+      link.rel = 'prefetch';
+      link.href = url.pathname;
+      document.head.appendChild(link);
+    };
+
+    var hoverTimer;
+    var onIntent = function (e) {
+      var a = e.target.closest && e.target.closest('a[href]');
+      if (!a) return;
+      clearTimeout(hoverTimer);
+      // A cursor crossing a link on its way somewhere else is not intent.
+      hoverTimer = setTimeout(function () {
+        prefetch(a.getAttribute('href'));
+      }, 120);
+    };
+
+    document.addEventListener('mouseover', onIntent, { passive: true });
+    document.addEventListener('focusin', onIntent, { passive: true });
+    document.addEventListener('mouseout', function () {
+      clearTimeout(hoverTimer);
+    }, { passive: true });
   }
 
   /* ------------------------------------------- interactive hero dot matrix */

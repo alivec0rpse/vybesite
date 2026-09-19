@@ -51,6 +51,11 @@ const REQUIRED = [
   'site.webmanifest',
   'assets/site.css',
   'assets/site.js',
+  // Same reasoning as the Apple file below: nothing on the site links to
+  // either of these, so a missing one is silent until an answer engine or a
+  // security researcher goes looking and finds a 404.
+  'llms.txt',
+  '.well-known/security.txt',
   // Apple Pay domain verification. Listed because its absence is invisible:
   // the site looks perfect and Apple Pay just stops verifying the domain.
   '.well-known/apple-developer-merchantid-domain-association',

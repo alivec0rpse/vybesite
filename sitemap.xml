@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
   <url>
@@ -7,65 +8,80 @@
     <lastmod>2026-09-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
+    <image:image><image:loc>https://vybe.net.in/assets/og-image.png</image:loc><image:caption>Vybe Technologies — Smart. Simple. Affordable.</image:caption></image:image>
+    <image:image><image:loc>https://vybe.net.in/assets/vybe-lockup.png</image:loc><image:caption>Vybe Technologies logo</image:caption></image:image>
+    <image:image><image:loc>https://vybe.net.in/assets/partners/caias.png</image:loc><image:caption>Christ Academy Institute for Advanced Studies — Clients</image:caption></image:image>
+    <image:image><image:loc>https://vybe.net.in/assets/partners/vendx.png</image:loc><image:caption>Vendx Global Pvt Ltd — Clients</image:caption></image:image>
+    <image:image><image:loc>https://vybe.net.in/assets/partners/jsglobal.png</image:loc><image:caption>JS Global Industries — Brand Partners</image:caption></image:image>
   </url>
   <url>
     <loc>https://vybe.net.in/erp/</loc>
     <lastmod>2026-09-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
+    <image:image><image:loc>https://vybe.net.in/assets/og-image.png</image:loc><image:caption>Vybe Technologies — Smart. Simple. Affordable.</image:caption></image:image>
   </url>
   <url>
     <loc>https://vybe.net.in/cms/</loc>
     <lastmod>2026-09-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
+    <image:image><image:loc>https://vybe.net.in/assets/og-image.png</image:loc><image:caption>Vybe Technologies — Smart. Simple. Affordable.</image:caption></image:image>
   </url>
   <url>
     <loc>https://vybe.net.in/smart-classroom/</loc>
     <lastmod>2026-09-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
+    <image:image><image:loc>https://vybe.net.in/assets/og-image.png</image:loc><image:caption>Vybe Technologies — Smart. Simple. Affordable.</image:caption></image:image>
   </url>
   <url>
     <loc>https://vybe.net.in/workspace/</loc>
     <lastmod>2026-09-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <image:image><image:loc>https://vybe.net.in/assets/og-image.png</image:loc><image:caption>Vybe Technologies — Smart. Simple. Affordable.</image:caption></image:image>
   </url>
   <url>
     <loc>https://vybe.net.in/it-solutions/</loc>
     <lastmod>2026-09-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://vybe.net.in/cloud/</loc>
-    <lastmod>2026-09-19</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <image:image><image:loc>https://vybe.net.in/assets/og-image.png</image:loc><image:caption>Vybe Technologies — Smart. Simple. Affordable.</image:caption></image:image>
   </url>
   <url>
     <loc>https://vybe.net.in/privacy-policy/</loc>
     <lastmod>2026-09-19</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
+    <image:image><image:loc>https://vybe.net.in/assets/og-image.png</image:loc><image:caption>Vybe Technologies — Smart. Simple. Affordable.</image:caption></image:image>
   </url>
   <url>
     <loc>https://vybe.net.in/terms/</loc>
     <lastmod>2026-09-19</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
+    <image:image><image:loc>https://vybe.net.in/assets/og-image.png</image:loc><image:caption>Vybe Technologies — Smart. Simple. Affordable.</image:caption></image:image>
   </url>
   <url>
     <loc>https://vybe.net.in/refund-policy/</loc>
     <lastmod>2026-09-19</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
+    <image:image><image:loc>https://vybe.net.in/assets/og-image.png</image:loc><image:caption>Vybe Technologies — Smart. Simple. Affordable.</image:caption></image:image>
   </url>
   <url>
     <loc>https://vybe.net.in/shipping-policy/</loc>
     <lastmod>2026-09-19</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
+    <image:image><image:loc>https://vybe.net.in/assets/og-image.png</image:loc><image:caption>Vybe Technologies — Smart. Simple. Affordable.</image:caption></image:image>
+  </url>
+  <url>
+    <loc>https://vybe.net.in/contact/</loc>
+    <lastmod>2026-09-19</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.8</priority>
+    <image:image><image:loc>https://vybe.net.in/assets/og-image.png</image:loc><image:caption>Vybe Technologies — Smart. Simple. Affordable.</image:caption></image:image>
   </url>
 </urlset>

@@ -13,6 +13,10 @@
      flash of fallback text without any third-party connection. -->
 <link rel="preload" href="/assets/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/plus-jakarta-sans-var.woff2" as="font" type="font/woff2" crossorigin>
+<!-- The icon face is font-display: block, so every glyph on the page stays
+     invisible until it lands. Without this preload it is only discovered when
+     the stylesheet has parsed, which is a visible late pop of every icon. -->
+<link rel="preload" href="/assets/fonts/material-symbols-subset.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/site.css">
 
 <!-- Icons & PWA -->
@@ -31,6 +35,8 @@
 <meta property="og:title" content="Smart Classrooms — panels, cameras, power and content">
 <meta property="og:description" content="Smart classroom setup for schools and colleges: interactive flat panel installation, online class systems with camera and lighting, UPS-backed power and cabling.">
 <meta property="og:image" content="https://vybe.net.in/assets/og-image.png">
+<meta property="og:image:secure_url" content="https://vybe.net.in/assets/og-image.png">
+<meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Vybe Technologies — Smart. Simple. Affordable.">
@@ -58,9 +64,15 @@
         <div class="max-w-7xl mx-auto px-6 h-[72px] flex justify-between items-center">
             <a href="/" class="flex items-center gap-3 group" aria-label="Vybe Technologies — home">
                 <picture><source srcset="/assets/vybe-logo.webp" type="image/webp"><img src="/assets/vybe-logo.opt.png" alt="Vybe Technologies" class="h-6 object-contain" width="57" height="24" loading="eager" fetchpriority="high" decoding="async"></picture>
-                <span class="flex flex-col justify-center border-l border-slate-200 pl-3">
+                <!-- The word lockup is hidden below sm and the VYBE mark
+                     carries the brand alone. The logo, "Technologies", the
+                     Talk to Sales pill and the menu button together need
+                     ~410px; on a 360px Android the pill was landing on top of
+                     the word. Dropping the word is the only one of the four
+                     that costs nothing — the mark still says who this is. -->
+                <span class="hidden sm:flex flex-col justify-center border-l border-slate-200 pl-3">
                     <span class="text-[15px] font-bold font-display tracking-tight text-slate-900 leading-none">Technologies</span>
-                    <span class="text-[7px] font-bold text-slate-400 uppercase tracking-[0.2em] leading-none mt-1">Smart. Simple. Affordable.</span>
+                    <span class="text-[7px] font-bold text-slate-400 uppercase tracking-[0.2em] leading-none mt-1 whitespace-nowrap">Smart. Simple. Affordable.</span>
                 </span>
             </a>
 
@@ -75,11 +87,17 @@
                 <a href="/smart-classroom/" class="hover:text-brand transition-colors text-brand font-bold" aria-current="page">Classroom</a>
                 <a href="/workspace/" class="hover:text-brand transition-colors">Workspace</a>
                 <a href="/it-solutions/" class="hover:text-brand transition-colors">IT &amp; Cyber</a>
-                <a href="/cloud/" class="hover:text-brand transition-colors">Cloud</a>
+                
+                <a href="/contact/" class="hover:text-brand transition-colors">Contact</a>
             </nav>
 
             <div class="flex items-center gap-2 md:gap-4">
-                <a href="mailto:sales@vybe.net.in" class="bg-corporate hover:bg-slate-800 text-white px-4 md:px-5 py-2.5 rounded-full text-sm font-bold transition-all active:scale-95 whitespace-nowrap">
+                <!-- /contact/ rather than a bare mailto:. On a desktop with no
+                     mail client configured a mailto: button does nothing at
+                     all, which is a dead end on the one control the whole site
+                     funnels into. The page it opens leads with the same
+                     address, plus the phone numbers and the office. -->
+                <a href="/contact/" class="bg-corporate hover:bg-slate-800 text-white px-4 md:px-5 py-2.5 rounded-full text-sm font-bold transition-all active:scale-95 whitespace-nowrap">
                     Talk to Sales
                 </a>
 
@@ -97,11 +115,17 @@
                         <a href="/smart-classroom/" class="px-4 py-3 rounded-xl transition-colors bg-brand/10 text-brand font-bold" aria-current="page">Smart Classrooms</a>
                         <a href="/workspace/" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">Workspace &amp; Email</a>
                         <a href="/it-solutions/" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">IT &amp; Cyber</a>
-                        <a href="/cloud/" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">Vybe Cloud</a>
+                        
+                        <a href="/contact/" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">Contact Us</a>
                     </nav>
                 </details>
             </div>
         </div>
+
+        <!-- Reading progress. Purely decorative, so it is aria-hidden and sits
+             at zero width until site.js drives it; with JS off it is an
+             invisible 2px line rather than a broken-looking empty bar. -->
+        <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
     </header>
 
 <main id="main" class="flex-grow pt-[72px] page-enter">
@@ -314,30 +338,25 @@
                 <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-2">More from Vybe</p>
                 <h2 id="more-from-vybe" class="text-3xl md:text-4xl font-black font-display tracking-tight mb-10 text-white">The rest of the stack.</h2>
                 <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                    <a href="/erp/" class="group block rounded-2xl border bg-white/5 border-white/10 hover:border-white/30 p-6 transition-all hover:shadow-lg">
+                    <a href="/erp/" class="group block rounded-2xl border bg-white/5 border-white/10 hover:border-white/30 p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                         <span class="material-symbols-outlined text-brand text-[28px]" aria-hidden="true">dashboard_customize</span>
                         <h3 class="mt-3 text-lg font-bold font-display tracking-tight text-white">Vybe ERP</h3>
                         <p class="mt-1 text-sm text-slate-400 leading-relaxed">Cloud ERP for school and college administration.</p>
                     </a>
-                    <a href="/cms/" class="group block rounded-2xl border bg-white/5 border-white/10 hover:border-white/30 p-6 transition-all hover:shadow-lg">
+                    <a href="/cms/" class="group block rounded-2xl border bg-white/5 border-white/10 hover:border-white/30 p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                         <span class="material-symbols-outlined text-brand text-[28px]" aria-hidden="true">fastfood</span>
                         <h3 class="mt-3 text-lg font-bold font-display tracking-tight text-white">Vybe CMS</h3>
                         <p class="mt-1 text-sm text-slate-400 leading-relaxed">100% cashless cafeteria ordering and payouts.</p>
                     </a>
-                    <a href="/workspace/" class="group block rounded-2xl border bg-white/5 border-white/10 hover:border-white/30 p-6 transition-all hover:shadow-lg">
+                    <a href="/workspace/" class="group block rounded-2xl border bg-white/5 border-white/10 hover:border-white/30 p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                         <span class="material-symbols-outlined text-brand text-[28px]" aria-hidden="true">alternate_email</span>
                         <h3 class="mt-3 text-lg font-bold font-display tracking-tight text-white">Workspace &amp; Email</h3>
                         <p class="mt-1 text-sm text-slate-400 leading-relaxed">Google Workspace, Microsoft 365, Zoho Mail and student email.</p>
                     </a>
-                    <a href="/it-solutions/" class="group block rounded-2xl border bg-white/5 border-white/10 hover:border-white/30 p-6 transition-all hover:shadow-lg">
+                    <a href="/it-solutions/" class="group block rounded-2xl border bg-white/5 border-white/10 hover:border-white/30 p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                         <span class="material-symbols-outlined text-brand text-[28px]" aria-hidden="true">code_blocks</span>
                         <h3 class="mt-3 text-lg font-bold font-display tracking-tight text-white">IT &amp; Cyber</h3>
                         <p class="mt-1 text-sm text-slate-400 leading-relaxed">Custom software, security and managed IT.</p>
-                    </a>
-                    <a href="/cloud/" class="group block rounded-2xl border bg-white/5 border-white/10 hover:border-white/30 p-6 transition-all hover:shadow-lg">
-                        <span class="material-symbols-outlined text-brand text-[28px]" aria-hidden="true">cloud</span>
-                        <h3 class="mt-3 text-lg font-bold font-display tracking-tight text-white">Vybe Cloud</h3>
-                        <p class="mt-1 text-sm text-slate-400 leading-relaxed">Scalable servers, hosting and DDoS protection.</p>
                     </a>
                 </div>
             </div>
@@ -378,7 +397,7 @@
                     <li><a href="/smart-classroom/" class="hover:text-brand transition-colors">Smart Classrooms</a></li>
                     <li><a href="/workspace/" class="hover:text-brand transition-colors">Workspace &amp; Email</a></li>
                     <li><a href="/it-solutions/" class="hover:text-brand transition-colors">Custom App Development</a></li>
-                    <li><a href="/cloud/" class="hover:text-brand transition-colors">Cloud &amp; Infrastructure</a></li>
+                    
                 </ul>
             </div>
 
@@ -389,7 +408,7 @@
                     <li><a href="/terms/" class="hover:text-brand transition-colors">Terms of Service</a></li>
                     <li><a href="/refund-policy/" class="hover:text-brand transition-colors">Cancellation &amp; Refund</a></li>
                     <li><a href="/shipping-policy/" class="hover:text-brand transition-colors">Shipping &amp; Exchange</a></li>
-                    <li><a href="mailto:support@vybe.net.in" class="hover:text-brand transition-colors">Contact Support</a></li>
+                    <li><a href="/contact/" class="hover:text-brand transition-colors">Contact Us</a></li>
                 </ul>
             </div>
 

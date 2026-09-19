@@ -27,6 +27,13 @@ const ORG = {
   phoneAlt: '+91-99641-77677',
   sales: 'sales@vybe.net.in',
   support: 'support@vybe.net.in',
+  legal: 'legal@vybe.net.in',
+  // Escalation of last resort, and worded that way everywhere it appears: the
+  // three mailboxes above handle the overwhelming majority of enquiries, and a
+  // grievance route that reads as a parallel front door just moves the queue.
+  // Named rather than a role alias on purpose — the point of this address is
+  // that it reaches a person, so it must not be another shared inbox.
+  grievance: 'manjunath@vybe.net.in',
   street: '#103, First Floor, 10th Main, Gaurav Nagar, J.P Nagar 7th Phase',
   locality: 'Bengaluru',
   region: 'Karnataka',
@@ -52,6 +59,14 @@ const write = (p, s) => {
 };
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const ld = (obj) => `<script type="application/ld+json">${JSON.stringify(obj).replace(/</g, '\\u003c')}</script>`;
+
+/* ----------------------------------------------------------------- locale
+ *
+ * The site is published in English only, at the root. The locale is still
+ * named in one place rather than inlined, because `lang`, `og:locale` and the
+ * JSON-LD `inLanguage` all have to agree.
+ */
+const LOC = { tag: 'en-IN', og: 'en_IN' };
 
 /**
  * Pull one `<div id="…-view">` block out of the source SPA by walking div
@@ -92,6 +107,21 @@ const HREF = {
   'workspace-view': '/workspace/',
   'classroom-view': '/smart-classroom/',
 };
+
+/**
+ * Products that still exist in src/app.html but are not currently sold, and so
+ * are not published. This set is the only switch: the nav, the mobile menu,
+ * the footer, the related-products rail, the home grid card, the home
+ * ItemList, the 404 links, llms.txt and the sitemap all filter on it, and the
+ * link-integrity check at the end of this file fails the build if anything
+ * still points at one.
+ *
+ * Deleting an entry republishes the page in full — the copy, the deep dive,
+ * the FAQs and the schema are all still here, untouched. The matching 301 in
+ * staticwebapp.config.json is the only thing that also has to come out.
+ */
+const UNPUBLISHED = new Set(['cloud']);
+const published = (nav) => !UNPUBLISHED.has(nav);
 
 /** <picture> with a WebP source and a PNG fallback, always with intrinsic size. */
 function picture({ base, alt, cls, h, aspect, eager = false, hidden = false }) {
@@ -172,6 +202,26 @@ function transformView(view, { dark = false } = {}) {
   // can reach them, and the matching </div> is rewritten to </a> as well.
   out = divClickToAnchor(out);
 
+  // Drop the whole grid card for any product in UNPUBLISHED. The card is a
+  // card-shaped anchor with no nested <a>, so matching to the first </a> takes
+  // exactly the one element. Done after divClickToAnchor so there is a single
+  // shape to match rather than both a <div onclick> and an <a>.
+  for (const nav of UNPUBLISHED) {
+    const href = (PRODUCTS.find((p) => p.nav === nav) || {}).href;
+    if (!href) continue;
+    out = out.replace(new RegExp(`<a href="${href}"[^>]*>[\\s\\S]*?</a>\\s*`, 'g'), '');
+  }
+
+  // The home grid is two columns, so removing a card can leave the last one
+  // orphaned beside an empty cell. Widen it to fill the row: a full-width
+  // closing card reads as deliberate, an empty half reads as a bug. Only
+  // applies when the count is odd, so restoring the sixth card reverts it.
+  const cards = [...out.matchAll(/<a href="\/[a-z-]*\/" class="[^"]*\bp-10\b[^"]*"/g)];
+  if (cards.length % 2 === 1) {
+    const last = cards[cards.length - 1][0];
+    out = out.replace(last, last.replace(/\bflex flex-col\b/, 'md:col-span-2 flex flex-col'));
+  }
+
   // "Back to Home" / "Back" buttons are replaced by breadcrumbs in the shell.
   out = out.replace(/<button onclick="showPage\('home-view'\)"[\s\S]*?<\/button>\s*/g, '');
 
@@ -229,6 +279,15 @@ function transformView(view, { dark = false } = {}) {
   // leave text invisible if JS fails.
   out = out.replace(/class="([^"]*)\breveal active\b([^"]*)"/g, 'class="$1reveal$2"');
 
+  // Tag the headline figures so site.js can count them up when they scroll
+  // into view. The final value stays in the HTML — the animation only ever
+  // rewrites a number that is already there, so with JS off (or with reduced
+  // motion on) the reader still sees "99.9%" and not a zero.
+  out = out.replace(
+    /<p class="(text-3xl md:text-4xl font-black text-brand[^"]*)">([^<]+)<\/p>/g,
+    (_, cls, value) => `<p class="${cls} stat-figure" data-count-to="${esc(value.trim())}">${value}</p>`
+  );
+
   return { wrapperClass: view.wrapperClass, inner: out.trim(), dark };
 }
 
@@ -263,9 +322,15 @@ function navbar(active) {
         <div class="max-w-7xl mx-auto px-6 h-[72px] flex justify-between items-center">
             <a href="/" class="flex items-center gap-3 group" aria-label="Vybe Technologies — home">
                 ${picture({ base: 'vybe-logo', alt: 'Vybe Technologies', cls: 'h-6 object-contain', h: 24, aspect: LOGO_ASPECT, eager: true })}
-                <span class="flex flex-col justify-center border-l border-slate-200 pl-3">
+                <!-- The word lockup is hidden below sm and the VYBE mark
+                     carries the brand alone. The logo, "Technologies", the
+                     Talk to Sales pill and the menu button together need
+                     ~410px; on a 360px Android the pill was landing on top of
+                     the word. Dropping the word is the only one of the four
+                     that costs nothing — the mark still says who this is. -->
+                <span class="hidden sm:flex flex-col justify-center border-l border-slate-200 pl-3">
                     <span class="text-[15px] font-bold font-display tracking-tight text-slate-900 leading-none">Technologies</span>
-                    <span class="text-[7px] font-bold text-slate-400 uppercase tracking-[0.2em] leading-none mt-1">Smart. Simple. Affordable.</span>
+                    <span class="text-[7px] font-bold text-slate-400 uppercase tracking-[0.2em] leading-none mt-1 whitespace-nowrap">Smart. Simple. Affordable.</span>
                 </span>
             </a>
 
@@ -280,11 +345,17 @@ function navbar(active) {
                 ${item('/smart-classroom/', 'Classroom', 'classroom')}
                 ${item('/workspace/', 'Workspace', 'workspace')}
                 ${item('/it-solutions/', 'IT &amp; Cyber', 'it')}
-                ${item('/cloud/', 'Cloud', 'cloud')}
+                ${published('cloud') ? item('/cloud/', 'Cloud', 'cloud') : ''}
+                ${item('/contact/', 'Contact', 'contact')}
             </nav>
 
             <div class="flex items-center gap-2 md:gap-4">
-                <a href="mailto:${ORG.sales}" class="bg-corporate hover:bg-slate-800 text-white px-4 md:px-5 py-2.5 rounded-full text-sm font-bold transition-all active:scale-95 whitespace-nowrap">
+                <!-- /contact/ rather than a bare mailto:. On a desktop with no
+                     mail client configured a mailto: button does nothing at
+                     all, which is a dead end on the one control the whole site
+                     funnels into. The page it opens leads with the same
+                     address, plus the phone numbers and the office. -->
+                <a href="/contact/" class="bg-corporate hover:bg-slate-800 text-white px-4 md:px-5 py-2.5 rounded-full text-sm font-bold transition-all active:scale-95 whitespace-nowrap">
                     Talk to Sales
                 </a>
 
@@ -302,11 +373,17 @@ function navbar(active) {
                         ${mobileItem('/smart-classroom/', 'Smart Classrooms', 'classroom', active)}
                         ${mobileItem('/workspace/', 'Workspace &amp; Email', 'workspace', active)}
                         ${mobileItem('/it-solutions/', 'IT &amp; Cyber', 'it', active)}
-                        ${mobileItem('/cloud/', 'Vybe Cloud', 'cloud', active)}
+                        ${published('cloud') ? mobileItem('/cloud/', 'Vybe Cloud', 'cloud', active) : ''}
+                        ${mobileItem('/contact/', 'Contact Us', 'contact', active)}
                     </nav>
                 </details>
             </div>
         </div>
+
+        <!-- Reading progress. Purely decorative, so it is aria-hidden and sits
+             at zero width until site.js drives it; with JS off it is an
+             invisible 2px line rather than a broken-looking empty bar. -->
+        <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
     </header>`;
 }
 
@@ -372,7 +449,7 @@ function footer() {
                     ${link('/smart-classroom/', 'Smart Classrooms')}
                     ${link('/workspace/', 'Workspace &amp; Email')}
                     ${link('/it-solutions/', 'Custom App Development')}
-                    ${link('/cloud/', 'Cloud &amp; Infrastructure')}
+                    ${published('cloud') ? link('/cloud/', 'Cloud &amp; Infrastructure') : ''}
                 </ul>
             </div>
 
@@ -383,7 +460,7 @@ function footer() {
                     ${link('/terms/', 'Terms of Service')}
                     ${link('/refund-policy/', 'Cancellation &amp; Refund')}
                     ${link('/shipping-policy/', 'Shipping &amp; Exchange')}
-                    ${link(`mailto:${ORG.support}`, 'Contact Support')}
+                    ${link('/contact/', 'Contact Us')}
                 </ul>
             </div>
 
@@ -543,7 +620,7 @@ const PRODUCTS = [
  * go that is not the back button.
  */
 function relatedSection(currentNav, { dark = false } = {}) {
-  const others = PRODUCTS.filter((p) => p.nav !== currentNav);
+  const others = PRODUCTS.filter((p) => p.nav !== currentNav && published(p.nav));
   if (!others.length) return '';
 
   const bg = dark ? 'bg-slate-900 dark-section text-white' : 'bg-surface-main';
@@ -554,7 +631,7 @@ function relatedSection(currentNav, { dark = false } = {}) {
 
   const cards = others
     .map(
-      (p) => `<a href="${p.href}" class="group block rounded-2xl border ${card} p-6 transition-all hover:shadow-lg">
+      (p) => `<a href="${p.href}" class="group block rounded-2xl border ${card} p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                         <span class="material-symbols-outlined text-brand text-[28px]" aria-hidden="true">${p.icon}</span>
                         <h3 class="mt-3 text-lg font-bold font-display tracking-tight ${title}">${esc(p.name)}</h3>
                         <p class="mt-1 text-sm ${body} leading-relaxed">${esc(p.blurb)}</p>
@@ -770,7 +847,7 @@ function partnersSection() {
                             ${g.items
                               .map(
                                 (i) => `<li><a href="${i.url}" target="_blank" rel="noopener"
-                                   class="group flex flex-col h-full rounded-2xl border border-white/10 bg-white/5 p-6 hover:border-white/25 hover:bg-white/10 transition-all">
+                                   class="group flex flex-col h-full rounded-2xl border border-white/10 bg-white/5 p-6 hover:border-white/25 hover:bg-white/10 hover:-translate-y-1 transition-all duration-300">
                                     ${logo(i)}
                                     <span class="mt-5 flex items-start gap-3 text-sm text-slate-400">
                                         <span class="min-w-0">${[i.short, i.meta].filter(Boolean).map(esc).join(' &middot; ')}</span>
@@ -1087,7 +1164,9 @@ function shell(page) {
   const graph = [organization, localBusiness, website];
 
   graph.push({
-    '@type': 'WebPage',
+    // ContactPage / AboutPage etc. where the page is one of schema.org's named
+    // WebPage subtypes; plain WebPage otherwise.
+    '@type': page.pageType || 'WebPage',
     '@id': `${url}#webpage`,
     url,
     name: page.title,
@@ -1095,7 +1174,7 @@ function shell(page) {
     isPartOf: { '@id': `${SITE}/#website` },
     about: { '@id': `${SITE}/#organization` },
     primaryImageOfPage: { '@id': `${SITE}/#image` },
-    inLanguage: 'en-IN',
+    inLanguage: LOC.tag,
     datePublished: '2025-01-15',
     dateModified: page.lastmod || BUILD_DATE,
     ...(page.trail.length > 1 ? { breadcrumb: { '@id': `${url}#breadcrumb` } } : {}),
@@ -1114,7 +1193,7 @@ function shell(page) {
   const bodyClass = page.bodyClass || 'text-slate-900 selection:bg-brand/10 selection:text-brand flex flex-col min-h-screen relative z-0';
 
   return `<!DOCTYPE html>
-<html lang="en-IN" class="scroll-smooth">
+<html lang="${LOC.tag}" class="scroll-smooth">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1127,6 +1206,10 @@ ${page.noindex ? '' : `<link rel="canonical" href="${url}">\n`}<meta name="robot
      flash of fallback text without any third-party connection. -->
 <link rel="preload" href="/assets/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/plus-jakarta-sans-var.woff2" as="font" type="font/woff2" crossorigin>
+<!-- The icon face is font-display: block, so every glyph on the page stays
+     invisible until it lands. Without this preload it is only discovered when
+     the stylesheet has parsed, which is a visible late pop of every icon. -->
+<link rel="preload" href="/assets/fonts/material-symbols-subset.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/site.css">
 
 <!-- Icons & PWA -->
@@ -1140,11 +1223,13 @@ ${page.noindex ? '' : `<link rel="canonical" href="${url}">\n`}<meta name="robot
 <!-- Open Graph -->
 <meta property="og:type" content="${page.ogType || 'website'}">
 <meta property="og:site_name" content="${ORG.name}">
-<meta property="og:locale" content="en_IN">
+<meta property="og:locale" content="${LOC.og}">
 <meta property="og:url" content="${url}">
 <meta property="og:title" content="${esc(page.ogTitle || page.title)}">
 <meta property="og:description" content="${esc(page.description)}">
 <meta property="og:image" content="${SITE}/assets/og-image.png">
+<meta property="og:image:secure_url" content="${SITE}/assets/og-image.png">
+<meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Vybe Technologies — Smart. Simple. Affordable.">
@@ -1243,14 +1328,17 @@ const PAGES = [
       '@type': 'ItemList',
       '@id': `${url}#services`,
       name: 'Vybe Technologies products and services',
+      // Filtered on UNPUBLISHED, and the positions are numbered after the
+      // filter — an ItemList that advertises a service we do not currently
+      // sell, or that skips a position, is worse than a shorter list.
       itemListElement: [
-        { name: 'Vybe ERP', url: `${SITE}/erp/`, description: 'Cloud-based Educational Resource Planning suite for schools and colleges.' },
-        { name: 'Vybe CMS', url: `${SITE}/cms/`, description: '100% cashless cafeteria management system with QR pickup and split payouts.' },
-        { name: 'Smart Classrooms', url: `${SITE}/smart-classroom/`, description: 'Smart classroom setup — interactive flat panels, online and hybrid class systems, UPS-backed power and Extramarks content.' },
-        { name: 'Workspace & Email', url: `${SITE}/workspace/`, description: 'Google Workspace, Microsoft 365 and Zoho Mail setup, staff and student email, single sign-on, secure online classes and phishing training.' },
-        { name: 'Vybe IT Solutions', url: `${SITE}/it-solutions/`, description: 'Custom app development, penetration testing and managed security operations.' },
-        { name: 'Vybe Cloud', url: `${SITE}/cloud/`, description: 'Scalable cloud architecture, game servers and DDoS protection.' },
-      ].map((s, i) => ({
+        { nav: 'erp', name: 'Vybe ERP', url: `${SITE}/erp/`, description: 'Cloud-based Educational Resource Planning suite for schools and colleges.' },
+        { nav: 'cms', name: 'Vybe CMS', url: `${SITE}/cms/`, description: '100% cashless cafeteria management system with QR pickup and split payouts.' },
+        { nav: 'classroom', name: 'Smart Classrooms', url: `${SITE}/smart-classroom/`, description: 'Smart classroom setup — interactive flat panels, online and hybrid class systems, UPS-backed power and Extramarks content.' },
+        { nav: 'workspace', name: 'Workspace & Email', url: `${SITE}/workspace/`, description: 'Google Workspace, Microsoft 365 and Zoho Mail setup, staff and student email, single sign-on, secure online classes and phishing training.' },
+        { nav: 'it', name: 'Vybe IT Solutions', url: `${SITE}/it-solutions/`, description: 'Custom app development, penetration testing and managed security operations.' },
+        { nav: 'cloud', name: 'Vybe Cloud', url: `${SITE}/cloud/`, description: 'Scalable cloud architecture, game servers and DDoS protection.' },
+      ].filter((s) => published(s.nav)).map((s, i) => ({
         '@type': 'ListItem',
         position: i + 1,
         item: { '@type': 'Service', name: s.name, url: s.url, description: s.description, provider: { '@id': `${SITE}/#organization` }, areaServed: { '@type': 'Country', name: 'India' } },
@@ -1589,7 +1677,7 @@ const PAGES = [
     url: '/cloud/',
     file: 'cloud/index.html',
     nav: 'cloud',
-    title: 'Vybe Cloud | Scalable Cloud Servers, Game Hosting & DDoS Protection',
+    title: 'Vybe Cloud | Cloud Servers, Game Hosting & DDoS Protection',
     ogTitle: 'Vybe Cloud — Enterprise-grade infrastructure',
     description:
       'Enterprise infrastructure: auto-scaling private clouds on AWS and Azure with a 99.99% uptime SLA, bare-metal game servers and active DDoS traffic scrubbing.',
@@ -1652,15 +1740,32 @@ function lastmodFor(url, content) {
 
 const emitted = [];
 
-for (const page of PAGES) {
+/**
+ * Every document, collected before anything is written.
+ *
+ * The body and the metadata are built here; the loop at the bottom does the
+ * writing, once the full set is known.
+ */
+const DOCS = [];
+
+for (const page of PAGES.filter((p) => published(p.nav))) {
   page.body = renderView(page.view, page);
   page.lastmod = lastmodFor(page.url, [page.title, page.description, page.body].join('\n'));
-  write(page.file, shell(page));
-  emitted.push({ url: page.url, priority: page.priority, changefreq: 'monthly', lastmod: page.lastmod });
+  DOCS.push({ page, file: page.file, priority: page.priority, changefreq: 'monthly' });
 }
 
 /* ---------------------------------------------------------------- legal pages */
 
+/*
+ * English only, and linked unprefixed from all four locales.
+ *
+ * These four documents are binding: a refund window, a liability limit and a
+ * data-retention promise mean exactly what their words mean. A translated
+ * policy is a second set of words that can disagree with the first, and the
+ * disagreement only surfaces in a dispute. Publishing one authoritative text
+ * is the honest option, and the footer says so in every language rather than
+ * leaving a reader to wonder why this page did not change with the rest.
+ */
 const LEGAL = [
   {
     src: 'src/privacy_policy.html',
@@ -1718,9 +1823,11 @@ for (const doc of LEGAL) {
   const trail = [CRUMB_HOME, { name: doc.crumb, url: doc.url }];
   const lastmod = lastmodFor(doc.url, [doc.title, doc.description, body].join('\n'));
 
-  write(
-    doc.file,
-    shell({
+  DOCS.push({
+    file: doc.file,
+    priority: '0.3',
+    changefreq: 'yearly',
+    page: {
       url: doc.url,
       nav: null,
       title: doc.title,
@@ -1731,18 +1838,219 @@ for (const doc of LEGAL) {
       body: `<div class="py-12 px-6">${body}</div>`,
       bodyClass: 'min-h-screen flex flex-col text-slate-800 selection:bg-brand/20 selection:text-brand relative z-0',
       schema: () => [],
-    })
-  );
-  emitted.push({ url: doc.url, priority: '0.3', changefreq: 'yearly', lastmod });
+    },
+  });
+}
+
+/* --------------------------------------------------------------- contact us */
+
+/**
+ * A real page rather than the bare `mailto:` the nav button used to be.
+ *
+ * There is no form: this is a static site on Azure Static Web Apps with no
+ * function backend, and the CSP is `form-action 'self'`, so a form would have
+ * nowhere to POST. A form that silently fails is far worse than a phone number
+ * that works, so the page routes people to the mailbox that can actually
+ * answer them instead of pretending to collect a message.
+ *
+ * Every number, address and hour below comes from ORG, so this page and the
+ * footer and the LocalBusiness schema can never disagree with each other.
+ */
+const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+  `${ORG.name}, ${ORG.street}, ${ORG.locality}, ${ORG.region} ${ORG.postal}`
+)}`;
+
+// `phone` is optional. Legal correspondence wants a written record and a
+// named recipient, so that card deliberately offers an address rather than a
+// number somebody would have to repeat in writing anyway.
+function contactCard({ icon, label, blurb, email, phone, phoneLabel }) {
+  const tel = phone
+    ? `<a href="tel:${phone.replace(/[^+\d]/g, '')}" class="flex items-center gap-3 font-bold text-slate-900 hover:text-brand transition-colors">
+                                <span class="material-symbols-outlined text-[20px] text-slate-400" aria-hidden="true">call</span>
+                                ${esc(phoneLabel)}
+                            </a>`
+    : '';
+  return `<li class="flex flex-col h-full rounded-2xl border border-slate-200 bg-white p-8 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-brand/40">
+                        <span class="material-symbols-outlined text-brand text-[28px]" aria-hidden="true">${icon}</span>
+                        <h3 class="mt-4 text-xl font-bold font-display tracking-tight text-slate-900">${esc(label)}</h3>
+                        <p class="mt-2 text-sm text-slate-600 leading-relaxed">${esc(blurb)}</p>
+                        <!-- mt-auto, not a fixed margin: the blurbs are different
+                             lengths, so pinning the contact block to the bottom is
+                             what keeps the rules and the addresses on one line
+                             across all three cards. -->
+                        <div class="mt-auto pt-6 border-t border-slate-100 flex flex-col gap-3 text-sm">
+                            <a href="mailto:${email}" class="flex items-center gap-3 font-bold text-slate-900 hover:text-brand transition-colors">
+                                <span class="material-symbols-outlined text-[20px] text-slate-400" aria-hidden="true">mail</span>
+                                ${esc(email)}
+                            </a>
+                            ${tel}
+                        </div>
+                    </li>`;
+}
+
+const contactFaqs = [
+  {
+    q: 'Who should we contact — sales, support or legal?',
+    a: `Sales, on <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a>, for anything you do not have yet: a quote, a demo, a new campus, extra modules or hardware. Support, on <a class="text-brand font-bold" href="mailto:${ORG.support}">${ORG.support}</a>, for something already running that is not behaving. Legal, on <a class="text-brand font-bold" href="mailto:${ORG.legal}">${ORG.legal}</a>, for contracts, data protection and privacy requests, security disclosures and invoicing disputes. If you pick the wrong one we will pass it across rather than send you back.`,
+  },
+  {
+    q: 'What if my enquiry is not resolved?',
+    a: `Start with sales, support or legal, whichever fits — they own the work and settle almost everything directly. If the matter is still unresolved after that, if you are not satisfied with how it was handled, or in a serious matter, you may bring it to our Grievance Officer at <a class="text-brand font-bold" href="mailto:${ORG.grievance}">${ORG.grievance}</a>, who also receives privacy and data protection grievances. Please attach the original correspondence and the date it was sent.`,
+  },
+  {
+    q: 'What should we include in a first enquiry?',
+    a: 'The more of this you can tell us up front, the more useful the first reply is: roughly how many students or staff the system has to cover, which of the products you are interested in, anything you are running today that the new system has to work alongside or replace, and the timeline you are working to. None of it is required to start a conversation.',
+  },
+  {
+    q: 'Where are you located, and can we visit?',
+    a: `Our registered office is at ${esc(ORG.street)}, ${esc(ORG.locality)}, ${esc(ORG.region)} ${ORG.postal}. You are welcome to come and see the products running — call ahead on <a class="text-brand font-bold" href="tel:+919964177877">+91 99641 77877</a> so somebody who can answer your questions is in the office.`,
+  },
+  {
+    q: 'Do you work with institutions outside Bengaluru?',
+    a: 'Yes. We are based in Bengaluru and serve customers across India. The software is cloud-hosted, so an ERP or cafeteria deployment does not depend on how far away you are; on-site work such as smart classroom installation and hardware is scheduled per project.',
+  },
+  {
+    q: 'What are your working hours?',
+    a: `Monday to Saturday, 9:00&nbsp;AM to 6:30&nbsp;PM IST. Email sent outside those hours is picked up the next working morning.`,
+  },
+];
+
+const contactBody = `<div class="w-full bg-surface-main">
+${breadcrumbs([CRUMB_HOME, { name: 'Contact Us', url: '/contact/' }], false)}
+
+        <section class="px-6 pt-12 pb-20 md:pb-28 relative overflow-hidden">
+            <div class="absolute inset-0 bg-grid-faint" aria-hidden="true"></div>
+            <div class="max-w-6xl mx-auto relative z-10">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-3">Contact Us</p>
+                <h1 class="text-5xl md:text-7xl font-black font-display tracking-tighter text-slate-900">Talk to us.</h1>
+                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">Tell us what you are trying to run, and we will tell you plainly whether we are the right fit for it. No call centre and no ticket queue — the numbers below reach the people who build and support the software.</p>
+
+                <ul class="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                    ${contactCard({
+                      icon: 'handshake',
+                      label: 'Sales & new projects',
+                      blurb: 'Quotes, demos, new campuses, extra modules and hardware. The fastest way to get a proposal together.',
+                      email: ORG.sales,
+                      phone: ORG.phone,
+                      phoneLabel: '+91 99641 77877',
+                    })}
+                    ${contactCard({
+                      icon: 'support_agent',
+                      label: 'Customer support',
+                      blurb: 'Already running Vybe software and something is not right? This reaches the team that maintains it.',
+                      email: ORG.support,
+                      phone: ORG.phoneAlt,
+                      phoneLabel: '+91 99641 77677',
+                    })}
+                    ${contactCard({
+                      icon: 'gavel',
+                      label: 'Legal & compliance',
+                      blurb: 'Contracts, data protection and privacy requests, security disclosures, invoicing disputes and anything else that needs a written record.',
+                      email: ORG.legal,
+                    })}
+                </ul>
+
+                <!-- The escalation path is published rather than left to be
+                     discovered — a grievance route nobody can find is the same
+                     as not having one, and Indian intermediary and data
+                     protection rules both expect it to be stated. It is framed
+                     as a last resort, not a fourth mailbox: the three teams
+                     above own the work and answering is their job. -->
+                <div class="mt-8 rounded-2xl border border-slate-200 bg-white/70 p-6 md:p-8 flex flex-col sm:flex-row gap-5 sm:items-start">
+                    <span class="material-symbols-outlined text-brand text-[28px] shrink-0" aria-hidden="true">flag</span>
+                    <div>
+                        <h3 class="text-base font-bold font-display tracking-tight text-slate-900">Grievance Officer</h3>
+                        <p class="mt-2 text-sm text-slate-600 leading-relaxed max-w-3xl">Please raise your enquiry with sales, support or legal first — they own the work and settle the large majority of matters directly. If it remains unresolved after that, if you are not satisfied with how it was handled, or in a serious matter, you may bring it to our Grievance Officer at <a href="mailto:${ORG.grievance}" class="font-bold text-brand hover:underline">${ORG.grievance}</a>. Please attach the original correspondence and the date it was sent, so the matter can be taken up from where it stands rather than started again.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-corporate dark-section text-slate-300 py-20 md:py-28 px-6 relative z-10" aria-labelledby="office-heading">
+            <div class="max-w-6xl mx-auto grid gap-12 md:grid-cols-2">
+                <div>
+                    <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-2">Registered office</p>
+                    <h2 id="office-heading" class="text-3xl md:text-4xl font-black font-display tracking-tight text-white">Come and see it running.</h2>
+                    <address class="mt-6 not-italic text-base leading-relaxed text-slate-300">
+                        #103, First Floor, 10th Main<br>
+                        Gaurav Nagar, J.P Nagar 7th Phase<br>
+                        ${ORG.locality}, ${ORG.region} &ndash; ${ORG.postal}<br>
+                        India
+                    </address>
+                    <a href="${MAPS_URL}" target="_blank" rel="noopener"
+                       class="mt-6 inline-flex items-center gap-2 text-sm font-bold text-white hover:text-brand transition-colors">
+                        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">location_on</span>
+                        Open in Google Maps
+                        <span class="material-symbols-outlined text-[18px]" aria-hidden="true">open_in_new</span>
+                    </a>
+                </div>
+
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-8">
+                    <h3 class="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Opening hours</h3>
+                    <dl class="mt-5 space-y-3 text-sm">
+                        <div class="flex justify-between gap-6 border-b border-white/10 pb-3">
+                            <dt class="text-slate-400">Monday &ndash; Saturday</dt>
+                            <dd class="font-bold text-white">9:00&nbsp;AM &ndash; 6:30&nbsp;PM</dd>
+                        </div>
+                        <div class="flex justify-between gap-6">
+                            <dt class="text-slate-400">Sunday</dt>
+                            <dd class="font-bold text-white">Closed</dd>
+                        </div>
+                    </dl>
+                    <p class="mt-6 text-sm text-slate-400 leading-relaxed">All times IST (UTC+5:30). Email sent outside working hours is picked up the next working morning.</p>
+                </div>
+            </div>
+        </section>
+
+${faqSection(contactFaqs, { dark: false })}
+</div>`;
+
+{
+  const url = '/contact/';
+  const lastmod = lastmodFor(url, contactBody);
+  DOCS.push({
+    file: 'contact/index.html',
+    priority: '0.8',
+    changefreq: 'yearly',
+    page: {
+      url,
+      nav: 'contact',
+      pageType: 'ContactPage',
+      title: 'Contact Vybe Technologies | Bengaluru Office, Phone & Email',
+      ogTitle: 'Contact Vybe Technologies',
+      description:
+        'Talk to Vybe Technologies in Bengaluru. Sales, support and legal contacts, our grievance escalation route, phone numbers, registered office address and opening hours.',
+      lastmod,
+      trail: [CRUMB_HOME, { name: 'Contact Us', url }],
+      faqs: contactFaqs,
+      body: contactBody,
+      // The office node in the shared graph already carries the address, the
+      // phones and the hours; this only says that this page is the one about
+      // contacting it, which is the part Google reads off a ContactPage.
+      schema: () => [],
+    },
+  });
 }
 
 /* ------------------------------------------------------------------ 404 page */
 
 const notFoundLink = (href, label, desc) =>
-  `<a href="${href}" class="block bg-white p-6 rounded-2xl border border-slate-200 hover:border-brand hover:shadow-lg transition-all text-left">
+  `<a href="${href}" class="block bg-white p-6 rounded-2xl border border-slate-200 hover:border-brand hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-left">
                         <span class="block font-black font-display tracking-tight text-slate-900 mb-1">${label}</span>
                         <span class="block text-sm text-slate-600 leading-relaxed">${desc}</span>
                     </a>`;
+
+/* ------------------------------------------------------------- write it out */
+
+for (const doc of DOCS) {
+  write(doc.file, shell(doc.page));
+  emitted.push({
+    url: doc.page.url,
+    priority: doc.priority,
+    changefreq: doc.changefreq,
+    lastmod: doc.page.lastmod,
+  });
+}
 
 write(
   '404.html',
@@ -1765,8 +2073,8 @@ write(
                     ${notFoundLink('/erp/', 'Vybe ERP', 'Cloud ERP for schools and colleges.')}
                     ${notFoundLink('/cms/', 'Vybe CMS', '100% cashless campus cafeteria system.')}
                     ${notFoundLink('/it-solutions/', 'IT &amp; Cyber', 'Custom app development and security.')}
-                    ${notFoundLink('/cloud/', 'Vybe Cloud', 'Scalable servers and DDoS protection.')}
-                    ${notFoundLink(`mailto:${ORG.sales}`, 'Talk to Sales', `Email ${ORG.sales}.`)}
+                    ${published('cloud') ? notFoundLink('/cloud/', 'Vybe Cloud', 'Scalable servers and DDoS protection.') : ''}
+                    ${notFoundLink('/contact/', 'Contact Us', 'Phone, email and where to find us.')}
                 </div>
             </div>
         </section>`,
@@ -1775,8 +2083,30 @@ write(
 
 /* --------------------------------------------------------- sitemap & friends */
 
+/**
+ * The images worth surfacing in Google Images, read off the page that actually
+ * renders them. Only first-party art we own the rights to: the share card, the
+ * lockup, and — on the home page — the partner marks their owners publish for
+ * exactly this use. Anything decorative (dot grids, gradients) is not an image
+ * search result and is deliberately absent.
+ */
+function sitemapImages(url) {
+  const img = (loc, caption) =>
+    `\n    <image:image><image:loc>${loc}</image:loc><image:caption>${esc(caption)}</image:caption></image:image>`;
+
+  let out = img(`${SITE}/assets/og-image.png`, `${ORG.name} — ${ORG.slogan}`);
+  if (url === '/') {
+    out += img(`${SITE}/assets/vybe-lockup.png`, `${ORG.name} logo`);
+    for (const g of PARTNERS) {
+      for (const i of g.items) out += img(`${SITE}/assets/partners/${i.logo}.png`, `${i.name} — ${g.label}`);
+    }
+  }
+  return out;
+}
+
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 ${emitted
@@ -1785,7 +2115,7 @@ ${emitted
     <loc>${SITE}${e.url}</loc>
     <lastmod>${e.lastmod}</lastmod>
     <changefreq>${e.changefreq}</changefreq>
-    <priority>${e.priority}</priority>
+    <priority>${e.priority}</priority>${sitemapImages(e.url)}
   </url>`
   )
   .join('\n')}
@@ -1805,6 +2135,66 @@ Disallow: /tools/
 Disallow: /node_modules/
 
 Sitemap: ${SITE}/sitemap.xml
+`
+);
+
+/*
+ * /llms.txt — the llmstxt.org convention. Answer engines increasingly read a
+ * curated map of a site rather than guessing from the HTML, and an AI answer
+ * that names us is worth as much as a blue link now. It is generated from the
+ * same PAGES array the sitemap is, so it cannot drift out of date.
+ */
+write(
+  'llms.txt',
+  `# ${ORG.name}
+
+> ${organization.description}
+
+Based in ${ORG.locality}, ${ORG.region}, India. Sales: ${ORG.sales} / ${ORG.phone}.
+
+## Products
+
+${PRODUCTS.filter((p) => published(p.nav))
+  .map((p) => `- [${p.name}](${SITE}${p.href}): ${p.blurb}`)
+  .join('\n')}
+
+## Contact
+
+- [Contact Us](${SITE}/contact/): Phone, email, registered office and opening hours.
+- Sales: ${ORG.sales} — quotes, demos, new deployments, hardware.
+- Support: ${ORG.support} — existing Vybe deployments.
+- Legal and compliance: ${ORG.legal} — contracts, privacy and data protection requests, security disclosures.
+- Grievance Officer: ${ORG.grievance} — last resort only, after sales, support or legal have not resolved the matter. Route enquiries to the three addresses above first.
+
+## Policies
+
+${LEGAL.map((d) => `- [${d.crumb}](${SITE}${d.url}): ${d.description}`).join('\n')}
+
+## Notes
+
+- Every page above is a real HTML document with its own canonical URL and schema.org graph.
+- Sitemap: ${SITE}/sitemap.xml
+`
+);
+
+/*
+ * RFC 9116. Points vulnerability reports at a mailbox that is actually read,
+ * rather than leaving a finder to guess. Expires is required by the RFC and is
+ * refreshed on every build, so it can never go stale while the site is
+ * maintained.
+ */
+const securityExpiry = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().replace(/\.\d+Z$/, 'Z');
+write(
+  '.well-known/security.txt',
+  // Two addresses, most-preferred first, as RFC 9116 specifies. legal@ is
+  // listed because the contact page names it as the route for security
+  // disclosures, and a researcher who reads both must not find them at odds.
+  `Contact: mailto:${ORG.legal}
+Contact: mailto:${ORG.support}
+Expires: ${securityExpiry}
+Preferred-Languages: en
+Canonical: ${SITE}/.well-known/security.txt
+Policy: ${SITE}/terms/
 `
 );
 
@@ -1838,5 +2228,35 @@ write(
 // from "rebuilt". Commit this file — it is what keeps lastmod honest.
 write(LASTMOD_FILE, JSON.stringify(lastmodDb, null, 2) + '\n');
 
+/* ------------------------------------------------------- link integrity */
+
+/**
+ * Every internal href in the emitted HTML has to resolve to a page we actually
+ * wrote or a file that exists on disk. This is what makes UNPUBLISHED safe: a
+ * link left pointing at a retired product fails the build here rather than
+ * turning into a 404 — or, worse, a soft-404 redirect — in production.
+ */
+{
+  const pages = new Set(emitted.map((e) => e.url));
+  const broken = [];
+
+  for (const file of [...emitted.map((e) => (e.url === '/' ? 'index.html' : `${e.url.slice(1)}index.html`)), '404.html']) {
+    const html = read(file);
+    for (const m of html.matchAll(/\shref="(\/[^"#]*)"/g)) {
+      const href = m[1];
+      if (pages.has(href)) continue;
+      if (fs.existsSync(path.join(ROOT, href.replace(/^\//, '')))) continue;
+      broken.push(`${file} -> ${href}`);
+    }
+  }
+
+  if (broken.length) {
+    console.error('build: internal links point at nothing:');
+    for (const b of [...new Set(broken)]) console.error(`   ${b}`);
+    process.exit(1);
+  }
+}
+
 console.log(`built ${emitted.length} pages:`);
-for (const e of emitted) console.log('  ', e.url.padEnd(18), e.lastmod);
+for (const e of emitted) console.log('  ', e.url.padEnd(22), e.lastmod);
+

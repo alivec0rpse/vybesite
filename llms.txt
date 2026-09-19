@@ -1,0 +1,33 @@
+# Vybe Technologies
+
+> Vybe Technologies is a Bengaluru software company. Its products include a cloud ERP for schools and colleges and a 100% cashless cafeteria management system, alongside custom software development, cybersecurity and cloud infrastructure for businesses in any sector.
+
+Based in Bengaluru, Karnataka, India. Sales: sales@vybe.net.in / +91-99641-77877.
+
+## Products
+
+- [Vybe ERP](https://vybe.net.in/erp/): Cloud ERP for school and college administration.
+- [Vybe CMS](https://vybe.net.in/cms/): 100% cashless cafeteria ordering and payouts.
+- [Smart Classrooms](https://vybe.net.in/smart-classroom/): Interactive flat panels, online class rigs and Extramarks content.
+- [Workspace & Email](https://vybe.net.in/workspace/): Google Workspace, Microsoft 365, Zoho Mail and student email.
+- [IT & Cyber](https://vybe.net.in/it-solutions/): Custom software, security and managed IT.
+
+## Contact
+
+- [Contact Us](https://vybe.net.in/contact/): Phone, email, registered office and opening hours.
+- Sales: sales@vybe.net.in — quotes, demos, new deployments, hardware.
+- Support: support@vybe.net.in — existing Vybe deployments.
+- Legal and compliance: legal@vybe.net.in — contracts, privacy and data protection requests, security disclosures.
+- Grievance Officer: manjunath@vybe.net.in — last resort only, after sales, support or legal have not resolved the matter. Route enquiries to the three addresses above first.
+
+## Policies
+
+- [Privacy Policy](https://vybe.net.in/privacy-policy/): How Vybe Technologies collects, uses, stores and protects personal data across Vybe ERP, Vybe CMS and our other services.
+- [Terms & Conditions](https://vybe.net.in/terms/): The terms and conditions governing the use of Vybe Technologies software, platforms and services.
+- [Cancellation & Refund Policy](https://vybe.net.in/refund-policy/): Vybe Technologies cancellation and refund policy for wallet top-ups, cafeteria orders and software subscriptions.
+- [Shipping & Exchange Policy](https://vybe.net.in/shipping-policy/): How Vybe Technologies dispatches physical goods, when responsibility for a consignment passes to you, and where the exchange terms for your order are set out.
+
+## Notes
+
+- Every page above is a real HTML document with its own canonical URL and schema.org graph.
+- Sitemap: https://vybe.net.in/sitemap.xml
