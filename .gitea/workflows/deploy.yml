@@ -1,0 +1,66 @@
+# =============================================================================
+# Build and deploy vybe.net.in to Azure Static Web Apps on every push to main.
+#
+# Why the SWA CLI instead of Azure/static-web-apps-deploy@v1:
+# that action is a Docker action written against GitHub's API — it wants to
+# post commit statuses and open preview environments per pull request, and on
+# a Gitea runner those calls have nowhere to go. The CLI is plain npm, takes a
+# deployment token, and is the route Azure documents for non-GitHub CI.
+#
+# Required repository secret (Settings -> Actions -> Secrets):
+#   AZURE_STATIC_WEB_APPS_API_TOKEN
+# =============================================================================
+name: Deploy to Azure Static Web Apps
+
+on:
+  push:
+    branches: [main]
+  # Lets you redeploy the current main from the Actions tab without an empty commit.
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        # Puppeteer only drives the local screenshot scripts. Without this it
+        # pulls a ~170MB Chromium on every run for a browser CI never opens.
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: 'true'
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Validate HTML
+        # Deliberately between build and deploy: a malformed page fails the
+        # run rather than reaching production and sitting in Search Console.
+        run: npm run validate
+
+      - name: Stage the deploy artifact
+        # Copies the site into dist/, leaving build.js, src/ and tools/ behind.
+        run: npm run stage
+
+      - name: Deploy to Azure
+        env:
+          SWA_CLI_DEPLOYMENT_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+        run: |
+          if [ -z "$SWA_CLI_DEPLOYMENT_TOKEN" ]; then
+            echo "AZURE_STATIC_WEB_APPS_API_TOKEN is not set."
+            echo "Add it under Settings -> Actions -> Secrets in this repository."
+            exit 1
+          fi
+          npx --yes @azure/static-web-apps-cli@2 deploy ./dist \
+            --deployment-token "$SWA_CLI_DEPLOYMENT_TOKEN" \
+            --env production \
+            --swa-config-location ./dist \
+            --no-use-keychain

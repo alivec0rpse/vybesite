@@ -17,6 +17,7 @@
   },
   "scripts": {
     "build": "node build.js && npm run css",
+    "stage": "node tools/stage.js",
     "css": "tailwindcss -i src/input.css -o assets/site.css --minify",
     "images": "node tools/gen-images.mjs",
     "fonts": "node tools/gen-fonts.mjs",
