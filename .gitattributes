@@ -1,0 +1,14 @@
+# This checkout has core.autocrlf enabled, which rewrites LF to CRLF on
+# checkout for anything Git considers text. That is fine for source, and not
+# fine for files whose bytes are the payload.
+#
+# The Apple Pay association file is a hex-encoded JSON blob with no line
+# terminators. Nothing to convert today, but a stray newline introduced later
+# would be checked out as CRLF and Apple would reject the domain.
+.well-known/** -text
+
+# Fonts and images are binary; never line-ending convert or diff them.
+*.woff2 binary
+*.png binary
+*.webp binary
+*.ico binary

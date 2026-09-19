@@ -51,6 +51,9 @@ const REQUIRED = [
   'site.webmanifest',
   'assets/site.css',
   'assets/site.js',
+  // Apple Pay domain verification. Listed because its absence is invisible:
+  // the site looks perfect and Apple Pay just stops verifying the domain.
+  '.well-known/apple-developer-merchantid-domain-association',
 ];
 
 function copyDir(from, to) {

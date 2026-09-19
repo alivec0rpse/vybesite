@@ -18,6 +18,13 @@
       "headers": { "Cache-Control": "public, max-age=3600" }
     },
     {
+      "route": "/.well-known/apple-developer-merchantid-domain-association",
+      "headers": {
+        "Content-Type": "text/plain",
+        "Cache-Control": "public, max-age=3600"
+      }
+    },
+    {
       "route": "/robots.txt",
       "headers": { "Cache-Control": "public, max-age=3600" }
     },
@@ -69,7 +76,7 @@
 
   "navigationFallback": {
     "rewrite": "/404.html",
-    "exclude": ["/assets/*", "/*.xml", "/*.txt", "/*.ico", "/*.webmanifest", "/*.png", "/*.webp"]
+    "exclude": ["/assets/*", "/.well-known/*", "/*.xml", "/*.txt", "/*.ico", "/*.webmanifest", "/*.png", "/*.webp"]
   },
 
   "responseOverrides": {
