@@ -252,7 +252,29 @@
                             </div>
                         </div>
 
-                        <!-- PILLAR 3: Vybe IT Solutions -->
+                        <!-- PILLAR 3: Smart Classrooms -->
+                        <div onclick="showPage('classroom-view')" class="cursor-pointer bg-white p-10 rounded-2xl border border-slate-200 hover:border-brand hover:shadow-lg transition-all duration-300 flex flex-col h-full group relative z-20 reveal active">
+                            <h4 class="text-2xl font-black font-display tracking-tight mb-3 text-slate-900 group-hover:text-brand transition-colors">Smart Classrooms</h4>
+                            <p class="text-slate-600 leading-relaxed mb-8 flex-grow">
+                                Interactive flat panels, cameras, lighting and UPS installed end to end, with Extramarks Smart Class Plus content and online class rigs for hybrid teaching.
+                            </p>
+                            <div class="mt-auto font-bold text-sm text-brand flex items-center gap-1">
+                                Explore Smart Classrooms <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+                            </div>
+                        </div>
+
+                        <!-- PILLAR 4: Workspace & Email -->
+                        <div onclick="showPage('workspace-view')" class="cursor-pointer bg-white p-10 rounded-2xl border border-slate-200 hover:border-brand hover:shadow-lg transition-all duration-300 flex flex-col h-full group relative z-20 reveal active" style="transition-delay: 100ms;">
+                            <h4 class="text-2xl font-black font-display tracking-tight mb-3 text-slate-900 group-hover:text-brand transition-colors">Workspace &amp; Email</h4>
+                            <p class="text-slate-600 leading-relaxed mb-8 flex-grow">
+                                Google Workspace, Microsoft 365 and Zoho Mail. Staff and student email on your own domain, single sign-on, and people tested against real phishing.
+                            </p>
+                            <div class="mt-auto font-bold text-sm text-brand flex items-center gap-1">
+                                Explore Workspace <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+                            </div>
+                        </div>
+
+                        <!-- PILLAR 5: Vybe IT Solutions -->
                         <div onclick="showPage('it-view')" class="cursor-pointer bg-white p-10 rounded-2xl border border-slate-200 hover:border-brand hover:shadow-lg transition-all duration-300 flex flex-col h-full group relative z-20 reveal active">
                             <h4 class="text-2xl font-black font-display tracking-tight mb-3 text-slate-900 group-hover:text-brand transition-colors">Vybe IT Solutions</h4>
                             <p class="text-slate-600 leading-relaxed mb-8 flex-grow">
@@ -263,7 +285,7 @@
                             </div>
                         </div>
 
-                        <!-- PILLAR 4: Vybe Cloud -->
+                        <!-- PILLAR 6: Vybe Cloud -->
                         <div onclick="showPage('cloud-view')" class="cursor-pointer bg-white p-10 rounded-2xl border border-slate-200 hover:border-brand hover:shadow-lg transition-all duration-300 flex flex-col h-full group relative z-20 reveal active" style="transition-delay: 100ms;">
                             <h4 class="text-2xl font-black font-display tracking-tight mb-3 text-slate-900 group-hover:text-brand transition-colors">Vybe Cloud</h4>
                             <p class="text-slate-600 leading-relaxed mb-8 flex-grow">
@@ -785,6 +807,178 @@
                         <span class="material-symbols-outlined text-slate-300 text-3xl mb-4">admin_panel_settings</span>
                         <h4 class="font-bold text-lg mb-2 text-white">Managed SecOps</h4>
                         <p class="text-slate-400 text-sm leading-relaxed">24/7 proactive monitoring, incident response, and server hardening.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==========================================
+             SERVICE DETAIL VIEW: SMART CLASSROOMS
+             ========================================== -->
+        <div id="classroom-view" class="view-section bg-slate-900 text-white relative overflow-hidden w-full" style="display: none;">
+            <div class="absolute inset-0 opacity-[0.03]" style="background-image: url('data:image/svg+xml;utf8,&lt;svg width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'&gt;&lt;circle cx=\'2\' cy=\'2\' r=\'1.5\' fill=\'%23ffffff\'/&gt;&lt;/svg&gt;'); background-repeat: repeat;"></div>
+            <div class="absolute -top-40 -left-40 w-96 h-96 bg-brand rounded-full blur-[120px] pointer-events-none opacity-20"></div>
+
+            <section class="py-24 px-6 relative z-10 max-w-6xl mx-auto w-full">
+                <button onclick="showPage('home-view')" class="flex items-center gap-1 text-slate-400 hover:text-white font-bold text-xs uppercase tracking-widest mb-12 transition-colors w-max">
+                    <span class="material-symbols-outlined text-[18px]">arrow_back</span> Back to Home
+                </button>
+
+                <div class="mb-16 max-w-3xl reveal active">
+                    <div class="w-16 h-16 bg-white/10 border border-white/20 rounded-2xl flex items-center justify-center text-white mb-6">
+                        <span class="material-symbols-outlined text-[28px]">smart_display</span>
+                    </div>
+                    <h1 class="text-4xl md:text-6xl font-bold font-display tracking-tighter mb-6 text-white">Smart Classrooms.</h1>
+                    <p class="text-lg md:text-xl text-slate-400 font-normal leading-relaxed">
+                        Interactive flat panels, cameras, lighting and power, installed as one working room rather than a box of parts. We are an Extramarks channel partner and a JS Global Industries dealer, so the content and the hardware arrive together.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <div class="md:col-span-2 bg-white/5 border border-white/10 p-8 md:p-10 rounded-3xl flex flex-col justify-between hover:bg-white/10 transition-colors reveal active">
+                        <div>
+                            <span class="material-symbols-outlined text-brand text-3xl mb-4">smart_display</span>
+                            <h3 class="font-bold text-2xl mb-3 tracking-tight">Smart Interactive Flat Panels</h3>
+                            <p class="text-slate-400 text-sm leading-relaxed max-w-lg mb-6">Supply, wall or stand mounting, and commissioning of interactive flat panels sized to the room rather than to the brochure. No bulbs, no darkened room, no calibration drift — a teacher walks in, touches the screen and teaches.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-white/10 px-3 py-1.5 rounded-lg text-xs font-bold border border-white/5">65" to 98"</span>
+                            <span class="bg-white/10 px-3 py-1.5 rounded-lg text-xs font-bold border border-white/5">Wall &amp; Stand Mount</span>
+                            <span class="bg-white/10 px-3 py-1.5 rounded-lg text-xs font-bold border border-white/5">Writing Boards</span>
+                            <span class="bg-white/10 px-3 py-1.5 rounded-lg text-xs font-bold border border-white/5">JS Global Dealer</span>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-1 bg-brand p-8 md:p-10 rounded-3xl flex flex-col justify-center items-center text-center shadow-lg shadow-brand/20 reveal active" style="transition-delay: 100ms;">
+                        <span class="material-symbols-outlined text-white text-4xl mb-4">construction</span>
+                        <h3 class="font-bold text-xl mb-2 text-white">Kitting out a block?</h3>
+                        <p class="text-white/80 text-sm mb-6">Send us the room count and sizes for a per-classroom quote.</p>
+                        <a href="mailto:sales@vybe.net.in" class="w-full bg-white text-brand px-6 py-3 rounded-full text-sm font-bold shadow-sm hover:scale-105 active:scale-95 transition-transform">Contact Sales</a>
+                    </div>
+
+                    <div class="md:col-span-2 bg-white/5 border border-white/10 p-8 md:p-10 rounded-3xl hover:bg-white/10 transition-colors reveal active">
+                        <span class="material-symbols-outlined text-brand text-3xl mb-4">videocam</span>
+                        <h3 class="font-bold text-2xl mb-3 tracking-tight">Online Class Systems</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed max-w-2xl mb-6">A complete rig for teaching the room and the remote cohort at the same time: a classroom PC, a camera framed on the teaching area, a second chat monitor so the teacher can see remote questions without dropping the lesson, proper lighting so the camera has something to work with, and the panel itself as the shared surface.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-white/10 px-3 py-1.5 rounded-lg text-xs font-bold border border-white/5">Classroom PC</span>
+                            <span class="bg-white/10 px-3 py-1.5 rounded-lg text-xs font-bold border border-white/5">Camera</span>
+                            <span class="bg-white/10 px-3 py-1.5 rounded-lg text-xs font-bold border border-white/5">Chat Monitor</span>
+                            <span class="bg-white/10 px-3 py-1.5 rounded-lg text-xs font-bold border border-white/5">Lighting</span>
+                            <span class="bg-white/10 px-3 py-1.5 rounded-lg text-xs font-bold border border-white/5">Audio</span>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-1 bg-white/5 border border-white/10 p-8 rounded-3xl hover:border-white/30 transition-colors reveal active" style="transition-delay: 100ms;">
+                        <span class="material-symbols-outlined text-slate-300 text-3xl mb-4">power</span>
+                        <h4 class="font-bold text-lg mb-2 text-white">UPS &amp; Power</h4>
+                        <p class="text-slate-400 text-sm leading-relaxed">UPS backup, surge protection, dedicated points and concealed cabling — so a cut does not end the period and nothing is run off an extension board.</p>
+                    </div>
+
+                    <div class="md:col-span-1 bg-white/5 border border-white/10 p-8 rounded-3xl hover:border-white/30 transition-colors reveal active">
+                        <span class="material-symbols-outlined text-slate-300 text-3xl mb-4">auto_stories</span>
+                        <h4 class="font-bold text-lg mb-2 text-white">Extramarks Smart Class Plus</h4>
+                        <p class="text-slate-400 text-sm leading-relaxed">Curriculum-mapped animated lessons and LMS modules for K-12, licensed and deployed onto the panels as an Extramarks channel partner.</p>
+                    </div>
+
+                    <div class="md:col-span-1 bg-white/5 border border-white/10 p-8 rounded-3xl hover:border-white/30 transition-colors reveal active" style="transition-delay: 100ms;">
+                        <span class="material-symbols-outlined text-slate-300 text-3xl mb-4">menu_book</span>
+                        <h4 class="font-bold text-lg mb-2 text-white">Extramarks Forte</h4>
+                        <p class="text-slate-400 text-sm leading-relaxed">The higher-education stack for universities and colleges: LMS, assessments and course delivery, set up and rolled out department by department.</p>
+                    </div>
+
+                    <div class="md:col-span-1 bg-white/5 border border-white/10 p-8 rounded-3xl hover:border-white/30 transition-colors reveal active" style="transition-delay: 200ms;">
+                        <span class="material-symbols-outlined text-slate-300 text-3xl mb-4">co_present</span>
+                        <h4 class="font-bold text-lg mb-2 text-white">Training &amp; Handover</h4>
+                        <p class="text-slate-400 text-sm leading-relaxed">Hands-on sessions for the teachers who have to use it on Monday, plus AMC and support so a dead panel is a phone call, not a tender.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==========================================
+             SERVICE DETAIL VIEW: WORKSPACE & EMAIL
+             ========================================== -->
+        <div id="workspace-view" class="view-section bg-white relative overflow-hidden w-full" style="display: none;">
+            <div class="absolute inset-0 bg-slate-50 pointer-events-none z-0"></div>
+
+            <section class="py-24 px-6 relative z-10 max-w-6xl mx-auto w-full">
+                <button onclick="showPage('home-view')" class="flex items-center gap-1 text-slate-400 hover:text-slate-900 font-bold text-xs uppercase tracking-widest mb-12 transition-colors w-max">
+                    <span class="material-symbols-outlined text-[18px]">arrow_back</span> Back to Home
+                </button>
+
+                <div class="mb-16 max-w-3xl reveal active">
+                    <div class="w-16 h-16 bg-white border border-slate-200 shadow-sm rounded-2xl flex items-center justify-center text-slate-900 mb-6">
+                        <span class="material-symbols-outlined text-[24px]">alternate_email</span>
+                    </div>
+                    <h1 class="text-4xl md:text-6xl font-bold font-display tracking-tighter mb-4 text-slate-900">Workspace &amp; Email.</h1>
+                    <p class="text-lg md:text-xl text-slate-500 font-normal leading-relaxed max-w-2xl">
+                        Google Workspace, Microsoft 365 for Business and Zoho Mail, set up properly. Email on your own domain for staff and students, one sign-in for every app, online classes nobody can crash, and people trained to spot the phishing mail that gets past the filter.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2 bg-white p-8 md:p-10 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between reveal active">
+                        <div>
+                            <span class="material-symbols-outlined text-slate-400 text-3xl mb-4">workspaces</span>
+                            <h3 class="text-2xl font-bold mb-3 text-slate-900 tracking-tight">Google Workspace, Microsoft 365 &amp; Zoho Mail</h3>
+                            <p class="text-sm text-slate-500 leading-relaxed max-w-lg mb-6">Licensing, tenant setup and migration from whatever you are on now, including shared mailboxes, calendars and drives. We move the mail across without losing history and without a day of downtime, and we will tell you honestly which of the three suits your budget and your team.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-slate-50 px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-200 text-slate-600">Domain &amp; DNS</span>
+                            <span class="bg-slate-50 px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-200 text-slate-600">Mailbox Migration</span>
+                            <span class="bg-slate-50 px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-200 text-slate-600">Shared Drives</span>
+                            <span class="bg-slate-50 px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-200 text-slate-600">Licence Management</span>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-1 bg-brand p-8 md:p-10 rounded-3xl flex flex-col justify-center items-center text-center shadow-lg shadow-brand/20 reveal active" style="transition-delay: 100ms;">
+                        <span class="material-symbols-outlined text-white text-4xl mb-4">rocket_launch</span>
+                        <h3 class="font-bold text-xl mb-2 text-white">Moving your team over?</h3>
+                        <p class="text-white/80 text-sm mb-6">Tell us your headcount and current setup for a migration plan.</p>
+                        <a href="mailto:sales@vybe.net.in" class="w-full bg-white text-brand px-6 py-3 rounded-full text-sm font-bold shadow-sm hover:scale-105 active:scale-95 transition-transform">Contact Sales</a>
+                    </div>
+
+                    <div class="md:col-span-1 bg-white p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow reveal active">
+                        <span class="material-symbols-outlined text-slate-400 text-3xl mb-4">badge</span>
+                        <h4 class="font-bold text-lg mb-2 text-slate-900">Student Email Accounts</h4>
+                        <p class="text-sm text-slate-500 leading-relaxed">Every student on an institution-owned address, provisioned in bulk from your existing roll and rolled forward each academic year.</p>
+                    </div>
+
+                    <div class="md:col-span-2 bg-slate-900 text-white p-8 md:p-10 rounded-3xl reveal active" style="transition-delay: 100ms;">
+                        <span class="material-symbols-outlined text-brand text-3xl mb-4">cast_for_education</span>
+                        <h4 class="font-bold text-xl mb-3 tracking-tight">Online Classes Nobody Can Crash</h4>
+                        <p class="text-sm text-slate-400 leading-relaxed max-w-2xl">Because every student has an institutional account, class meetings can admit your own people automatically from the lobby and hold everyone else outside it. A leaked link stops being a way in, and every participant is in the room under their real, named account — so if somebody disrupts a class, there is no question who it was.</p>
+                    </div>
+
+                    <div class="md:col-span-1 bg-white p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow reveal active">
+                        <span class="material-symbols-outlined text-slate-400 text-3xl mb-4">key</span>
+                        <h4 class="font-bold text-lg mb-2 text-slate-900">Single Sign-On</h4>
+                        <p class="text-sm text-slate-500 leading-relaxed">One identity across Workspace, Microsoft 365 and your other SaaS, with SAML, multi-factor authentication and conditional access.</p>
+                    </div>
+
+                    <div class="md:col-span-1 bg-white p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow reveal active" style="transition-delay: 100ms;">
+                        <span class="material-symbols-outlined text-slate-400 text-3xl mb-4">mark_email_read</span>
+                        <h4 class="font-bold text-lg mb-2 text-slate-900">Email Deliverability</h4>
+                        <p class="text-sm text-slate-500 leading-relaxed">SPF, DKIM and DMARC configured and enforced, so your mail lands in the inbox and nobody can send as your domain.</p>
+                    </div>
+
+                    <div class="md:col-span-1 bg-white p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow reveal active" style="transition-delay: 200ms;">
+                        <span class="material-symbols-outlined text-slate-400 text-3xl mb-4">devices</span>
+                        <h4 class="font-bold text-lg mb-2 text-slate-900">Device &amp; Access Control</h4>
+                        <p class="text-sm text-slate-500 leading-relaxed">Managed enrolment, joiner and leaver workflows, and remote wipe for the laptop that walks out of the building.</p>
+                    </div>
+
+                    <div class="md:col-span-1 bg-white p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow reveal active">
+                        <span class="material-symbols-outlined text-slate-400 text-3xl mb-4">phishing</span>
+                        <h4 class="font-bold text-lg mb-2 text-slate-900">Phishing Simulation</h4>
+                        <p class="text-sm text-slate-500 leading-relaxed">Scheduled, consent-based simulated phishing campaigns against your own staff, reported by department so you know where the risk actually sits.</p>
+                    </div>
+
+                    <div class="md:col-span-2 bg-slate-900 text-white p-8 md:p-10 rounded-3xl reveal active" style="transition-delay: 100ms;">
+                        <span class="material-symbols-outlined text-brand text-3xl mb-4">school</span>
+                        <h4 class="font-bold text-xl mb-3 tracking-tight">Staff Security Awareness Training</h4>
+                        <p class="text-sm text-slate-400 leading-relaxed max-w-xl">Short, practical sessions for non-technical staff on passwords, business email compromise, invoice fraud and what to do in the ten minutes after somebody clicks. Delivered on site or remotely, with a follow-up simulation to show whether it stuck.</p>
                     </div>
                 </div>
             </section>

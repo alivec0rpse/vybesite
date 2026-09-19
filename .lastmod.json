@@ -1,22 +1,22 @@
 {
   "/": {
-    "hash": "669b981ed230d524",
+    "hash": "0abc89883076f539",
     "date": "2026-09-19"
   },
   "/erp/": {
-    "hash": "6ee9cefb838350e1",
+    "hash": "7302909e9eeb8ff9",
     "date": "2026-09-19"
   },
   "/cms/": {
-    "hash": "dfd4028026b57ec4",
+    "hash": "5a9570071740e2a5",
     "date": "2026-09-19"
   },
   "/it-solutions/": {
-    "hash": "29e56b463a159576",
+    "hash": "690314a119edaa4b",
     "date": "2026-09-19"
   },
   "/cloud/": {
-    "hash": "5b4e98898d575086",
+    "hash": "86334b23b7395b0f",
     "date": "2026-09-19"
   },
   "/privacy-policy/": {
@@ -33,6 +33,14 @@
   },
   "/shipping-policy/": {
     "hash": "9359b0880208e09f",
+    "date": "2026-09-19"
+  },
+  "/workspace/": {
+    "hash": "c5207cd6dcf6b26d",
+    "date": "2026-09-19"
+  },
+  "/smart-classroom/": {
+    "hash": "901eddd4eea7bd3c",
     "date": "2026-09-19"
   }
 }

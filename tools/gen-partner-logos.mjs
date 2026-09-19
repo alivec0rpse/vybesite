@@ -63,10 +63,13 @@ const MARKS = [
   // signed. Left unbuilt rather than merely unreferenced: an orphaned file
   // under assets/ is still a public URL anyone can fetch.
   // { name: 'milkymist', file: 'milkymist.png' },
-  { name: 'extramarks', file: 'extramarks.svg' },
+  // Same reason as Milky Mist above: Extramarks do not permit use of their
+  // mark before the channel partner contract is executed, which is scheduled
+  // for the week of 21 September 2026. Both entries stay commented until then.
+  // { name: 'extramarks', file: 'extramarks.svg' },
   // The largest Forte mark published anywhere on their site is 179x101, so
   // this one gets upscaled. See the sharpen below.
-  { name: 'extramarksforte', file: 'extramarksforte.webp' },
+  // { name: 'extramarksforte', file: 'extramarksforte.webp' },
   { name: 'jsglobal', file: 'jsglobal.jpg', crop: { left: 60, top: 40, width: 730, height: 610 } },
 ];
 

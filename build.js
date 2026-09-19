@@ -83,7 +83,15 @@ function extractView(src, id) {
 /* ------------------------------------------------- content transformations */
 
 const LOGO_ASPECT = 1447 / 609;
-const HREF = { 'home-view': '/', 'erp-view': '/erp/', 'cms-view': '/cms/', 'it-view': '/it-solutions/', 'cloud-view': '/cloud/' };
+const HREF = {
+  'home-view': '/',
+  'erp-view': '/erp/',
+  'cms-view': '/cms/',
+  'it-view': '/it-solutions/',
+  'cloud-view': '/cloud/',
+  'workspace-view': '/workspace/',
+  'classroom-view': '/smart-classroom/',
+};
 
 /** <picture> with a WebP source and a PNG fallback, always with intrinsic size. */
 function picture({ base, alt, cls, h, aspect, eager = false, hidden = false }) {
@@ -232,6 +240,7 @@ ${breadcrumbs(page.trail, view.dark)}
 ${view.inner}
 ${deepDive(page.nav, { dark: view.dark })}
 ${page.nav === 'home' ? partnersSection() : ''}
+${page.credentials ? credentialsSection({ dark: view.dark, standalone: true }) : ''}
 ${faqSection(page.faqs, { dark: view.dark })}
 ${page.nav === 'home' ? '' : relatedSection(page.nav, { dark: view.dark })}
 </div>`;
@@ -260,10 +269,16 @@ function navbar(active) {
                 </span>
             </a>
 
-            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600" aria-label="Primary">
+            <!-- lg, not md: six items plus the logo lockup and the sales button
+                 overlap on a 768px tablet, where "IT & Cyber" wraps to two lines
+                 and "Cloud" disappears behind the button. Tablets get the same
+                 menu as phones, which has the same links in the same markup. -->
+            <nav class="hidden lg:flex items-center gap-6 xl:gap-8 text-sm font-medium text-slate-600" aria-label="Primary">
                 ${item('/', 'Home', 'home')}
                 ${item('/erp/', 'ERP', 'erp')}
                 ${item('/cms/', 'Cafeteria', 'cms')}
+                ${item('/smart-classroom/', 'Classroom', 'classroom')}
+                ${item('/workspace/', 'Workspace', 'workspace')}
                 ${item('/it-solutions/', 'IT &amp; Cyber', 'it')}
                 ${item('/cloud/', 'Cloud', 'cloud')}
             </nav>
@@ -275,7 +290,7 @@ function navbar(active) {
 
                 <!-- Mobile menu. Pure CSS <details>: works with JS disabled, and
                      the links are the same markup the crawler already sees. -->
-                <details class="group md:hidden relative" id="mobile-nav">
+                <details class="group lg:hidden relative" id="mobile-nav">
                     <summary class="list-none [&::-webkit-details-marker]:hidden cursor-pointer flex items-center justify-center w-12 h-12 rounded-full text-slate-700 hover:bg-slate-100 transition-colors" aria-label="Menu">
                         <span class="material-symbols-outlined text-[24px] group-open:hidden" aria-hidden="true">menu</span>
                         <span class="material-symbols-outlined text-[24px] hidden group-open:inline-block" aria-hidden="true">close</span>
@@ -284,6 +299,8 @@ function navbar(active) {
                         ${mobileItem('/', 'Home', 'home', active)}
                         ${mobileItem('/erp/', 'Vybe ERP', 'erp', active)}
                         ${mobileItem('/cms/', 'Vybe CMS (Cafeteria)', 'cms', active)}
+                        ${mobileItem('/smart-classroom/', 'Smart Classrooms', 'classroom', active)}
+                        ${mobileItem('/workspace/', 'Workspace &amp; Email', 'workspace', active)}
                         ${mobileItem('/it-solutions/', 'IT &amp; Cyber', 'it', active)}
                         ${mobileItem('/cloud/', 'Vybe Cloud', 'cloud', active)}
                     </nav>
@@ -352,6 +369,8 @@ function footer() {
                 <ul class="space-y-3 text-sm">
                     ${link('/erp/', 'Educational ERP')}
                     ${link('/cms/', 'Smart Cafeteria (CMS)')}
+                    ${link('/smart-classroom/', 'Smart Classrooms')}
+                    ${link('/workspace/', 'Workspace &amp; Email')}
                     ${link('/it-solutions/', 'Custom App Development')}
                     ${link('/cloud/', 'Cloud &amp; Infrastructure')}
                 </ul>
@@ -423,7 +442,17 @@ const organization = {
   knowsAbout: [
     'Educational ERP', 'Campus management software', 'Cashless cafeteria systems',
     'Kitchen display systems', 'Custom software development', 'Cybersecurity', 'Cloud infrastructure',
+    'Google Workspace', 'Microsoft 365', 'Zoho Mail', 'Student email', 'Single sign-on',
   ],
+  // Vendor programme enrolments. ProgramMembership rather than a bare
+  // Organization because that is what these are — membership of a named
+  // programme run by a named host, which is the claim being made.
+  memberOf: [
+    { '@type': 'ProgramMembership', programName: 'Ingram Micro Partner Program', hostingOrganization: { '@type': 'Organization', name: 'Ingram Micro', url: 'https://www.ingrammicro.com/' } },
+    { '@type': 'ProgramMembership', programName: 'AWS Partner Network', hostingOrganization: { '@type': 'Organization', name: 'Amazon Web Services', url: 'https://aws.amazon.com/partners/' } },
+    { '@type': 'ProgramMembership', programName: 'Google Cloud Partner Advantage', hostingOrganization: { '@type': 'Organization', name: 'Google Cloud', url: 'https://cloud.google.com/partners' } },
+  ],
+  award: 'Azure credits grant, Microsoft for Startups',
 };
 
 /**
@@ -501,6 +530,8 @@ function faqSchema(url, faqs) {
 const PRODUCTS = [
   { nav: 'erp', href: '/erp/', name: 'Vybe ERP', blurb: 'Cloud ERP for school and college administration.', icon: 'dashboard_customize' },
   { nav: 'cms', href: '/cms/', name: 'Vybe CMS', blurb: '100% cashless cafeteria ordering and payouts.', icon: 'fastfood' },
+  { nav: 'classroom', href: '/smart-classroom/', name: 'Smart Classrooms', blurb: 'Interactive flat panels, online class rigs and Extramarks content.', icon: 'smart_display' },
+  { nav: 'workspace', href: '/workspace/', name: 'Workspace & Email', blurb: 'Google Workspace, Microsoft 365, Zoho Mail and student email.', icon: 'alternate_email' },
   { nav: 'it', href: '/it-solutions/', name: 'IT & Cyber', blurb: 'Custom software, security and managed IT.', icon: 'code_blocks' },
   { nav: 'cloud', href: '/cloud/', name: 'Vybe Cloud', blurb: 'Scalable servers, hosting and DDoS protection.', icon: 'cloud' },
 ];
@@ -598,23 +629,30 @@ const PARTNERS = [
   */
   {
     label: 'Brand Partners',
-    note: 'Brands we work alongside to reach schools, colleges and campuses.',
+    note: 'Brands we are an authorised channel partner or dealer for, and deploy on campus.',
     items: [
+      /* Extramarks and Extramarks Forte are held back for the same reason as
+       * Milky Mist above: their mark may not be used until the channel partner
+       * contract is executed, scheduled for the week of 21 September 2026.
+       * The marks are also commented out of tools/gen-partner-logos.mjs, so
+       * uncommenting here alone will not render them — rerun `npm run logos`.
+       *
       {
         name: 'Extramarks Education',
-        meta: 'Digital learning for K-12 schools',
+        meta: 'Channel partner — digital learning for K-12 schools',
         url: 'https://www.extramarks.com/',
         logo: 'extramarks',
       },
       {
         name: 'Extramarks Forte',
-        meta: 'Smart LMS for universities',
+        meta: 'Channel partner — smart LMS for universities',
         url: 'https://www.extramarksforte.com/',
         logo: 'extramarksforte',
       },
+      */
       {
         name: 'JS Global Industries',
-        meta: 'Classroom display and writing boards, Bengaluru',
+        meta: 'Partner and dealer — classroom boards, Bengaluru',
         url: 'https://www.jsglobalindustries.co.in/',
         logo: 'jsglobal',
       },
@@ -634,6 +672,84 @@ const PARTNER_ORGS = PARTNERS.flatMap((g) =>
     url: i.url,
   }))
 );
+
+/* ------------------------------------------------------------- credentials */
+
+/**
+ * Vendor programmes we are actually enrolled in, and the grant we actually
+ * received. Worth stating plainly on a page that sells cloud and procurement:
+ * it is the difference between "we can set up AWS for you" and a verifiable
+ * commercial relationship with the vendor.
+ *
+ * Deliberately text, not logos. AWS, Google Cloud, Microsoft and Ingram Micro
+ * all restrict their corporate marks and issue partners a specific badge
+ * instead; using the plain vendor logo is a trademark problem, not a design
+ * choice. Drop the issued badges into src/logos/ and this can become a mark
+ * wall like the one above.
+ *
+ * Every `tier` here is the entry-level wording on purpose. Overstating a
+ * partner tier is the one claim on this page a vendor would actually chase.
+ */
+const CREDENTIALS = [
+  {
+    name: 'Ingram Micro',
+    tier: 'Registered partner',
+    note: 'Distribution and licensing for the hardware and software we resell.',
+  },
+  {
+    name: 'AWS Partner Network',
+    tier: 'Registered partner',
+    note: 'Amazon Web Services, for the infrastructure we design and run.',
+  },
+  {
+    name: 'Google Cloud Partner Advantage',
+    tier: 'Programme member',
+    note: 'Covers Google Cloud Platform and Google Workspace deployments.',
+  },
+  {
+    name: 'Microsoft for Startups',
+    tier: 'Azure credits grant',
+    note: 'Awarded Azure credits under the Microsoft for Startups programme.',
+  },
+];
+
+/**
+ * A compact accreditation strip. Rendered dark under the partner wall on the
+ * home page, and light on /cloud/ where the vendor relationships are the point.
+ */
+function credentialsSection({ dark = false, standalone = false } = {}) {
+  const head = dark ? 'text-white' : 'text-slate-900';
+  const muted = dark ? 'text-slate-400' : 'text-slate-500';
+  const label = dark ? 'text-slate-400' : 'text-slate-400';
+  const card = dark ? 'border-white/10 bg-white/5' : 'border-slate-200 bg-white';
+  const icon = dark ? 'text-brand' : 'text-brand';
+
+  const items = CREDENTIALS.map(
+    (c) => `<li class="rounded-2xl border ${card} p-6">
+                            <span class="material-symbols-outlined ${icon} text-[22px]" aria-hidden="true">verified</span>
+                            <h3 class="mt-3 text-base font-bold ${head} tracking-tight">${esc(c.name)}</h3>
+                            <p class="mt-1 text-xs font-bold uppercase tracking-[0.15em] ${label}">${esc(c.tier)}</p>
+                            <p class="mt-3 text-sm ${muted} leading-relaxed">${esc(c.note)}</p>
+                        </li>`
+  ).join('\n                        ');
+
+  const body = `<h2 id="accreditations-heading" class="text-xs font-bold uppercase tracking-[0.2em] ${label}">Accreditations</h2>
+                    <p class="mt-2 text-sm ${muted}">Vendor programmes we are enrolled in, and the grant we have received.</p>
+                    <ul class="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        ${items}
+                    </ul>`;
+
+  if (!standalone) return body;
+
+  return `
+        <section id="accreditations" class="${
+          dark ? 'bg-slate-950 dark-section' : 'bg-surface-main'
+        } border-t ${dark ? 'border-white/10' : 'border-slate-200'} py-16 px-6 relative z-10" aria-labelledby="accreditations-heading">
+            <div class="max-w-6xl mx-auto">
+                ${body}
+            </div>
+        </section>`;
+}
 
 function partnersSection() {
   // The declared box is the canvas ratio, not the rendered size, so the
@@ -675,6 +791,9 @@ function partnersSection() {
                 <p class="mt-5 text-lg leading-relaxed text-slate-300 max-w-3xl">The organisations running our software and hardware, and the brands we go to market alongside.</p>
                 <div class="mt-12 space-y-12">
                     ${groups}
+                </div>
+                <div class="mt-16 pt-12 border-t border-white/10">
+                    ${credentialsSection({ dark: true })}
                 </div>
             </div>
         </section>`;
@@ -761,6 +880,106 @@ const DEEP_DIVE = {
     ],
   },
 
+  classroom: {
+    kicker: 'What it takes',
+    heading: 'A room that works on Monday morning.',
+    lede: 'Smart classroom projects fail in a consistent and predictable way. The panels arrive, get mounted, work for a term, and then one room has a dead panel nobody has budget to fix, another has a camera pointing at a wall, and in the third the teacher has gone back to the whiteboard because the login never worked. Almost none of that is a hardware problem. It is what happens when a room is bought as a list of items rather than specified, installed and handed over as a working system.',
+    blocks: [
+      {
+        h: 'The panel, and why it is not a projector',
+        p: 'An interactive flat panel is the anchor of the room, and for nearly every classroom it is the right call over a projector. A projector needs the lights down, which fights the thing you actually want — students able to read and write while looking at the board. It needs a bulb, which is a recurring cost that arrives as a surprise and usually fails mid-lesson. It drifts out of alignment and dims so gradually that nobody notices until it is genuinely bad. A panel has no consumables, is readable in full daylight, and is touch-interactive from the moment it is switched on. The exception is the very large hall where no panel can be read from the back row, and there we will tell you to use a projector rather than sell you a 98-inch panel that still will not work.',
+      },
+      {
+        h: 'Sizing, which is about the back row and nothing else',
+        p: 'Panel size is set by the distance to the furthest student, not by the dimensions of the room and definitely not by the budget line. The working rule is that the back row should sit no further from the panel than roughly six times the panel’s height. For a typical 30-to-40-seat classroom that lands on 75 inches; smaller tutorial rooms take 65; wide or deep halls need 86 or 98. This is why we measure rooms before quoting instead of applying one size across a building — a block of classrooms is rarely uniform, and the room that gets the wrong panel is the room that stops being used.',
+      },
+      {
+        h: 'The online class rig, item by item',
+        p: 'Teaching the room and a remote cohort at the same time needs five things, and most rooms that claim to do hybrid are missing at least two. A classroom PC to run the session, so it does not depend on whichever laptop the teacher brought. A camera framed on the teaching area rather than bolted wherever there was a spare bracket. A second chat monitor, which is the component everyone skips and the one teachers notice immediately — without it, reading a remote student’s question means minimising what you are teaching, so in practice remote students stop being answered at all. Lighting, because a camera does not need a bright room, it needs light on the teacher’s face, and a classroom lit from directly above gives you a silhouette. And room audio that picks up students asking questions, not just the person standing at the desk. The panel is the shared surface both audiences are looking at.',
+      },
+      {
+        h: 'Power, the part that is always cut first',
+        p: 'This is the least interesting section on this page and the one that decides whether the room is still working in two years. A panel and a PC on an unprotected supply in most of India will eventually meet a surge or an outage mid-period. So the install includes UPS backup sized to carry the panel and PC through a typical cut, surge protection, dedicated power points, and concealed cabling. The alternative is the arrangement you find in a depressing number of smart classrooms: a forty-thousand-rupee panel running off an extension board trailing across a doorway.',
+      },
+      {
+        h: 'Extramarks Smart Class Plus, for schools',
+        p: 'Hardware with nothing on it is a very expensive television. As an Extramarks channel partner we license and deploy Smart Class Plus, which is curriculum-mapped animated content for K-12 — the lessons where an animation genuinely explains something a diagram cannot, which is most of physics, chemistry and biology — together with LMS modules for assignments and assessment. Because we are the channel partner rather than a middleman, the content licensing and the panel it runs on are the same purchase order and the same support line, and there is nobody to point at when the two do not talk to each other.',
+      },
+      {
+        h: 'Extramarks Forte, for colleges and universities',
+        p: 'Higher education has a different shape of problem. The content need is smaller and the delivery need is larger: course structures, assessments, submissions and results across departments that each do things slightly differently. Extramarks Forte is the product built for that, and we deploy it for universities and colleges department by department rather than as one institution-wide switch, because a rollout that starts everywhere at once tends to finish nowhere. We are a channel partner for Forte on the same terms as Smart Class Plus.',
+      },
+      {
+        h: 'Boards, because the panel is not the whole wall',
+        p: 'Almost every teacher wants a writing surface beside the panel. Working through a derivation or a correction is faster on a board than on a touchscreen, and the panel should be showing the material while that happens rather than being cleared for it. We are a partner and dealer for JS Global Industries, who manufacture classroom display and writing boards in Bengaluru, so the board and the panel are specified together and the wall gets laid out once instead of being retrofitted after somebody notices.',
+      },
+      {
+        h: 'Handover, and the reason rooms go unused',
+        p: 'The single best predictor of whether a smart classroom is still in daily use a year later is whether the teachers were trained on it properly, by someone patient, on the actual hardware, before they had to use it in front of thirty students. Nobody wants to be visibly incompetent in front of a class, so a teacher who is unsure will quietly avoid the panel and it will sit dark. Installation therefore includes hands-on sessions for the staff who have to teach with it, and after handover there is annual maintenance and support — so a failed panel is a phone call rather than a procurement exercise that takes a term.',
+      },
+      {
+        h: 'Where this joins the rest of the campus',
+        p: 'A classroom is not a standalone purchase for an institution that already runs software. Where the campus is on Vybe ERP, the room sits inside the same system for timetables, attendance and academics instead of being a parallel setup with its own logins and its own spreadsheet. And the institutional student accounts we set up as part of workspace and email are exactly what make the online side safe: classes admit your own students automatically, a leaked link does not grant entry, and everyone in the session is identifiable. Bought separately, these are three projects. Bought together, they are one room that works.',
+      },
+    ],
+  },
+
+  workspace: {
+    kicker: 'What is involved',
+    heading: 'Company email is the easy part.',
+    lede: 'Almost anyone can point a domain at Google Workspace and create a dozen mailboxes. What takes longer, and is what actually goes wrong later, is the part underneath: who can reach what, what happens when somebody leaves, whether your mail is being delivered or quietly spam-foldered, whether a stranger can walk into your online class, and whether your staff can tell a real invoice from a forged one. That whole picture is the job.',
+    blocks: [
+      {
+        h: 'Google Workspace, Microsoft 365 or Zoho Mail — how to choose',
+        p: 'If your team already lives in Excel, uses Teams, or you have Windows laptops you want centrally managed, Microsoft 365 for Business is usually the shorter path — Entra ID and Intune come with it and you will want both eventually. If your people work mostly in a browser, collaborate heavily on documents at the same time, and nobody is attached to desktop Office, Google Workspace is simpler to run and simpler to explain to staff. Zoho Mail is the one worth taking seriously on cost: it is materially cheaper per user than either, it does the mail part properly, and for an organisation whose real requirement is professional addresses on its own domain rather than a full collaboration suite, it is often the honest recommendation. It is also an Indian company with Indian data centres, which some organisations prefer on data-residency grounds under the DPDP Act. We will tell you which way we would go for your situation and why, including when the answer is that any of the three would do and you should simply take the cheapest.',
+      },
+      {
+        h: 'Student email, and why a campus should not run on personal Gmail',
+        p: 'Most institutions arrive at this having quietly standardised on whatever students already had: a personal Gmail address, often created in a hurry, frequently shared with a sibling, occasionally something a prospective employer would rather not see on a CV. The costs are real even when they are invisible. Nobody can tell whether a submission genuinely came from the student who owns it, staff cannot circulate anything sensitive with confidence, there is no way to reach the cohort reliably, and when a student leaves there is no account to close because the institution never owned one. Institution-owned student addresses fix all of that at once, and both Google Workspace for Education and Microsoft 365 Education have tiers that cost qualifying institutions nothing or very little for the core accounts — which usually surprises people, and is the single most common reason this gets postponed for years longer than it needed to be.',
+      },
+      {
+        h: 'Provisioning a whole cohort without typing it in twice',
+        p: 'Creating four hundred accounts by hand is how this becomes a fortnight of somebody’s life. We provision in bulk from the roll you already have — and where the institution runs Vybe ERP, from the student records that are already in it, so the address is created at admission rather than as a separate administrative errand months later. Accounts are organised by year and by department, which is what makes it possible to mail one batch or restrict a resource to one course without maintaining a distribution list by hand. Each academic year the structure rolls forward: incoming students provisioned, existing students moved up, and graduating students moved to whatever the institution’s policy actually is, whether that is an alumni address, a period of read-only access, or a clean suspension. The point of writing that policy down is that it stops being a decision somebody has to make individually, four hundred times.',
+      },
+      {
+        h: 'Online classes that do not get crashed',
+        p: 'Remote and hybrid teaching has a specific failure mode that has nothing to do with bandwidth: someone who is not in the class gets hold of the link and joins to disrupt it. The link travels, because it only takes one student to forward it, and once an uninvited participant is in a session with forty teenagers the lesson is effectively over. Admitting people manually is not a fix either, because it makes the teacher a doorman for the first ten minutes of every period. Institutional student accounts solve it properly. Meetings are configured so that signed-in members of your own domain are admitted automatically from the lobby, while anyone outside it is held there and never reaches the room. The leaked link stops being a way in, because possession of the link is no longer what grants entry.',
+      },
+      {
+        h: 'Accountability, which is the part that actually changes behaviour',
+        p: 'The other half of the problem is anonymity. A participant who joined as "Guest" or under an invented name can disrupt a session and simply rejoin under a different one, and there is nothing for the institution to act on afterwards. When every participant is in the room under a named, institution-owned account, that stops. Each join is attributable, the attendance record is a genuine record rather than a list of nicknames, and if somebody does cause a problem the follow-up is a straightforward disciplinary matter instead of an investigation. In practice the deterrent does most of the work — the incidents largely stop once students understand the room knows exactly who they are. We also set up recording and retention in line with whatever the institution has decided about consent and storage, rather than leaving each teacher to improvise it.',
+      },
+      {
+        h: 'Email on your own domain, set up so it gets delivered',
+        p: 'Mail from a new domain is treated with suspicion by default, and the fix is three DNS records that are widely skipped. SPF states which servers may send as you. DKIM signs each message so it cannot be altered in transit. DMARC ties the two together and tells receiving servers what to do when a message fails — and, crucially, sends you reports on who is attempting to send as your domain. We configure all three and move DMARC to enforcement once the reports are clean, rather than leaving it permanently on the monitoring setting that protects nobody.',
+      },
+      {
+        h: 'Migrating without losing the last six years of mail',
+        p: 'The mail history is usually the thing people are most nervous about, and reasonably so: for a lot of businesses the mailbox is the filing system. We migrate existing mail, contacts and calendars across with folder structure intact, run the new tenant in parallel while DNS propagates, and cut over once delivery is confirmed working in both directions. Shared mailboxes such as accounts@ or info@ get set up as shared mailboxes rather than as a personal account four people share a password to, which is where most of the access problems start.',
+      },
+      {
+        h: 'Single sign-on: one identity, everywhere',
+        p: 'Single sign-on means your staff have one account, protected by one strong authentication step, that gets them into Workspace or Microsoft 365 and into the other SaaS tools you pay for — your ERP, your accounting package, your CRM — over SAML or OIDC. The benefit people notice is fewer passwords. The benefit that matters is that access is now centralised: multi-factor authentication is enforced in one place, conditional access rules can require a managed device or block sign-ins from countries you do not operate in, and when somebody leaves, disabling one account closes every door at once instead of leaving a forgotten login live for two years.',
+      },
+      {
+        h: 'Joiners, leavers and the accounts nobody closed',
+        p: 'Most organisations have a decent process for creating accounts and no process at all for removing them, because creating one is somebody’s urgent problem and removing one is nobody’s. We set up the offboarding side properly: access revoked on the last day, the mailbox converted or delegated to a manager so the work does not vanish with the person, and company data removed from personal devices. Device enrolment through Intune or Google endpoint management makes remote wipe possible for the laptop that gets lost or the phone that does not come back.',
+      },
+      {
+        h: 'Phishing simulation, run against your own staff',
+        p: 'A simulated phishing campaign sends your people a realistic but harmless lure and records who clicks, who submits credentials and who reports it. It is done with the organisation’s authorisation and it is not a trap laid for individuals — the useful output is the pattern, broken down by department and by role, showing where the real exposure sits. Finance and reception are usually the answer, because they are the two functions whose job is to open attachments from strangers. Campaigns are run on a schedule rather than once, because the number that matters is whether the click rate falls over the year, not what it was in January.',
+      },
+      {
+        h: 'Training that is worth an hour of your staff’s time',
+        p: 'Security awareness training fails when it is a compliance video nobody watches. Ours is short, in-person or live remote, and built around the attacks that actually reach Indian businesses: business email compromise, where an attacker impersonates a director and asks for an urgent transfer; invoice fraud, where a genuine supplier’s bank details are silently changed; credential harvesting pages that look exactly like your own login screen. We also cover the part most training skips, which is what to do in the ten minutes after somebody has clicked — because the difference between an incident and a breach is usually how fast it was reported, and staff who expect to be blamed do not report.',
+      },
+      {
+        h: 'Why this sits next to our security work',
+        p: 'Workspace setup is often treated as an IT admin errand and security as a separate, later purchase. In practice the identity layer is the security perimeter for most small and mid-size organisations: the overwhelming majority of intrusions begin with a valid credential rather than an exploit. The same team that configures your tenant also does our penetration testing and managed SecOps, so the configuration is built by people who spend the rest of their week attacking configurations.',
+      },
+    ],
+  },
+
   cloud: {
     kicker: 'The infrastructure',
     heading: 'Servers sized for the day it matters.',
@@ -768,7 +987,7 @@ const DEEP_DIVE = {
     blocks: [
       {
         h: 'Private cloud on AWS and Azure',
-        p: 'We design and deploy Virtual Private Clouds on AWS and Microsoft Azure: an isolated network you control, with your own subnets, routing and security groups rather than a shared box with neighbours. The architecture auto-scales, so capacity follows demand up during a traffic spike and back down again afterwards. That is the difference between paying for a peak and paying for a year of peaks. The uptime SLA is 99.99%.',
+        p: 'We design and deploy Virtual Private Clouds on AWS and Microsoft Azure: an isolated network you control, with your own subnets, routing and security groups rather than a shared box with neighbours. The architecture auto-scales, so capacity follows demand up during a traffic spike and back down again afterwards. That is the difference between paying for a peak and paying for a year of peaks. The uptime SLA is 99.99%. We are a registered partner in the AWS Partner Network and a member of the Google Cloud Partner Advantage programme, and we hold an Azure credits grant from Microsoft for Startups — which matters less as a badge than as the reason we can go to the vendor directly when something needs escalating.',
       },
       {
         h: 'AWS or Azure, and why it is usually not a close call',
@@ -972,6 +1191,8 @@ const erp = transformView(extractView(src, 'erp-view'));
 const cms = transformView(extractView(src, 'cms-view'), { dark: false });
 const it = transformView(extractView(src, 'it-view'), { dark: true });
 const cloud = transformView(extractView(src, 'cloud-view'));
+const workspace = transformView(extractView(src, 'workspace-view'));
+const classroom = transformView(extractView(src, 'classroom-view'), { dark: true });
 
 const CRUMB_HOME = { name: 'Home', url: '/' };
 
@@ -991,7 +1212,7 @@ const PAGES = [
     faqs: [
       {
         q: 'What does Vybe Technologies do?',
-        a: 'Vybe Technologies is a software company based in Bengaluru. Our flagship products are <strong>Vybe ERP</strong> for school and college administration, <strong>Vybe CMS</strong> for 100% cashless cafeterias, and <strong>Vybe Cloud</strong> for scalable servers and hosting. Alongside those, <strong>Vybe IT Solutions</strong> takes on custom software work for businesses of any size or sector — web and mobile apps, business ERPs, retail POS, bespoke SaaS, internal tools — together with cybersecurity and managed IT. If your requirement does not match a product off our shelf, we build it to fit.',
+        a: 'Vybe Technologies is a software company based in Bengaluru. Our flagship products are <strong>Vybe ERP</strong> for school and college administration, <strong>Vybe CMS</strong> for 100% cashless cafeterias, and <strong>Vybe Cloud</strong> for scalable servers and hosting. We set up <strong>smart classrooms</strong> — interactive flat panels, online and hybrid class systems and Extramarks content — and handle <strong>workspace and email setup</strong>: Google Workspace, Microsoft 365 and Zoho Mail, staff and student accounts, single sign-on and secure online classes. Alongside those, <strong>Vybe IT Solutions</strong> takes on custom software work for businesses of any size or sector — web and mobile apps, business ERPs, retail POS, bespoke SaaS, internal tools — together with cybersecurity and managed IT. If your requirement does not match a product off our shelf, we build it to fit.',
       },
       {
         q: 'Who does Vybe work with?',
@@ -1006,6 +1227,14 @@ const PAGES = [
         a: 'Yes. The ERP is fully customisable, and Vybe IT Solutions builds bespoke web and mobile applications — educational portals, business ERPs, retail POS and custom SaaS — to an institution\u2019s exact operational requirements.',
       },
       {
+        q: 'Do you set up smart classrooms?',
+        a: 'Yes — <a href="/smart-classroom/">smart classroom setup</a> end to end: smart interactive flat panels sized to the room, online and hybrid class systems (classroom PC, camera, chat monitor, lighting and audio), UPS-backed power and cabling, and teacher training at handover. We are an <strong>Extramarks channel partner</strong> for Smart Class Plus in schools and Extramarks Forte in colleges and universities, and a partner and dealer for <strong>JS Global Industries</strong> classroom boards.',
+      },
+      {
+        q: 'Is Vybe an accredited partner of any cloud or hardware vendor?',
+        a: 'Yes. We are a registered <strong>Ingram Micro</strong> partner for distribution and licensing, a registered partner in the <strong>AWS Partner Network</strong>, and a member of the <strong>Google Cloud Partner Advantage</strong> programme, which covers both Google Cloud Platform and Google Workspace. We have also been awarded Azure credits under <strong>Microsoft for Startups</strong>.',
+      },
+      {
         q: 'How do we get a quote?',
         a: `Email <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a> or call <a class="text-brand font-bold" href="tel:+919964177877">+91 99641 77877</a> with your campus size and the modules you need, and we will put together a proposal.`,
       },
@@ -1017,6 +1246,8 @@ const PAGES = [
       itemListElement: [
         { name: 'Vybe ERP', url: `${SITE}/erp/`, description: 'Cloud-based Educational Resource Planning suite for schools and colleges.' },
         { name: 'Vybe CMS', url: `${SITE}/cms/`, description: '100% cashless cafeteria management system with QR pickup and split payouts.' },
+        { name: 'Smart Classrooms', url: `${SITE}/smart-classroom/`, description: 'Smart classroom setup — interactive flat panels, online and hybrid class systems, UPS-backed power and Extramarks content.' },
+        { name: 'Workspace & Email', url: `${SITE}/workspace/`, description: 'Google Workspace, Microsoft 365 and Zoho Mail setup, staff and student email, single sign-on, secure online classes and phishing training.' },
         { name: 'Vybe IT Solutions', url: `${SITE}/it-solutions/`, description: 'Custom app development, penetration testing and managed security operations.' },
         { name: 'Vybe Cloud', url: `${SITE}/cloud/`, description: 'Scalable cloud architecture, game servers and DDoS protection.' },
       ].map((s, i) => ({
@@ -1121,6 +1352,197 @@ const PAGES = [
   },
 
   {
+    url: '/smart-classroom/',
+    file: 'smart-classroom/index.html',
+    nav: 'classroom',
+    title: 'Smart Classroom Setup | Interactive Flat Panels & Online Classes',
+    ogTitle: 'Smart Classrooms — panels, cameras, power and content',
+    description:
+      'Smart classroom setup for schools and colleges: interactive flat panel installation, online class systems with camera and lighting, UPS-backed power and cabling.',
+    trail: [CRUMB_HOME, { name: 'Smart Classrooms', url: '/smart-classroom/' }],
+    priority: '0.9',
+    dark: true,
+    bodyClass: 'text-white dark-section selection:bg-brand/10 selection:text-brand flex flex-col min-h-screen relative z-0',
+    view: classroom,
+    faqs: [
+      {
+        q: 'What is included in a smart classroom setup?',
+        a: 'A complete room rather than a list of parts: the interactive flat panel supplied and mounted, a classroom PC, camera, audio and lighting where the room is used for online or hybrid teaching, UPS backup and surge protection, dedicated power points and concealed cabling, content and LMS licensing, and teacher training at handover. Specifications are set per room — a 40-seat lecture hall and a 20-seat tutorial room do not take the same panel.',
+      },
+      {
+        q: 'Should we buy an interactive flat panel or a projector?',
+        a: 'A panel, in almost every case. Projectors need a darkened room, a bulb that is a recurring cost and eventually fails mid-lesson, and periodic alignment; the image degrades steadily and nobody notices until it is bad. A flat panel has no consumables, is readable in full daylight, and is touch-interactive out of the box. Projectors still make sense for very large halls where a panel cannot be seen from the back row, and we will say so when that is the situation.',
+      },
+      {
+        q: 'What size panel do we need?',
+        a: 'It depends on the distance from the panel to the back row, not on the size of the room. As a working rule, the back row should be no further from the panel than about six times its height, which for a typical 30-to-40-seat classroom puts you at 75 inches, with 65 inches suitable for smaller tutorial rooms and 86 or 98 inches for wide or deep halls. We measure the rooms rather than quoting one size across a building.',
+      },
+      {
+        q: 'What do we need to run online or hybrid classes?',
+        a: 'Five things, and most rooms are missing at least two of them. A classroom PC to run the session, a camera framed on the teaching area, a second chat monitor so the teacher can see remote students’ questions without minimising what they are teaching, lighting so the camera has usable light on the teacher’s face, and audio that picks up the room rather than only the person at the desk. The panel itself is the shared surface both audiences see. We supply and install the whole rig.',
+      },
+      {
+        q: 'Do you supply UPS and handle the electrical work?',
+        a: 'Yes. UPS backup sized to keep the panel and PC running through a typical outage, surge protection, dedicated power points and concealed cabling are part of the installation. This is the part most commonly skipped, and it is why so many smart classrooms end up with a panel running off an extension board trailing across a doorway.',
+      },
+      {
+        q: 'Are you an Extramarks partner?',
+        a: 'Yes, we are an Extramarks channel partner. That covers <strong>Extramarks Smart Class Plus</strong> — curriculum-mapped animated lessons and LMS modules for K-12 schools — and <strong>Extramarks Forte</strong>, the higher-education stack for universities and colleges. We license, deploy and support both, so the content and the hardware it runs on come from one place and there is nobody to point at when something does not work.',
+      },
+      {
+        q: 'What is the difference between Extramarks Smart Class Plus and Extramarks Forte?',
+        a: 'Smart Class Plus is built for K-12: animated lessons mapped to the syllabus, delivered on the classroom panel, with LMS modules for assignments and assessment. Forte is the higher-education product, aimed at universities and colleges, covering LMS, course delivery and assessments at degree level. Schools generally want the first; colleges and universities want the second. Both can sit alongside Vybe ERP.',
+      },
+      {
+        q: 'Do you supply writing boards as well as panels?',
+        a: 'Yes. We are a partner and dealer for JS Global Industries, who manufacture classroom display and writing boards in Bengaluru. Most rooms want both — a panel for delivery and a writing surface beside it for working through a problem — and specifying them together means the wall is laid out once rather than retrofitted.',
+      },
+      {
+        q: 'Do you train our teachers, and what happens after installation?',
+        a: 'Installation includes hands-on training for the staff who have to teach with it, which is what decides whether the room gets used or quietly goes back to chalk. After handover we offer annual maintenance and support, so a failed panel is a phone call rather than a procurement exercise.',
+      },
+      {
+        q: 'Can smart classrooms integrate with Vybe ERP?',
+        a: `Yes. Where the institution runs <a class="text-brand font-bold" href="/erp/">Vybe ERP</a>, the classroom sits inside the same system — timetables, attendance and academics — rather than being a parallel setup with its own logins. Student accounts set up through our <a class="text-brand font-bold" href="/workspace/">workspace and email</a> service are what let online classes admit your own students automatically and keep every participant identifiable.`,
+      },
+    ],
+    schema: (url) => [
+      {
+        '@type': 'Service',
+        '@id': `${url}#classroom`,
+        name: 'Smart Classroom Setup & Installation',
+        url,
+        serviceType: 'Audio-visual installation and classroom technology',
+        description:
+          'Supply, mounting and commissioning of smart interactive flat panels and writing boards, with UPS backup, surge protection, dedicated power and concealed cabling, specified per room for schools and colleges.',
+        provider: { '@id': `${SITE}/#organization` },
+        areaServed: { '@type': 'Country', name: 'India' },
+        audience: { '@type': 'EducationalAudience', educationalRole: 'teacher' },
+      },
+      {
+        '@type': 'Service',
+        '@id': `${url}#online-class`,
+        name: 'Online & Hybrid Class System Setup',
+        url,
+        serviceType: 'Hybrid classroom audio-visual systems',
+        description:
+          'Complete online class rigs: classroom PC, camera, dedicated chat monitor so teachers can see remote questions, lighting and room audio, built around the interactive flat panel as the shared surface.',
+        provider: { '@id': `${SITE}/#organization` },
+        areaServed: { '@type': 'Country', name: 'India' },
+      },
+      {
+        '@type': 'Service',
+        '@id': `${url}#content`,
+        name: 'Extramarks Smart Class Plus & Forte Deployment',
+        url,
+        serviceType: 'Digital learning content and LMS deployment',
+        description:
+          'Licensing, deployment and support of Extramarks Smart Class Plus curriculum-mapped animated lessons and LMS modules for K-12 schools, and Extramarks Forte LMS and course delivery for universities and colleges, as an Extramarks channel partner.',
+        provider: { '@id': `${SITE}/#organization` },
+        areaServed: { '@type': 'Country', name: 'India' },
+      },
+    ],
+  },
+
+  {
+    url: '/workspace/',
+    file: 'workspace/index.html',
+    nav: 'workspace',
+    title: 'Google Workspace & Student Email Setup | Microsoft 365, Zoho Mail',
+    ogTitle: 'Workspace & Email — set up properly, secured properly',
+    description:
+      'Google Workspace, Microsoft 365 and Zoho Mail setup: staff and student email on your own domain, single sign-on, secure online classes and phishing training.',
+    trail: [CRUMB_HOME, { name: 'Workspace & Email', url: '/workspace/' }],
+    priority: '0.8',
+    view: workspace,
+    // Google Cloud Partner Advantage covers Workspace, and Ingram Micro is how
+    // the licences are actually bought — both are relevant here.
+    credentials: true,
+    faqs: [
+      {
+        q: 'Should we use Google Workspace, Microsoft 365 or Zoho Mail?',
+        a: 'Microsoft 365 for Business usually wins if your team already relies on desktop Office and Teams, or if you have Windows laptops to manage centrally — Entra ID and Intune come with it. Google Workspace is usually simpler if your people work mainly in a browser and collaborate live on documents. Zoho Mail is the value option and a genuinely good one: noticeably cheaper per user, Indian-owned with Indian data centres if data residency matters to you, and the right answer when what you actually need is professional email on your own domain rather than a full collaboration suite. We will recommend one for your specific setup and explain why.',
+      },
+      {
+        q: 'Do you set up Zoho Mail?',
+        a: 'Yes. Zoho Mail is one of the three suites we deploy, and we handle it the same way as the others — domain verification, DNS, mailbox creation, migration of your existing mail, and SPF, DKIM and DMARC configured properly. It is often what we recommend to smaller teams and cost-sensitive institutions, since the per-user cost is well below Google Workspace or Microsoft 365 for what is, for many organisations, the same practical outcome.',
+      },
+      {
+        q: 'Can you migrate our existing email without losing anything?',
+        a: 'Yes. We migrate existing mail, contacts and calendars with folder structure intact, run the new tenant in parallel while DNS propagates, and cut over only once delivery is confirmed working both ways. Shared addresses like accounts@ or info@ are set up as proper shared mailboxes rather than a personal account with a shared password. Migrations between Google Workspace, Microsoft 365 and Zoho in any direction are all routine.',
+      },
+      {
+        q: 'Can you set up email accounts for students, not just staff?',
+        a: 'Yes, and it is a large part of what we do. Every student gets an institution-owned address on your domain, provisioned in bulk from your existing roll — or created automatically at admission where the institution runs Vybe ERP — and organised by year and department so you can mail a single batch without maintaining lists by hand. Each academic year the structure rolls forward, with graduating students moved to whatever your policy says: an alumni address, read-only access, or suspension. Both Google Workspace for Education and Microsoft 365 Education have tiers that cost qualifying institutions nothing or very little for the core student accounts.',
+      },
+      {
+        q: 'How do you stop strangers joining our online classes?',
+        a: 'Once students have institutional accounts, class meetings can be configured to admit signed-in members of your own domain automatically from the lobby and hold everybody else outside it. A leaked link stops being a way in, because having the link is no longer what grants entry, and the teacher is not stuck admitting forty people by hand at the start of every period.',
+      },
+      {
+        q: 'What if a student disrupts an online class?',
+        a: 'Because every participant joins under a named, institution-owned account rather than as an anonymous guest, disruption is attributable. Nobody can misbehave under an invented name and rejoin under another one, the attendance record is a real record, and the follow-up is an ordinary disciplinary matter rather than an investigation. In practice most of the benefit is deterrence — the incidents largely stop once students know the room can identify everyone in it.',
+      },
+      {
+        q: 'What is SPF, DKIM and DMARC, and do we need all three?',
+        a: 'They are the three DNS records that decide whether your mail reaches the inbox and whether anyone else can send mail pretending to be you. SPF lists which servers may send as your domain, DKIM cryptographically signs each message, and DMARC tells receiving servers what to do when a message fails either check — and reports attempted impersonation back to you. Yes, you need all three, and DMARC needs to be moved to enforcement rather than left on monitoring.',
+      },
+      {
+        q: 'What does single sign-on actually give us?',
+        a: 'One account per employee, protected by one multi-factor step, that signs them into Workspace or Microsoft 365 and into your other SaaS tools over SAML or OIDC. It centralises access control: MFA is enforced in one place, conditional access can require a managed device or block sign-ins from countries you do not operate in, and disabling one account when somebody leaves closes every door at once.',
+      },
+      {
+        q: 'What is a phishing simulation and is it safe to run on our staff?',
+        a: 'It is an authorised, harmless test: we send your employees a realistic phishing lure and record who clicks, who submits credentials and who reports it. Nothing is installed and no real credentials are captured. It is run with the organisation’s consent and reported as departmental patterns rather than as a list of individuals to punish — the point is to find where training is needed, and staff who expect to be blamed stop reporting real incidents.',
+      },
+      {
+        q: 'What does the staff security training cover?',
+        a: 'Short, practical, live sessions for non-technical staff on the attacks that actually arrive: business email compromise, invoice fraud where a supplier’s bank details are quietly changed, credential-harvesting pages that copy your own login screen, and password and MFA hygiene. We also cover what to do in the first ten minutes after somebody clicks, since how fast an incident is reported usually decides whether it becomes a breach.',
+      },
+      {
+        q: 'How do we get started?',
+        a: `Email <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a> with your headcount, your domain and what you are running today, and we will come back with a migration plan and a quote.`,
+      },
+    ],
+    schema: (url) => [
+      {
+        '@type': 'Service',
+        '@id': `${url}#workspace`,
+        name: 'Google Workspace, Microsoft 365 & Zoho Mail Setup',
+        url,
+        serviceType: 'Email and productivity suite deployment',
+        description:
+          'Licensing, tenant configuration and migration for Google Workspace, Microsoft 365 for Business and Zoho Mail: company email on your own domain, shared mailboxes, calendars and drives, SPF, DKIM and DMARC, and single sign-on with multi-factor and conditional access.',
+        provider: { '@id': `${SITE}/#organization` },
+        areaServed: { '@type': 'Country', name: 'India' },
+      },
+      {
+        '@type': 'Service',
+        '@id': `${url}#student-email`,
+        name: 'Student Email & Online Class Setup',
+        url,
+        serviceType: 'Education email and virtual classroom deployment',
+        description:
+          'Institution-owned student email accounts on Google Workspace for Education or Microsoft 365 Education, provisioned in bulk and rolled forward each academic year, with online classes configured to auto-admit signed-in domain members from the lobby so leaked links do not grant entry and every participant is identifiable.',
+        provider: { '@id': `${SITE}/#organization` },
+        areaServed: { '@type': 'Country', name: 'India' },
+        audience: { '@type': 'EducationalAudience', educationalRole: 'student' },
+      },
+      {
+        '@type': 'Service',
+        '@id': `${url}#awareness`,
+        name: 'Staff Security Awareness Training & Phishing Simulation',
+        url,
+        serviceType: 'Security awareness training',
+        description:
+          'Authorised simulated phishing campaigns reported by department, with practical live training for non-technical staff on business email compromise, invoice fraud and credential harvesting.',
+        provider: { '@id': `${SITE}/#organization` },
+        areaServed: { '@type': 'Country', name: 'India' },
+      },
+    ],
+  },
+
+  {
     url: '/it-solutions/',
     file: 'it-solutions/index.html',
     nav: 'it',
@@ -1174,6 +1596,8 @@ const PAGES = [
     trail: [CRUMB_HOME, { name: 'Vybe Cloud', url: '/cloud/' }],
     priority: '0.8',
     view: cloud,
+    // The one page where the vendor relationships are the product, not a badge.
+    credentials: true,
     faqs: [
       { q: 'Which cloud platforms do you deploy on?', a: 'We design and deploy Virtual Private Clouds (VPCs) on AWS and Microsoft Azure, architected to auto-scale during traffic spikes. The uptime SLA is 99.99%.' },
       { q: 'Do you host game servers?', a: 'Yes. We provision high clock-speed, bare-metal servers tuned for multiplayer online games, targeting under 20ms ping with zero packet loss.' },
