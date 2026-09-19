@@ -1,10 +1,8 @@
-/* =========================================================================
- * Vybe Technologies — progressive enhancement only.
- *
- * Every word of content is already in the HTML and painted before this file
- * runs (it is deferred). Nothing here is required to read or navigate the
- * site; it only adds the scroll reveal, the nav shadow and the hero canvas.
- * ========================================================================= */
+/*
+ * Progressive enhancement only. Every word of content is in the HTML and
+ * painted before this deferred file runs. Nothing here is required to read
+ * or navigate the site.
+ */
 (function () {
   'use strict';
 
@@ -21,9 +19,8 @@
   }
 
   /* ------------------------------------------------- reading progress bar */
-  // Set through the CSSOM rather than a style attribute: the production CSP is
-  // style-src 'self' with no 'unsafe-inline', which drops style attributes but
-  // does not restrict scripted CSSOM writes.
+  // Through the CSSOM, not a style attribute: the CSP drops inline styles but
+  // does not restrict scripted writes.
   var bar = document.getElementById('scroll-progress');
   if (bar) {
     var barTicking = false;
@@ -45,8 +42,7 @@
   }
 
   /* ------------------------------------------------------ mobile menu ux */
-  // The menu itself is pure CSS (<details>). This only adds the dismissals
-  // people expect: click-away and Escape.
+  // The menu is pure CSS (<details>). This adds click-away and Escape.
   var menu = document.getElementById('mobile-nav');
   if (menu) {
     document.addEventListener('click', function (e) {
@@ -92,10 +88,8 @@
   }
 
   /* ------------------------------------------------------- counting stats */
-  // The finished value is already rendered in the HTML. This only replaces it
-  // with a lower number and walks it back up, so a reader with JS off, with
-  // reduced motion on, or with the stat already scrolled past never sees
-  // anything but the real figure.
+  // The finished value is already in the HTML; this walks up to it. With JS
+  // off or reduced motion on, the reader still sees the real figure.
   var figures = document.querySelectorAll('.stat-figure[data-count-to]');
   if (figures.length && !reducedMotion && 'IntersectionObserver' in window) {
     var countUp = function (el) {
@@ -113,8 +107,7 @@
       var step = function (now) {
         if (!start) start = now;
         var t = Math.min((now - start) / duration, 1);
-        // easeOutExpo: fast off the mark, long settle. Reads as a counter
-        // landing on a figure rather than a linear ramp.
+        // easeOutExpo: reads as a counter landing, not a linear ramp.
         var eased = t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
         el.textContent = prefix + (target * eased).toFixed(places) + suffix;
         if (t < 1) requestAnimationFrame(step);
@@ -137,9 +130,8 @@
   }
 
   /* --------------------------------------------- prefetch on hover intent */
-  // Our pages are small and fully static, so the next one can be in cache
-  // before the click lands. Gated on Save-Data and 2g so it never spends
-  // someone's metered data on a page they only pointed at.
+  // Pages are small and static, so the next one can be cached before the
+  // click lands. Gated on Save-Data and 2g to stay off metered connections.
   var conn = navigator.connection;
   var frugal = !!conn && (conn.saveData || /(^|-)2g$/.test(conn.effectiveType || ''));
 

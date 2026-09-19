@@ -1,8 +1,5 @@
-/* =========================================================================
-   Vybe Technologies — single stylesheet.
-   Self-hosted variable fonts, so the page makes zero third-party requests
-   and nothing render-blocking sits on another origin's latency.
-   ========================================================================= */
+/* Single stylesheet. Fonts are self-hosted, so the page makes no third-party
+   requests and nothing render-blocking sits on another origin's latency. */
 
 @font-face {
   font-family: 'Inter';
@@ -91,9 +88,8 @@
     transform: translateY(0);
   }
 
-  /* Reading progress, sitting on the header's bottom border. site.js drives
-     the scale; until it does the bar is scaled to nothing, so with JS off it
-     is an invisible 2px line rather than a full bar that never moves. */
+  /* Reading progress. Scaled to nothing until site.js drives it, so with JS
+     off it is an invisible line rather than a bar that never moves. */
   .scroll-progress {
     position: absolute;
     left: 0;
@@ -106,9 +102,8 @@
     will-change: transform;
   }
 
-  /* Counting digits change width as they animate, which makes the whole stat
-     row twitch. Tabular figures give every digit the same advance so the
-     number ticks up in place. */
+  /* Tabular figures, so a counting number ticks up in place instead of
+     twitching as the digit widths change. */
   .stat-figure {
     font-variant-numeric: tabular-nums;
   }
@@ -122,9 +117,8 @@
   .animate-float-badge { animation: float-badge 4s ease-in-out infinite; }
   .animate-float-badge-delayed { animation: float-badge 5s ease-in-out infinite; animation-delay: 1.5s; }
 
-  /* Staggered animation offsets. These were inline `style="animation-delay:…"`
-     attributes in the original, which the production Content-Security-Policy
-     (style-src 'self', no 'unsafe-inline') silently drops. */
+  /* Staggered offsets. Were inline animation-delay attributes, which the
+     production CSP silently drops. */
   .anim-delay-500 { animation-delay: 0.5s; }
   .anim-delay-1000 { animation-delay: 1s; }
 
@@ -179,8 +173,7 @@
     font-size: 0.9em;
   }
 
-  /* Page enters with a short fade. Content is already in the DOM and painted,
-     so this never delays first contentful paint the way the old JS loader did. */
+  /* A short fade in. Content is already painted, so this delays nothing. */
   .page-enter {
     animation: fadeInPage 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
@@ -198,8 +191,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Keyboard users need to see where they are. The original stripped outlines
-   with focus:outline-none and put nothing back. */
+/* Keyboard users need to see where they are. */
 :focus-visible {
   outline: 3px solid #e31837;
   outline-offset: 3px;
@@ -226,8 +218,7 @@ body {
   50% { transform: translateY(-15px) rotate(2deg); }
 }
 
-/* Respect the OS-level motion preference. Required for WCAG 2.3.3 and it
-   stops the canvas/orb animations burning battery for users who opted out. */
+/* WCAG 2.3.3, and it stops the canvas burning battery for users who opted out. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

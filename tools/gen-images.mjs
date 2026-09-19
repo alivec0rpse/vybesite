@@ -13,13 +13,9 @@ await sharp(S + 'vybe-logo.png').resize({ width: 600 }).png({ compressionLevel: 
 await sharp(S + 'vybe-logo.png').resize({ width: 600 }).webp({ quality: 92 }).toFile(A + 'vybe-logo.webp');
 
 /**
- * 1b. The full lockup — mark + "Technologies" + tagline.
- *
- * This is what Organization.logo points at, not the bare mark. A machine
- * reading the bare VYBE glyph cannot tell it says "Vybe Technologies"; the
- * lockup spells the company name out, which is what a Knowledge Panel wants.
- * Trimmed because the source carries a band of empty alpha along the bottom
- * that would otherwise be baked into the declared height.
+ * 1b. The full lockup, which is what Organization.logo points at: it spells
+ * the company name out where the bare glyph does not. Trimmed because the
+ * source carries a band of empty alpha along the bottom.
  */
 const lockup = await sharp(S + 'vybe-lockup.png').trim().png({ compressionLevel: 9 }).toBuffer();
 const lm = await sharp(lockup).metadata();
@@ -43,14 +39,12 @@ const markWhite = await sharp(MARK)                 // use alpha as a mask, fill
 
 /**
  * `pad` is the horizontal margin as a fraction of the icon size. The wordmark
- * is ~2.4:1, so it is the width that fills the square and the height falls out
- * of the aspect ratio — it is centred vertically in the remaining space.
+ * is ~2.4:1, so width fills the square and the height follows from that.
  */
 async function icon(size, pad) {
   const inner = Math.round(size * (1 - pad * 2));
   let pipe = sharp(markWhite).resize({ width: inner, fit: 'inside' });
-  // Below ~64px each letter is only a few pixels wide; a touch of sharpening
-  // keeps the strokes from smearing into the red.
+  // Below ~64px the strokes smear into the red without a touch of sharpening.
   if (size < 64) pipe = pipe.sharpen({ sigma: 0.6 });
   const mark = await pipe.toBuffer();
   const m = await sharp(mark).metadata();
@@ -62,15 +56,15 @@ async function icon(size, pad) {
 fs.writeFileSync(A + 'icon-512.png', await icon(512, 0.11));
 fs.writeFileSync(A + 'icon-192.png', await icon(192, 0.11));
 fs.writeFileSync(A + 'apple-touch-icon.png', await icon(180, 0.10));
-// Android masks to a circle: a 2.4:1 mark only stays inside the 80% safe zone
-// up to ~74% width, hence the wider padding here.
+// Android masks to a circle, so the mark needs wider padding to stay inside
+// the 80% safe zone.
 fs.writeFileSync(A + 'icon-maskable-512.png', await icon(512, 0.155));
 fs.writeFileSync(A + 'favicon-48.png', await icon(48, 0.08));
 fs.writeFileSync(A + 'favicon-32.png', await icon(32, 0.06));
 fs.writeFileSync(A + 'favicon-16.png', await icon(16, 0.04));
 
-// 4. favicon.ico — 16/32/48 only. ICO stores each size as an uncompressed
-// bitmap, so adding a 192px frame would balloon the file to ~150KB.
+// 4. favicon.ico, 16/32/48 only. ICO frames are uncompressed bitmaps, so a
+// 192px frame would push the file to ~150KB.
 const pngToIco = await import('png-to-ico').then((m) => m.default || m);
 fs.writeFileSync(
   ROOT + 'favicon.ico',

@@ -9,13 +9,8 @@
 <link rel="canonical" href="https://vybe.net.in/shipping-policy/">
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 
-<!-- Typography is self-hosted; preloading the two variable faces removes the
-     flash of fallback text without any third-party connection. -->
 <link rel="preload" href="/assets/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/plus-jakarta-sans-var.woff2" as="font" type="font/woff2" crossorigin>
-<!-- The icon face is font-display: block, so every glyph on the page stays
-     invisible until it lands. Without this preload it is only discovered when
-     the stylesheet has parsed, which is a visible late pop of every icon. -->
 <link rel="preload" href="/assets/fonts/material-symbols-subset.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/site.css">
 
@@ -64,22 +59,12 @@
         <div class="max-w-7xl mx-auto px-6 h-[72px] flex justify-between items-center">
             <a href="/" class="flex items-center gap-3 group" aria-label="Vybe Technologies — home">
                 <picture><source srcset="/assets/vybe-logo.webp" type="image/webp"><img src="/assets/vybe-logo.opt.png" alt="Vybe Technologies" class="h-6 object-contain" width="57" height="24" loading="eager" fetchpriority="high" decoding="async"></picture>
-                <!-- The word lockup is hidden below sm and the VYBE mark
-                     carries the brand alone. The logo, "Technologies", the
-                     Talk to Sales pill and the menu button together need
-                     ~410px; on a 360px Android the pill was landing on top of
-                     the word. Dropping the word is the only one of the four
-                     that costs nothing — the mark still says who this is. -->
                 <span class="hidden sm:flex flex-col justify-center border-l border-slate-200 pl-3">
                     <span class="text-[15px] font-bold font-display tracking-tight text-slate-900 leading-none">Technologies</span>
                     <span class="text-[7px] font-bold text-slate-400 uppercase tracking-[0.2em] leading-none mt-1 whitespace-nowrap">Smart. Simple. Affordable.</span>
                 </span>
             </a>
 
-            <!-- lg, not md: six items plus the logo lockup and the sales button
-                 overlap on a 768px tablet, where "IT & Cyber" wraps to two lines
-                 and "Cloud" disappears behind the button. Tablets get the same
-                 menu as phones, which has the same links in the same markup. -->
             <nav class="hidden lg:flex items-center gap-6 xl:gap-8 text-sm font-medium text-slate-600" aria-label="Primary">
                 <a href="/" class="hover:text-brand transition-colors">Home</a>
                 <a href="/erp/" class="hover:text-brand transition-colors">ERP</a>
@@ -92,17 +77,10 @@
             </nav>
 
             <div class="flex items-center gap-2 md:gap-4">
-                <!-- /contact/ rather than a bare mailto:. On a desktop with no
-                     mail client configured a mailto: button does nothing at
-                     all, which is a dead end on the one control the whole site
-                     funnels into. The page it opens leads with the same
-                     address, plus the phone numbers and the office. -->
                 <a href="/contact/" class="bg-corporate hover:bg-slate-800 text-white px-4 md:px-5 py-2.5 rounded-full text-sm font-bold transition-all active:scale-95 whitespace-nowrap">
                     Talk to Sales
                 </a>
 
-                <!-- Mobile menu. Pure CSS <details>: works with JS disabled, and
-                     the links are the same markup the crawler already sees. -->
                 <details class="group lg:hidden relative" id="mobile-nav">
                     <summary class="list-none [&::-webkit-details-marker]:hidden cursor-pointer flex items-center justify-center w-12 h-12 rounded-full text-slate-700 hover:bg-slate-100 transition-colors" aria-label="Menu">
                         <span class="material-symbols-outlined text-[24px] group-open:hidden" aria-hidden="true">menu</span>
@@ -122,9 +100,6 @@
             </div>
         </div>
 
-        <!-- Reading progress. Purely decorative, so it is aria-hidden and sits
-             at zero width until site.js drives it; with JS off it is an
-             invisible 2px line rather than a broken-looking empty bar. -->
         <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
     </header>
 
@@ -192,9 +167,6 @@
                 </div>
                 <p class="text-sm leading-relaxed mb-6">Unified software suites, custom development and secure infrastructure — for campuses and for businesses that need something built to fit.</p>
 
-                <!-- Visible counterparts to the sameAs list in the JSON-LD.
-                     rel="me" states the same ownership claim in markup, and the
-                     profiles link back here, which is what makes it credible. -->
                 <ul class="flex items-center gap-3">
                     <li><a href="https://www.linkedin.com/company/vybe-technologies" rel="me noopener" target="_blank" aria-label="LinkedIn" title="LinkedIn"
                        class="flex items-center justify-center w-10 h-10 rounded-full bg-white/5 hover:bg-brand text-slate-300 hover:text-white transition-colors">

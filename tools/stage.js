@@ -1,19 +1,13 @@
-/* =========================================================================
- * Assemble dist/ — exactly what gets uploaded to Azure, and nothing else.
+/*
+ * Assemble dist/: what gets uploaded to Azure, and nothing else. build.js
+ * writes into the repo root, so the root is both source tree and site, and an
+ * unfiltered upload would carry build.js, src/ and tools/ with it.
  *
- * build.js writes its output into the repo root, which means the root is
- * both the source tree and the site. That is convenient locally and wrong
- * for a deploy: without this step the upload would also carry build.js,
- * src/, tools/ and package.json. staticwebapp.config.json 404s those paths,
- * so it was never a hole, but shipping your own build scripts to a public
- * CDN is not something to rely on a routing rule to hide.
- *
- * The list below is a DENY list rather than an allow list on purpose: a new
- * page directory should be deployed automatically, whereas a new build tool
- * is something you add to tools/ and therefore excluded by name.
+ * A deny list, not an allow list: a new page directory deploys automatically,
+ * a new build tool goes in tools/ and is excluded by name.
  *
  * Usage: node tools/stage.js
- * ========================================================================= */
+ */
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -51,13 +45,11 @@ const REQUIRED = [
   'site.webmanifest',
   'assets/site.css',
   'assets/site.js',
-  // Same reasoning as the Apple file below: nothing on the site links to
-  // either of these, so a missing one is silent until an answer engine or a
-  // security researcher goes looking and finds a 404.
+  // Nothing links to these, so a missing one is silent until an answer engine
+  // or a security researcher goes looking and finds a 404.
   'llms.txt',
   '.well-known/security.txt',
-  // Apple Pay domain verification. Listed because its absence is invisible:
-  // the site looks perfect and Apple Pay just stops verifying the domain.
+  // Apple Pay domain verification. Its absence is invisible until it fails.
   '.well-known/apple-developer-merchantid-domain-association',
 ];
 
@@ -84,9 +76,8 @@ for (const entry of fs.readdirSync(ROOT, { withFileTypes: true })) {
   files++;
 }
 
-// The IndexNow key file has to be reachable at the site root or the engines
-// reject every submission with a 403. It is named for the key it holds, so it
-// is matched by pattern rather than listed above.
+// The IndexNow key file must be at the site root or submissions 403. Matched
+// by pattern because it is named for the key it holds.
 const hasIndexNowKey = fs.readdirSync(DIST).some((f) => /^[a-f0-9]{8,128}\.txt$/i.test(f));
 if (!hasIndexNowKey) console.warn('stage: no IndexNow key file in dist/ — submissions will 403');
 

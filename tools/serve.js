@@ -1,11 +1,7 @@
-/* =========================================================================
- * Local preview on http://localhost:8099
- *
- * Reads globalHeaders straight out of staticwebapp.config.json, so the CSP
- * the browser enforces here is the same one Azure will send. Without that,
- * anything the CSP blocks (inline styles, third-party scripts) looks perfect
- * locally and breaks only in production.
- * ========================================================================= */
+/*
+ * Local preview on http://localhost:8099, serving globalHeaders straight out
+ * of staticwebapp.config.json so the CSP here matches the one Azure sends.
+ */
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -28,8 +24,7 @@ const MIME = {
 
 const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'staticwebapp.config.json'), 'utf8'));
 const globalHeaders = { ...config.globalHeaders };
-// HSTS on plain-HTTP localhost would poison the browser for every other
-// localhost project; everything else is worth enforcing.
+// HSTS on plain-HTTP localhost would poison every other localhost project.
 delete globalHeaders['Strict-Transport-Security'];
 
 http

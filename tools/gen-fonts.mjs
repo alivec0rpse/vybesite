@@ -1,13 +1,11 @@
-/* =========================================================================
- * Regenerates assets/fonts/material-symbols-subset.woff2.
- *
- * Scans every built page for Material Symbols ligature names and asks Google
- * Fonts for a subset containing only those glyphs, pinned to the single
- * instance the site actually renders (opsz 20, wght 400, FILL 1, GRAD 0).
- * Full variable font: ~200KB. This: ~7KB.
+/*
+ * Regenerates assets/fonts/material-symbols-subset.woff2. Scans the built
+ * pages for ligature names and fetches only those glyphs, pinned to the one
+ * instance the site renders (opsz 20, wght 400, FILL 1, GRAD 0). ~200KB full,
+ * ~7KB subset.
  *
  *   node tools/gen-fonts.mjs
- * ========================================================================= */
+ */
 import { readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';

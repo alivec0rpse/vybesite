@@ -1,28 +1,21 @@
-/* =========================================================================
- * Tell the IndexNow engines which pages actually changed.
+/*
+ * Tell the IndexNow engines which pages actually changed. Bing, Yandex,
+ * Seznam, Naver and DuckDuckGo all consume the shared api.indexnow.org
+ * endpoint. Google does not, so this adds to the sitemap, never replaces it.
  *
- * IndexNow is push, not pull: instead of waiting for a crawler to notice a
- * change, you POST the URLs and the participating engines fetch them. Bing,
- * Yandex, Seznam, Naver and DuckDuckGo (via Bing) all consume it through the
- * shared api.indexnow.org endpoint. Google does not participate, so this is
- * an addition to the sitemap, never a replacement for it.
+ * Submitting every URL on every deploy is treated as spam, and a CSS tweak
+ * does not change nine pages. .lastmod.json only moves a date when a page's
+ * content hash moves, so this diffs it against the copy in the last commit
+ * and submits exactly the pages that changed.
  *
- * Submitting every URL on every deploy is the thing to avoid. The protocol
- * treats it as spam, and it is also a lie: a CSS tweak does not change nine
- * pages. build.js already fingerprints each page's title, description and
- * body into .lastmod.json and only moves the date when the hash moves, so
- * that file is the honest changelog. This diffs it against the copy in the
- * last commit and submits exactly the pages whose content moved.
- *
- * The key is public by design: it lives at the site root so the engines can
- * fetch it and prove the submitter controls the domain. Nothing here is a
- * secret, which is why the key file is committed rather than held in CI.
+ * The key is public by design: the engines fetch it from the site root to
+ * prove the submitter controls the domain, so it is committed, not held in CI.
  *
  * Usage:
  *   node tools/indexnow.mjs              # changed pages only
  *   node tools/indexnow.mjs --all        # every URL in the sitemap
  *   node tools/indexnow.mjs --dry-run    # print the payload, send nothing
- * ========================================================================= */
+ */
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
@@ -43,10 +36,8 @@ const die = (msg) => {
 /* ------------------------------------------------------------------ key */
 
 /**
- * The key file is named for the key it contains, which is the convention the
- * protocol expects. Finding it by pattern rather than by a constant means the
- * filename and its contents cannot drift apart: rotating the key is one file
- * rename away, with nothing else to remember to edit.
+ * The key file is named for the key it contains, as the protocol expects.
+ * Found by pattern, so rotating the key is one rename and nothing else.
  */
 const keyFiles = fs.readdirSync(ROOT).filter((f) => /^[a-f0-9]{8,128}\.txt$/i.test(f));
 if (keyFiles.length !== 1) {
@@ -75,10 +66,9 @@ const origin = new URL(sitemapUrls[0]).origin;
 const host = new URL(origin).host;
 
 /**
- * Git is the only record of what the site looked like before this build. If
- * the previous .lastmod.json is unreachable — a shallow clone, a fresh repo,
- * an unstaged working tree — there is no diff to take, and falling back to
- * the full list is the safe answer rather than silently submitting nothing.
+ * Git is the only record of the previous build. If .lastmod.json is
+ * unreachable (shallow clone, fresh repo) there is no diff to take, and the
+ * full list is the safe fallback rather than silently submitting nothing.
  */
 function previousLastmod() {
   try {
@@ -141,10 +131,8 @@ const res = await fetch(ENDPOINT, {
 const body = await res.text();
 
 /**
- * 200 accepted, 202 accepted but the key is still being validated — both are
- * successes. Everything else is worth reading, but none of it is worth
- * failing a deploy over: the pages are already live and the sitemap still
- * carries them. This is a hint to the engines, not a gate.
+ * 200 and 202 are both successes. Nothing here fails a deploy: the pages are
+ * already live and in the sitemap. This is a hint to the engines, not a gate.
  */
 const MEANING = {
   200: 'accepted',

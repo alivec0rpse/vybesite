@@ -1,15 +1,9 @@
-/* =========================================================================
- * Vybe Technologies — static site builder.
+/*
+ * Static site builder. Turns the single-page app in src/app.html into one real
+ * HTML document per section, wrapped in the shared head, nav and footer.
  *
- * Takes the original single-page app (src/app.html) and emits one real,
- * crawlable HTML document per section, each with its own canonical URL,
- * title, description, structured data and breadcrumbs.
- *
- *   node build.js && npx tailwindcss -i src/input.css -o assets/site.css --minify
- *
- * The shared chrome (head / nav / footer / scripts) lives in this file, so a
- * change to the nav propagates to every page on the next build.
- * ========================================================================= */
+ *   node build.js && npm run css
+ */
 
 const fs = require('node:fs');
 const path = require('node:path');
@@ -28,11 +22,7 @@ const ORG = {
   sales: 'sales@vybe.net.in',
   support: 'support@vybe.net.in',
   legal: 'legal@vybe.net.in',
-  // Escalation of last resort, and worded that way everywhere it appears: the
-  // three mailboxes above handle the overwhelming majority of enquiries, and a
-  // grievance route that reads as a parallel front door just moves the queue.
-  // Named rather than a role alias on purpose — the point of this address is
-  // that it reaches a person, so it must not be another shared inbox.
+  // Escalation of last resort. A person, not a role alias, on purpose.
   grievance: 'manjunath@vybe.net.in',
   street: '#103, First Floor, 10th Main, Gaurav Nagar, J.P Nagar 7th Phase',
   locality: 'Bengaluru',
@@ -60,21 +50,13 @@ const write = (p, s) => {
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const ld = (obj) => `<script type="application/ld+json">${JSON.stringify(obj).replace(/</g, '\\u003c')}</script>`;
 
-/* ----------------------------------------------------------------- locale
- *
- * The site is published in English only, at the root. The locale is still
- * named in one place rather than inlined, because `lang`, `og:locale` and the
- * JSON-LD `inLanguage` all have to agree.
- */
+// English only. Named once so lang, og:locale and inLanguage cannot disagree.
 const LOC = { tag: 'en-IN', og: 'en_IN' };
 
 /**
- * Pull one `<div id="…-view">` block out of the source SPA by walking div
- * depth, so we get the whole subtree regardless of how it is indented.
- *
- * The wrapper's own classes carry the page's background and text colour
- * (e.g. `bg-slate-900 text-white` on the IT view), so it is kept — only the
- * SPA machinery (`view-section`, the inline `display:none`) is stripped.
+ * Pull one `<div id="…-view">` out of the source SPA by walking div depth. The
+ * wrapper's classes carry the page background so they are kept; only the SPA
+ * machinery (`view-section`, `display:none`) is stripped.
  */
 function extractView(src, id) {
   const open = new RegExp(`<div id="${id}" class="([^"]*)"[^>]*>`);
@@ -109,16 +91,10 @@ const HREF = {
 };
 
 /**
- * Products that still exist in src/app.html but are not currently sold, and so
- * are not published. This set is the only switch: the nav, the mobile menu,
- * the footer, the related-products rail, the home grid card, the home
- * ItemList, the 404 links, llms.txt and the sitemap all filter on it, and the
- * link-integrity check at the end of this file fails the build if anything
- * still points at one.
- *
- * Deleting an entry republishes the page in full — the copy, the deep dive,
- * the FAQs and the schema are all still here, untouched. The matching 301 in
- * staticwebapp.config.json is the only thing that also has to come out.
+ * Products still in src/app.html but not currently sold. Everything that lists
+ * a product filters on this set, and the link check at the end of the file
+ * fails the build if anything still points at one. Deleting an entry
+ * republishes the page; its 301 in staticwebapp.config.json then has to go.
  */
 const UNPUBLISHED = new Set(['cloud']);
 const published = (nav) => !UNPUBLISHED.has(nav);
@@ -133,10 +109,7 @@ function picture({ base, alt, cls, h, aspect, eager = false, hidden = false }) {
 
 const dedupe = (cls) => [...new Set(cls.split(/\s+/).filter(Boolean))].join(' ');
 
-/**
- * Rewrite `<div onclick="showPage('x-view')" …> … </div>` into a real anchor,
- * walking div depth so the correct closing tag is converted too.
- */
+/** `<div onclick="showPage('x-view')">` -> a real anchor, walking div depth. */
 function divClickToAnchor(html) {
   const open = /<div onclick="showPage\('([a-z-]+)'\)" class="([^"]*)"([^>]*)>/;
   let out = html;
@@ -164,10 +137,8 @@ function divClickToAnchor(html) {
 }
 
 /**
- * Inline `style="…"` -> an equivalent class, folded into the element's existing
- * class attribute. Anything not in this map is a build error rather than a
- * silent pass-through: an unhandled inline style would work locally and vanish
- * under the production CSP, which is the worst possible failure mode.
+ * Inline `style="…"` -> a class. Anything unmapped is a build error: an
+ * unhandled inline style works locally and vanishes under the production CSP.
  */
 const STYLE_CLASS = {
   'transition-delay: 100ms;': 'delay-100',
@@ -181,7 +152,7 @@ const STYLE_CLASS = {
 
 function styleAttrToClass(html) {
   return html.replace(/<([a-z]+)\b([^>]*?)\sstyle="([^"]*)"([^>]*)>/g, (full, tag, before, style, after) => {
-    // The dot-pattern data URI is matched loosely — it carries escaped quotes.
+    // Matched loosely: the data URI carries escaped quotes.
     const cls = /background-image:\s*url\('data:image\/svg\+xml/.test(style)
       ? 'bg-dot-white'
       : STYLE_CLASS[style.trim()];
@@ -198,24 +169,19 @@ function styleAttrToClass(html) {
 function transformView(view, { dark = false } = {}) {
   let out = view.inner;
 
-  // Clickable cards become real anchors — Google can follow them, keyboards
-  // can reach them, and the matching </div> is rewritten to </a> as well.
+  // Clickable cards become real anchors, so they are crawlable and focusable.
   out = divClickToAnchor(out);
 
-  // Drop the whole grid card for any product in UNPUBLISHED. The card is a
-  // card-shaped anchor with no nested <a>, so matching to the first </a> takes
-  // exactly the one element. Done after divClickToAnchor so there is a single
-  // shape to match rather than both a <div onclick> and an <a>.
+  // Drop the grid card for any unpublished product. No nested <a>, so
+  // matching to the first </a> takes exactly one card.
   for (const nav of UNPUBLISHED) {
     const href = (PRODUCTS.find((p) => p.nav === nav) || {}).href;
     if (!href) continue;
     out = out.replace(new RegExp(`<a href="${href}"[^>]*>[\\s\\S]*?</a>\\s*`, 'g'), '');
   }
 
-  // The home grid is two columns, so removing a card can leave the last one
-  // orphaned beside an empty cell. Widen it to fill the row: a full-width
-  // closing card reads as deliberate, an empty half reads as a bug. Only
-  // applies when the count is odd, so restoring the sixth card reverts it.
+  // Two columns: an odd count leaves the last card beside an empty cell, so
+  // widen it to fill the row.
   const cards = [...out.matchAll(/<a href="\/[a-z-]*\/" class="[^"]*\bp-10\b[^"]*"/g)];
   if (cards.length % 2 === 1) {
     const last = cards[cards.length - 1][0];
@@ -247,8 +213,7 @@ function transformView(view, { dark = false } = {}) {
     picture({ base: 'caias-logo', alt: 'Christ Academy Institute for Advanced Studies', cls, h: 112, aspect: 3 })
   );
 
-  // A 175KB remote PNG drawn at 3% opacity. A CSS pattern is visually
-  // identical and costs nothing.
+  // A 175KB remote PNG at 3% opacity. A CSS pattern looks the same for free.
   out = out.replace(
     /style="background-image: url\('https:\/\/lh3\.googleusercontent\.com\/[^']*'\);[^"]*"/g,
     'aria-hidden="true"'
@@ -258,9 +223,8 @@ function transformView(view, { dark = false } = {}) {
   // Decorative-only inline handlers and error fallbacks are no longer needed.
   out = out.replace(/\s*onerror="this\.style\.display='none';"/g, '');
 
-  // Heading levels were chosen visually, not semantically: the small eyebrow
-  // label above a section was an <h2> and the section's actual title an <h3>.
-  // Promote each real title and demote the label to a paragraph.
+  // Headings were picked visually: the eyebrow label was an <h2> and the real
+  // title an <h3>. Promote the title, demote the label to a paragraph.
   out = out.replace(
     /<h2 (class="text-xs[^"]*")>([\s\S]*?)<\/h2>\s*<h3 (class="[^"]*")>([\s\S]*?)<\/h3>/g,
     (_, labelCls, label, titleCls, title) => `<p ${labelCls}>${label}</p>\n<h2 ${titleCls}>${title}</h2>`
@@ -268,21 +232,15 @@ function transformView(view, { dark = false } = {}) {
   // Card titles then sit one level below their section heading.
   out = out.replace(/<h4 (class="text-2xl[^"]*")>([\s\S]*?)<\/h4>/g, '<h3 $1>$2</h3>');
 
-  // The production CSP is `style-src 'self'` with no 'unsafe-inline', which
-  // means browsers drop inline style attributes outright. Every one of these
-  // becomes a real class so the staggered reveals, the floating badges and the
-  // IT-page dot pattern survive on Azure — they would silently flatten
-  // otherwise, and only in production.
+  // The production CSP drops inline style attributes, so each one becomes a
+  // real class. Otherwise the reveals and badges flatten in production only.
   out = styleAttrToClass(out);
 
-  // Reveal-on-scroll starts hidden; mark it so JS can animate, but never
-  // leave text invisible if JS fails.
+  // Marked for JS to animate, but never left invisible if JS fails.
   out = out.replace(/class="([^"]*)\breveal active\b([^"]*)"/g, 'class="$1reveal$2"');
 
-  // Tag the headline figures so site.js can count them up when they scroll
-  // into view. The final value stays in the HTML — the animation only ever
-  // rewrites a number that is already there, so with JS off (or with reduced
-  // motion on) the reader still sees "99.9%" and not a zero.
+  // Tag headline figures for the count-up in site.js. The final value stays
+  // in the HTML, so with JS off the reader still sees "99.9%", not a zero.
   out = out.replace(
     /<p class="(text-3xl md:text-4xl font-black text-brand[^"]*)">([^<]+)<\/p>/g,
     (_, cls, value) => `<p class="${cls} stat-figure" data-count-to="${esc(value.trim())}">${value}</p>`
@@ -322,22 +280,12 @@ function navbar(active) {
         <div class="max-w-7xl mx-auto px-6 h-[72px] flex justify-between items-center">
             <a href="/" class="flex items-center gap-3 group" aria-label="Vybe Technologies — home">
                 ${picture({ base: 'vybe-logo', alt: 'Vybe Technologies', cls: 'h-6 object-contain', h: 24, aspect: LOGO_ASPECT, eager: true })}
-                <!-- The word lockup is hidden below sm and the VYBE mark
-                     carries the brand alone. The logo, "Technologies", the
-                     Talk to Sales pill and the menu button together need
-                     ~410px; on a 360px Android the pill was landing on top of
-                     the word. Dropping the word is the only one of the four
-                     that costs nothing — the mark still says who this is. -->
                 <span class="hidden sm:flex flex-col justify-center border-l border-slate-200 pl-3">
                     <span class="text-[15px] font-bold font-display tracking-tight text-slate-900 leading-none">Technologies</span>
                     <span class="text-[7px] font-bold text-slate-400 uppercase tracking-[0.2em] leading-none mt-1 whitespace-nowrap">Smart. Simple. Affordable.</span>
                 </span>
             </a>
 
-            <!-- lg, not md: six items plus the logo lockup and the sales button
-                 overlap on a 768px tablet, where "IT & Cyber" wraps to two lines
-                 and "Cloud" disappears behind the button. Tablets get the same
-                 menu as phones, which has the same links in the same markup. -->
             <nav class="hidden lg:flex items-center gap-6 xl:gap-8 text-sm font-medium text-slate-600" aria-label="Primary">
                 ${item('/', 'Home', 'home')}
                 ${item('/erp/', 'ERP', 'erp')}
@@ -350,17 +298,10 @@ function navbar(active) {
             </nav>
 
             <div class="flex items-center gap-2 md:gap-4">
-                <!-- /contact/ rather than a bare mailto:. On a desktop with no
-                     mail client configured a mailto: button does nothing at
-                     all, which is a dead end on the one control the whole site
-                     funnels into. The page it opens leads with the same
-                     address, plus the phone numbers and the office. -->
                 <a href="/contact/" class="bg-corporate hover:bg-slate-800 text-white px-4 md:px-5 py-2.5 rounded-full text-sm font-bold transition-all active:scale-95 whitespace-nowrap">
                     Talk to Sales
                 </a>
 
-                <!-- Mobile menu. Pure CSS <details>: works with JS disabled, and
-                     the links are the same markup the crawler already sees. -->
                 <details class="group lg:hidden relative" id="mobile-nav">
                     <summary class="list-none [&::-webkit-details-marker]:hidden cursor-pointer flex items-center justify-center w-12 h-12 rounded-full text-slate-700 hover:bg-slate-100 transition-colors" aria-label="Menu">
                         <span class="material-symbols-outlined text-[24px] group-open:hidden" aria-hidden="true">menu</span>
@@ -380,9 +321,6 @@ function navbar(active) {
             </div>
         </div>
 
-        <!-- Reading progress. Purely decorative, so it is aria-hidden and sits
-             at zero width until site.js drives it; with JS off it is an
-             invisible 2px line rather than a broken-looking empty bar. -->
         <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
     </header>`;
 }
@@ -424,9 +362,6 @@ function footer() {
                 </div>
                 <p class="text-sm leading-relaxed mb-6">Unified software suites, custom development and secure infrastructure — for campuses and for businesses that need something built to fit.</p>
 
-                <!-- Visible counterparts to the sameAs list in the JSON-LD.
-                     rel="me" states the same ownership claim in markup, and the
-                     profiles link back here, which is what makes it credible. -->
                 <ul class="flex items-center gap-3">
                     ${social(
                       ORG.profiles[0],
@@ -496,8 +431,7 @@ const organization = {
   slogan: ORG.slogan,
   description:
     'Vybe Technologies is a Bengaluru software company. Its products include a cloud ERP for schools and colleges and a 100% cashless cafeteria management system, alongside custom software development, cybersecurity and cloud infrastructure for businesses in any sector.',
-  // The full lockup, not the bare VYBE glyph: this is the image Google may put
-  // in a Knowledge Panel, and the lockup actually spells the company name.
+  // The full lockup, not the bare glyph: it spells the company name.
   logo: { '@type': 'ImageObject', '@id': `${SITE}/#logo`, url: `${SITE}/assets/vybe-lockup.png`, width: 892, height: 118, caption: ORG.name },
   image: { '@type': 'ImageObject', '@id': `${SITE}/#image`, url: `${SITE}/assets/og-image.png`, width: 1200, height: 630, caption: `${ORG.name} — ${ORG.slogan}` },
   address: {
@@ -513,17 +447,14 @@ const organization = {
     { '@type': 'ContactPoint', telephone: ORG.phoneAlt, contactType: 'customer support', email: ORG.support, areaServed: 'IN', availableLanguage: ['en', 'hi', 'kn'] },
   ],
   areaServed: { '@type': 'Country', name: 'India' },
-  // Profiles we control, asserting that all of these are the same entity.
-  // Each one must link back to vybe.net.in or the claim carries little weight.
+  // Profiles we control. Each must link back here or the claim is weak.
   sameAs: ORG.profiles,
   knowsAbout: [
     'Educational ERP', 'Campus management software', 'Cashless cafeteria systems',
     'Kitchen display systems', 'Custom software development', 'Cybersecurity', 'Cloud infrastructure',
     'Google Workspace', 'Microsoft 365', 'Zoho Mail', 'Student email', 'Single sign-on',
   ],
-  // Vendor programme enrolments. ProgramMembership rather than a bare
-  // Organization because that is what these are — membership of a named
-  // programme run by a named host, which is the claim being made.
+  // Vendor programme enrolments, which is what ProgramMembership describes.
   memberOf: [
     { '@type': 'ProgramMembership', programName: 'Ingram Micro Partner Program', hostingOrganization: { '@type': 'Organization', name: 'Ingram Micro', url: 'https://www.ingrammicro.com/' } },
     { '@type': 'ProgramMembership', programName: 'AWS Partner Network', hostingOrganization: { '@type': 'Organization', name: 'Amazon Web Services', url: 'https://aws.amazon.com/partners/' } },
@@ -533,11 +464,8 @@ const organization = {
 };
 
 /**
- * The office as a place you can walk into, kept separate from #organization.
- * The Organization is the abstract publisher every page points `about` at;
- * this is the physical branch, and it is the node that carries hours, phone
- * and (once you have them) coordinates. Google reads them off this type, not
- * off a bare Organization.
+ * The physical office, kept separate from #organization. Google reads hours,
+ * phone and address off this type, not off a bare Organization.
  */
 const localBusiness = {
   '@type': 'ProfessionalService',
@@ -552,8 +480,7 @@ const localBusiness = {
   address: { ...organization.address },
   areaServed: { '@type': 'Country', name: 'India' },
   sameAs: ORG.profiles,
-  // A required-ish field for LocalBusiness rich results. '$$' is the schema.org
-  // convention for mid-range; it is a band, not a quoted price.
+  // Schema.org's band for mid-range. A band, not a quoted price.
   priceRange: '$$',
   openingHoursSpecification: [
     {
@@ -613,12 +540,7 @@ const PRODUCTS = [
   { nav: 'cloud', href: '/cloud/', name: 'Vybe Cloud', blurb: 'Scalable servers, hosting and DDoS protection.', icon: 'cloud' },
 ];
 
-/**
- * Every product page used to link only back to the homepage, which left the
- * four of them as leaves hanging off one hub. Linking them to each other
- * spreads authority sideways and gives a reader on the ERP page somewhere to
- * go that is not the back button.
- */
+/** Cross-links the product pages, so none of them is a leaf off the home page. */
 function relatedSection(currentNav, { dark = false } = {}) {
   const others = PRODUCTS.filter((p) => p.nav !== currentNav && published(p.nav));
   if (!others.length) return '';
@@ -654,22 +576,15 @@ function relatedSection(currentNav, { dark = false } = {}) {
 /* --------------------------------------------------------- clients/partners */
 
 /**
- * Named organisations, grouped by the nature of the relationship.
- *
- * `logo` names a pair of files in assets/partners/, produced by
- * tools/gen-partner-logos.mjs from each company's own reversed artwork. They
- * all sit on one 480x160 canvas, so a single size class renders the whole row
- * in optical balance. That is also why the section is dark: these are the
- * light-on-dark marks their owners publish, used as published.
- *
- * Every `url` below was checked against the live site before being committed.
- * A dead or wrong outbound link on a page like this is worse than no link.
+ * Named organisations, grouped by relationship. `logo` names a pair of files in
+ * assets/partners/ built by tools/gen-partner-logos.mjs, all on one canvas so a
+ * single size class balances the row. The section is dark because these are the
+ * light-on-dark marks their owners publish. Every `url` was checked live.
  */
 const PARTNERS = [
   {
     label: 'Clients',
-    // Deliberately not "running our software": CAIAS runs the ERP, Vendx buys
-    // RFID cards. One sentence has to cover both without overclaiming either.
+    // Covers both software and hardware: CAIAS runs the ERP, Vendx buys cards.
     note: 'Organisations running Vybe software, hardware and services today.',
     items: [
       {
@@ -688,8 +603,8 @@ const PARTNERS = [
     ],
   },
   /*
-   * Held back until the MoU is signed, expected the week of 22 September 2026.
-   * Uncomment to publish; the mark is already built into assets/partners/.
+   * Held back until the MoU is signed. Uncomment to publish; the mark is
+   * already built into assets/partners/.
    *
   {
     label: 'Trusted Partner',
@@ -708,11 +623,9 @@ const PARTNERS = [
     label: 'Brand Partners',
     note: 'Brands we are an authorised channel partner or dealer for, and deploy on campus.',
     items: [
-      /* Extramarks and Extramarks Forte are held back for the same reason as
-       * Milky Mist above: their mark may not be used until the channel partner
-       * contract is executed, scheduled for the week of 21 September 2026.
-       * The marks are also commented out of tools/gen-partner-logos.mjs, so
-       * uncommenting here alone will not render them — rerun `npm run logos`.
+      /* Held back until the channel partner contract is executed. Also
+       * commented out of tools/gen-partner-logos.mjs, so uncommenting here
+       * alone will not render them; rerun `npm run logos`.
        *
       {
         name: 'Extramarks Education',
@@ -753,19 +666,9 @@ const PARTNER_ORGS = PARTNERS.flatMap((g) =>
 /* ------------------------------------------------------------- credentials */
 
 /**
- * Vendor programmes we are actually enrolled in, and the grant we actually
- * received. Worth stating plainly on a page that sells cloud and procurement:
- * it is the difference between "we can set up AWS for you" and a verifiable
- * commercial relationship with the vendor.
- *
- * Deliberately text, not logos. AWS, Google Cloud, Microsoft and Ingram Micro
- * all restrict their corporate marks and issue partners a specific badge
- * instead; using the plain vendor logo is a trademark problem, not a design
- * choice. Drop the issued badges into src/logos/ and this can become a mark
- * wall like the one above.
- *
- * Every `tier` here is the entry-level wording on purpose. Overstating a
- * partner tier is the one claim on this page a vendor would actually chase.
+ * Vendor programmes we are enrolled in. Text rather than logos: AWS, Google,
+ * Microsoft and Ingram Micro all restrict their marks and issue partners a
+ * specific badge instead. Every `tier` is the entry-level wording on purpose.
  */
 const CREDENTIALS = [
   {
@@ -790,10 +693,7 @@ const CREDENTIALS = [
   },
 ];
 
-/**
- * A compact accreditation strip. Rendered dark under the partner wall on the
- * home page, and light on /cloud/ where the vendor relationships are the point.
- */
+/** Accreditation strip. Dark under the partner wall, light on /cloud/. */
 function credentialsSection({ dark = false, standalone = false } = {}) {
   const head = dark ? 'text-white' : 'text-slate-900';
   const muted = dark ? 'text-slate-400' : 'text-slate-500';
@@ -829,8 +729,7 @@ function credentialsSection({ dark = false, standalone = false } = {}) {
 }
 
 function partnersSection() {
-  // The declared box is the canvas ratio, not the rendered size, so the
-  // browser reserves the right shape before the image lands.
+  // The declared box is the canvas ratio, so the browser reserves the shape.
   const dh = 128;
   const dw = Math.round((dh * PARTNER_LOGO.w) / PARTNER_LOGO.h);
 
@@ -879,14 +778,9 @@ function partnersSection() {
 /* ----------------------------------------------------------- long-form copy */
 
 /**
- * The product pages were built as sales decks: strong headlines, very little
- * prose. That reads fine but gives a search engine almost nothing to match a
- * query against — /cloud/ was 344 words. This section is the substance: real
- * explanation, in the reader's language, under headings that are themselves
- * plausible queries.
- *
- * Everything here restates what the page and its FAQs already claim. Nothing
- * asserts a client count, a price or a certification we have not said we hold.
+ * Long-form copy for the product pages, which were built as sales decks and so
+ * gave a search engine almost nothing to match a query against. Headings are
+ * themselves plausible queries. Nothing here claims more than the page does.
  */
 const DEEP_DIVE = {
   erp: {
@@ -1164,8 +1058,7 @@ function shell(page) {
   const graph = [organization, localBusiness, website];
 
   graph.push({
-    // ContactPage / AboutPage etc. where the page is one of schema.org's named
-    // WebPage subtypes; plain WebPage otherwise.
+    // ContactPage / AboutPage where the page is a named subtype, else WebPage.
     '@type': page.pageType || 'WebPage',
     '@id': `${url}#webpage`,
     url,
@@ -1178,9 +1071,8 @@ function shell(page) {
     datePublished: '2025-01-15',
     dateModified: page.lastmod || BUILD_DATE,
     ...(page.trail.length > 1 ? { breadcrumb: { '@id': `${url}#breadcrumb` } } : {}),
-    // Named third-party organisations on the page. `mentions` is the honest
-    // property here: it asserts the page refers to them, without claiming a
-    // formal relationship schema.org has no vocabulary for.
+    // Named third-party organisations on the page. `mentions` claims only
+    // that the page refers to them, not a relationship.
     ...(page.mentions ? { mentions: page.mentions } : {}),
   });
 
@@ -1202,13 +1094,8 @@ function shell(page) {
 <meta name="description" content="${esc(page.description)}">
 ${page.noindex ? '' : `<link rel="canonical" href="${url}">\n`}<meta name="robots" content="${page.noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'}">
 
-<!-- Typography is self-hosted; preloading the two variable faces removes the
-     flash of fallback text without any third-party connection. -->
 <link rel="preload" href="/assets/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/plus-jakarta-sans-var.woff2" as="font" type="font/woff2" crossorigin>
-<!-- The icon face is font-display: block, so every glyph on the page stays
-     invisible until it lands. Without this preload it is only discovered when
-     the stylesheet has parsed, which is a visible late pop of every icon. -->
 <link rel="preload" href="/assets/fonts/material-symbols-subset.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/site.css">
 
@@ -1328,9 +1215,7 @@ const PAGES = [
       '@type': 'ItemList',
       '@id': `${url}#services`,
       name: 'Vybe Technologies products and services',
-      // Filtered on UNPUBLISHED, and the positions are numbered after the
-      // filter — an ItemList that advertises a service we do not currently
-      // sell, or that skips a position, is worse than a shorter list.
+      // Numbered after the UNPUBLISHED filter, so the positions have no gaps.
       itemListElement: [
         { nav: 'erp', name: 'Vybe ERP', url: `${SITE}/erp/`, description: 'Cloud-based Educational Resource Planning suite for schools and colleges.' },
         { nav: 'cms', name: 'Vybe CMS', url: `${SITE}/cms/`, description: '100% cashless cafeteria management system with QR pickup and split payouts.' },
@@ -1543,8 +1428,7 @@ const PAGES = [
     trail: [CRUMB_HOME, { name: 'Workspace & Email', url: '/workspace/' }],
     priority: '0.8',
     view: workspace,
-    // Google Cloud Partner Advantage covers Workspace, and Ingram Micro is how
-    // the licences are actually bought — both are relevant here.
+    // Partner Advantage covers Workspace, and Ingram Micro sells the licences.
     credentials: true,
     faqs: [
       {
@@ -1717,10 +1601,8 @@ const PAGES = [
 /* --------------------------------------------------------------- emit pages */
 
 /**
- * `lastmod` has to mean something. Stamping today's date on all eight URLs at
- * every build teaches Google the signal is noise, and it stops trusting it for
- * crawl scheduling. So: hash each page's real content, keep the date it last
- * actually changed in .lastmod.json, and only move it when the hash moves.
+ * `lastmod` moves only when a page's content hash moves. Stamping today's date
+ * on every URL each build teaches Google the signal is noise.
  */
 const LASTMOD_FILE = '.lastmod.json';
 const lastmodDb = (() => {
@@ -1740,12 +1622,7 @@ function lastmodFor(url, content) {
 
 const emitted = [];
 
-/**
- * Every document, collected before anything is written.
- *
- * The body and the metadata are built here; the loop at the bottom does the
- * writing, once the full set is known.
- */
+/** Every document, collected before anything is written. */
 const DOCS = [];
 
 for (const page of PAGES.filter((p) => published(p.nav))) {
@@ -1756,16 +1633,7 @@ for (const page of PAGES.filter((p) => published(p.nav))) {
 
 /* ---------------------------------------------------------------- legal pages */
 
-/*
- * English only, and linked unprefixed from all four locales.
- *
- * These four documents are binding: a refund window, a liability limit and a
- * data-retention promise mean exactly what their words mean. A translated
- * policy is a second set of words that can disagree with the first, and the
- * disagreement only surfaces in a dispute. Publishing one authoritative text
- * is the honest option, and the footer says so in every language rather than
- * leaving a reader to wonder why this page did not change with the rest.
- */
+/* The binding policy documents, lifted out of their own source files. */
 const LEGAL = [
   {
     src: 'src/privacy_policy.html',
@@ -1804,9 +1672,7 @@ const LEGAL = [
 for (const doc of LEGAL) {
   const raw = read(doc.src);
 
-  // Keep only the document body; the shared shell supplies nav, footer and
-  // breadcrumbs so the legal pages match the rest of the site and link back
-  // into it instead of dead-ending on a history.back() button.
+  // Keep only the body; the shared shell supplies nav, footer and breadcrumbs.
   const inner = /<main[^>]*>([\s\S]*?)<\/main>/i.exec(raw);
   if (!inner) throw new Error(`no <main> in ${doc.src}`);
 
@@ -1845,24 +1711,15 @@ for (const doc of LEGAL) {
 /* --------------------------------------------------------------- contact us */
 
 /**
- * A real page rather than the bare `mailto:` the nav button used to be.
- *
- * There is no form: this is a static site on Azure Static Web Apps with no
- * function backend, and the CSP is `form-action 'self'`, so a form would have
- * nowhere to POST. A form that silently fails is far worse than a phone number
- * that works, so the page routes people to the mailbox that can actually
- * answer them instead of pretending to collect a message.
- *
- * Every number, address and hour below comes from ORG, so this page and the
- * footer and the LocalBusiness schema can never disagree with each other.
+ * No form: this is a static site with no backend and `form-action 'self'`, so a
+ * form would have nowhere to POST. Every number and address comes from ORG, so
+ * this page, the footer and the schema cannot disagree.
  */
 const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
   `${ORG.name}, ${ORG.street}, ${ORG.locality}, ${ORG.region} ${ORG.postal}`
 )}`;
 
-// `phone` is optional. Legal correspondence wants a written record and a
-// named recipient, so that card deliberately offers an address rather than a
-// number somebody would have to repeat in writing anyway.
+// `phone` is optional: legal correspondence wants a written record.
 function contactCard({ icon, label, blurb, email, phone, phoneLabel }) {
   const tel = phone
     ? `<a href="tel:${phone.replace(/[^+\d]/g, '')}" class="flex items-center gap-3 font-bold text-slate-900 hover:text-brand transition-colors">
@@ -1874,10 +1731,6 @@ function contactCard({ icon, label, blurb, email, phone, phoneLabel }) {
                         <span class="material-symbols-outlined text-brand text-[28px]" aria-hidden="true">${icon}</span>
                         <h3 class="mt-4 text-xl font-bold font-display tracking-tight text-slate-900">${esc(label)}</h3>
                         <p class="mt-2 text-sm text-slate-600 leading-relaxed">${esc(blurb)}</p>
-                        <!-- mt-auto, not a fixed margin: the blurbs are different
-                             lengths, so pinning the contact block to the bottom is
-                             what keeps the rules and the addresses on one line
-                             across all three cards. -->
                         <div class="mt-auto pt-6 border-t border-slate-100 flex flex-col gap-3 text-sm">
                             <a href="mailto:${email}" class="flex items-center gap-3 font-bold text-slate-900 hover:text-brand transition-colors">
                                 <span class="material-symbols-outlined text-[20px] text-slate-400" aria-hidden="true">mail</span>
@@ -1950,12 +1803,6 @@ ${breadcrumbs([CRUMB_HOME, { name: 'Contact Us', url: '/contact/' }], false)}
                     })}
                 </ul>
 
-                <!-- The escalation path is published rather than left to be
-                     discovered — a grievance route nobody can find is the same
-                     as not having one, and Indian intermediary and data
-                     protection rules both expect it to be stated. It is framed
-                     as a last resort, not a fourth mailbox: the three teams
-                     above own the work and answering is their job. -->
                 <div class="mt-8 rounded-2xl border border-slate-200 bg-white/70 p-6 md:p-8 flex flex-col sm:flex-row gap-5 sm:items-start">
                     <span class="material-symbols-outlined text-brand text-[28px] shrink-0" aria-hidden="true">flag</span>
                     <div>
@@ -2024,9 +1871,7 @@ ${faqSection(contactFaqs, { dark: false })}
       trail: [CRUMB_HOME, { name: 'Contact Us', url }],
       faqs: contactFaqs,
       body: contactBody,
-      // The office node in the shared graph already carries the address, the
-      // phones and the hours; this only says that this page is the one about
-      // contacting it, which is the part Google reads off a ContactPage.
+      // The office node in the shared graph already carries address and hours.
       schema: () => [],
     },
   });
@@ -2083,13 +1928,7 @@ write(
 
 /* --------------------------------------------------------- sitemap & friends */
 
-/**
- * The images worth surfacing in Google Images, read off the page that actually
- * renders them. Only first-party art we own the rights to: the share card, the
- * lockup, and — on the home page — the partner marks their owners publish for
- * exactly this use. Anything decorative (dot grids, gradients) is not an image
- * search result and is deliberately absent.
- */
+/** First-party images worth surfacing in Google Images. Nothing decorative. */
 function sitemapImages(url) {
   const img = (loc, caption) =>
     `\n    <image:image><image:loc>${loc}</image:loc><image:caption>${esc(caption)}</image:caption></image:image>`;
@@ -2139,10 +1978,8 @@ Sitemap: ${SITE}/sitemap.xml
 );
 
 /*
- * /llms.txt — the llmstxt.org convention. Answer engines increasingly read a
- * curated map of a site rather than guessing from the HTML, and an AI answer
- * that names us is worth as much as a blue link now. It is generated from the
- * same PAGES array the sitemap is, so it cannot drift out of date.
+ * /llms.txt, the llmstxt.org convention: a curated map for answer engines.
+ * Generated from the same arrays as the sitemap, so it cannot drift.
  */
 write(
   'llms.txt',
@@ -2177,18 +2014,12 @@ ${LEGAL.map((d) => `- [${d.crumb}](${SITE}${d.url}): ${d.description}`).join('\n
 `
 );
 
-/*
- * RFC 9116. Points vulnerability reports at a mailbox that is actually read,
- * rather than leaving a finder to guess. Expires is required by the RFC and is
- * refreshed on every build, so it can never go stale while the site is
- * maintained.
- */
+/* RFC 9116. Expires is required by the RFC, and is refreshed every build. */
 const securityExpiry = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().replace(/\.\d+Z$/, 'Z');
 write(
   '.well-known/security.txt',
-  // Two addresses, most-preferred first, as RFC 9116 specifies. legal@ is
-  // listed because the contact page names it as the route for security
-  // disclosures, and a researcher who reads both must not find them at odds.
+  // Most-preferred address first, as RFC 9116 specifies. legal@ leads because
+  // the contact page names it as the route for security disclosures.
   `Contact: mailto:${ORG.legal}
 Contact: mailto:${ORG.support}
 Expires: ${securityExpiry}
@@ -2224,17 +2055,14 @@ write(
   ) + '\n'
 );
 
-// Persist the content hashes so the next build can tell "actually changed"
-// from "rebuilt". Commit this file — it is what keeps lastmod honest.
+// Commit this file: the stored hashes are what keep lastmod honest.
 write(LASTMOD_FILE, JSON.stringify(lastmodDb, null, 2) + '\n');
 
 /* ------------------------------------------------------- link integrity */
 
 /**
- * Every internal href in the emitted HTML has to resolve to a page we actually
- * wrote or a file that exists on disk. This is what makes UNPUBLISHED safe: a
- * link left pointing at a retired product fails the build here rather than
- * turning into a 404 — or, worse, a soft-404 redirect — in production.
+ * Every internal href has to resolve to a page we wrote or a file on disk.
+ * This is what makes UNPUBLISHED safe: a stale link fails the build.
  */
 {
   const pages = new Set(emitted.map((e) => e.url));
