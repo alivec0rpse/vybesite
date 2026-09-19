@@ -231,6 +231,7 @@ function renderView(view, page) {
 ${breadcrumbs(page.trail, view.dark)}
 ${view.inner}
 ${deepDive(page.nav, { dark: view.dark })}
+${page.nav === 'home' ? partnersSection() : ''}
 ${faqSection(page.faqs, { dark: view.dark })}
 ${page.nav === 'home' ? '' : relatedSection(page.nav, { dark: view.dark })}
 </div>`;
@@ -542,6 +543,143 @@ function relatedSection(currentNav, { dark = false } = {}) {
         </section>`;
 }
 
+/* --------------------------------------------------------- clients/partners */
+
+/**
+ * Named organisations, grouped by the nature of the relationship.
+ *
+ * `logo` names a pair of files in assets/partners/, produced by
+ * tools/gen-partner-logos.mjs from each company's own reversed artwork. They
+ * all sit on one 480x160 canvas, so a single size class renders the whole row
+ * in optical balance. That is also why the section is dark: these are the
+ * light-on-dark marks their owners publish, used as published.
+ *
+ * Every `url` below was checked against the live site before being committed.
+ * A dead or wrong outbound link on a page like this is worse than no link.
+ */
+const PARTNERS = [
+  {
+    label: 'Clients',
+    // Deliberately not "running our software": CAIAS runs the ERP, Vendx buys
+    // RFID cards. One sentence has to cover both without overclaiming either.
+    note: 'Organisations running Vybe software, hardware and services today.',
+    items: [
+      {
+        name: 'Christ Academy Institute for Advanced Studies',
+        short: 'CAIAS',
+        meta: 'Bengaluru, India',
+        url: 'https://caias.in',
+        logo: 'caias',
+      },
+      {
+        name: 'Vendx Global Pvt Ltd',
+        meta: 'Automated retail and vending, Bengaluru',
+        url: 'https://vendxglobal.com',
+        logo: 'vendx',
+      },
+    ],
+  },
+  /*
+   * Held back until the MoU is signed, expected the week of 22 September 2026.
+   * Uncomment to publish; the mark is already built into assets/partners/.
+   *
+  {
+    label: 'Trusted Partner',
+    note: 'A long-running relationship that goes beyond a single engagement.',
+    items: [
+      {
+        name: 'Milky Mist',
+        meta: 'Milky Mist Dairy Food Limited',
+        url: 'https://www.milkymist.com/',
+        logo: 'milkymist',
+      },
+    ],
+  },
+  */
+  {
+    label: 'Brand Partners',
+    note: 'Brands we work alongside to reach schools, colleges and campuses.',
+    items: [
+      {
+        name: 'Extramarks Education',
+        meta: 'Digital learning for K-12 schools',
+        url: 'https://www.extramarks.com/',
+        logo: 'extramarks',
+      },
+      {
+        name: 'Extramarks Forte',
+        meta: 'Smart LMS for universities',
+        url: 'https://www.extramarksforte.com/',
+        logo: 'extramarksforte',
+      },
+      {
+        name: 'JS Global Industries',
+        meta: 'Classroom display and writing boards, Bengaluru',
+        url: 'https://www.jsglobalindustries.co.in/',
+        logo: 'jsglobal',
+      },
+    ],
+  },
+];
+
+/** Every partner mark is rendered from this one canvas. See gen-partner-logos.mjs. */
+const PARTNER_LOGO = { w: 960, h: 320 };
+
+/** Flattened, for the WebPage `mentions` node. */
+const PARTNER_ORGS = PARTNERS.flatMap((g) =>
+  g.items.map((i) => ({
+    '@type': 'Organization',
+    name: i.name,
+    ...(i.short ? { alternateName: i.short } : {}),
+    url: i.url,
+  }))
+);
+
+function partnersSection() {
+  // The declared box is the canvas ratio, not the rendered size, so the
+  // browser reserves the right shape before the image lands.
+  const dh = 128;
+  const dw = Math.round((dh * PARTNER_LOGO.w) / PARTNER_LOGO.h);
+
+  const logo = (i) =>
+    `<picture><source srcset="/assets/partners/${i.logo}.webp" type="image/webp"><img src="/assets/partners/${i.logo}.png" alt="${esc(
+      i.name
+    )}" class="h-24 md:h-32 w-auto object-contain opacity-90 group-hover:opacity-100 transition-opacity" width="${dw}" height="${dh}" loading="lazy" decoding="async"></picture>`;
+
+  const groups = PARTNERS.map(
+    (g) => `<div>
+                        <h3 class="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">${esc(g.label)}</h3>
+                        <p class="mt-2 text-sm text-slate-400/80">${esc(g.note)}</p>
+                        <ul class="mt-6 grid sm:grid-cols-2 gap-4">
+                            ${g.items
+                              .map(
+                                (i) => `<li><a href="${i.url}" target="_blank" rel="noopener"
+                                   class="group flex flex-col h-full rounded-2xl border border-white/10 bg-white/5 p-6 hover:border-white/25 hover:bg-white/10 transition-all">
+                                    ${logo(i)}
+                                    <span class="mt-5 flex items-start gap-3 text-sm text-slate-400">
+                                        <span class="min-w-0">${[i.short, i.meta].filter(Boolean).map(esc).join(' &middot; ')}</span>
+                                        <span class="material-symbols-outlined text-[18px] text-slate-500 group-hover:text-white transition-colors ml-auto shrink-0" aria-hidden="true">open_in_new</span>
+                                    </span>
+                                </a></li>`
+                              )
+                              .join('\n                            ')}
+                        </ul>
+                    </div>`
+  ).join('\n                    ');
+
+  return `
+        <section id="partners" class="bg-corporate py-20 md:py-28 px-6 relative z-10" aria-labelledby="partners-heading">
+            <div class="max-w-5xl mx-auto">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-2">Who we work with</p>
+                <h2 id="partners-heading" class="text-3xl md:text-4xl font-black font-display tracking-tight text-white">Clients and partners.</h2>
+                <p class="mt-5 text-lg leading-relaxed text-slate-300 max-w-3xl">The organisations running our software and hardware, and the brands we go to market alongside.</p>
+                <div class="mt-12 space-y-12">
+                    ${groups}
+                </div>
+            </div>
+        </section>`;
+}
+
 /* ----------------------------------------------------------- long-form copy */
 
 /**
@@ -742,6 +880,10 @@ function shell(page) {
     datePublished: '2025-01-15',
     dateModified: page.lastmod || BUILD_DATE,
     ...(page.trail.length > 1 ? { breadcrumb: { '@id': `${url}#breadcrumb` } } : {}),
+    // Named third-party organisations on the page. `mentions` is the honest
+    // property here: it asserts the page refers to them, without claiming a
+    // formal relationship schema.org has no vocabulary for.
+    ...(page.mentions ? { mentions: page.mentions } : {}),
   });
 
   const bc = breadcrumbSchema(url, page.trail);
@@ -845,6 +987,7 @@ const PAGES = [
     trail: [CRUMB_HOME],
     priority: '1.0',
     view: home,
+    mentions: PARTNER_ORGS,
     faqs: [
       {
         q: 'What does Vybe Technologies do?',

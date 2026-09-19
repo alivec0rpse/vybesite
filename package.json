@@ -20,6 +20,7 @@
     "stage": "node tools/stage.js",
     "css": "tailwindcss -i src/input.css -o assets/site.css --minify",
     "images": "node tools/gen-images.mjs",
+    "logos": "node tools/gen-partner-logos.mjs",
     "fonts": "node tools/gen-fonts.mjs",
     "serve": "node tools/serve.js",
     "validate": "html-validate index.html 404.html */index.html"
