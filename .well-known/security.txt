@@ -1,6 +1,6 @@
 Contact: mailto:legal@vybe.net.in
 Contact: mailto:support@vybe.net.in
-Expires: 2027-09-21T10:58:40Z
+Expires: 2027-09-21T13:21:59Z
 Preferred-Languages: en
 Canonical: https://vybe.net.in/.well-known/security.txt
 Policy: https://vybe.net.in/terms/

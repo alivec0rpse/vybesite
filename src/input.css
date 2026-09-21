@@ -71,6 +71,13 @@
     transform: translateX(-50%) translateY(4px);
     transition: none;
   }
+  /* The legal group is the long one. On a short window the list would run off
+     the bottom of the screen, so the card scrolls rather than the page. */
+  .nav-panel-card {
+    max-height: calc(100vh - 7rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
   .nav-group:hover > .nav-panel,
   .nav-group:focus-within > .nav-panel,
   .nav-group.is-pinned > .nav-panel {

@@ -333,6 +333,7 @@ const NAV_GROUPS = [
       { nav: 'reg-startup-india', href: '/registrations/startup-india/', label: 'DPIIT / Startup India', blurb: '₹999. Recognition itself is free.', icon: 'rocket_launch' },
       { nav: 'reg-iso', href: '/registrations/iso-certification/', label: 'ISO certification', blurb: 'From ₹1,599. Non-accredited; we say so upfront.', icon: 'workspace_premium' },
       { nav: 'reg-nsdc', href: '/registrations/nsdc-skill-india/', label: 'NSDC &amp; affiliation', blurb: 'Consulting on quote. We review; you file.', icon: 'school' },
+      { nav: 'reg-dsc', href: '/registrations/digital-signature-certificate/', label: 'Digital signatures', blurb: 'Class 3 DSC from ₹1,500. Token ₹599.', icon: 'key' },
     ],
   },
 ];
@@ -368,7 +369,7 @@ function navbar(active) {
                         <span class="material-symbols-outlined nav-caret text-[18px]" aria-hidden="true">expand_more</span>
                     </button>
                     <div class="nav-panel" id="nav-panel-${g.id}">
-                        <div class="rounded-2xl border border-slate-200 bg-white shadow-xl p-2">
+                        <div class="nav-panel-card rounded-2xl border border-slate-200 bg-white shadow-xl p-2">
                             <p class="px-3 pt-2 pb-3 text-xs text-slate-400 leading-snug">${g.blurb}</p>
                             <ul class="flex flex-col">
                                 ${g.items.map(panelItem).join('\n                                ')}
@@ -652,7 +653,7 @@ const PRODUCTS = [
   { nav: 'it', href: '/it-solutions/', name: 'IT & Cyber', blurb: 'Custom software, security and managed IT.', icon: 'code_blocks' },
   { nav: 'cloud', href: '/cloud/', name: 'Vybe Cloud', blurb: 'Scalable servers, hosting and DDoS protection.', icon: 'cloud' },
   { nav: 'printing', href: '/printing/', name: 'Printing', blurb: 'Everything from business cards to banners, standees and RFID cards.', icon: 'print' },
-  { nav: 'registrations', href: '/registrations/', name: 'Business Registrations', blurb: 'GST, Udyam (MSME), FSSAI and Startup India recognition, from ₹199, plus ISO and NSDC consulting.', icon: 'receipt_long' },
+  { nav: 'registrations', href: '/registrations/', name: 'Business Registrations', blurb: 'GST, Udyam (MSME), FSSAI and Startup India recognition, from ₹199, plus ISO, NSDC consulting and digital signatures.', icon: 'receipt_long' },
 ];
 
 /**
@@ -711,6 +712,7 @@ function beyondSoftwareSection() {
                         'DPIIT / Startup India recognition: ₹999',
                         'ISO certification, non-accredited: from ₹1,599',
                         'NSDC / Skill India and affiliation consulting: on quote',
+                        'Class 3 digital signature certificates: from ₹1,500',
                       ]
                     )}
                 </div>
@@ -1402,7 +1404,7 @@ const PAGES = [
         { nav: 'it', name: 'Vybe IT Solutions', url: `${SITE}/it-solutions/`, description: 'Custom app development, penetration testing and managed security operations.' },
         { nav: 'cloud', name: 'Vybe Cloud', url: `${SITE}/cloud/`, description: 'Scalable cloud architecture, game servers and DDoS protection.' },
         { nav: 'printing', name: 'Printing Services', url: `${SITE}/printing/`, description: 'Commercial printing — business and RFID cards, letterheads, bill books, brochures, flex banners, roll-up standees and signage, printed to your artwork.' },
-        { nav: 'registrations', name: 'Business Registrations', url: `${SITE}/registrations/`, description: 'GST, Udyam (MSME) and FSSAI registrations and DPIIT / Startup India recognition, prepared and filed at a flat professional fee with government charges separate, plus non-accredited ISO certification issued by Vybe and consulting on NSDC / Skill India and affiliation applications.' },
+        { nav: 'registrations', name: 'Business Registrations', url: `${SITE}/registrations/`, description: 'GST, Udyam (MSME) and FSSAI registrations and DPIIT / Startup India recognition, prepared and filed at a flat professional fee with government charges separate, plus non-accredited ISO certification issued by Vybe, consulting on NSDC / Skill India and affiliation applications, and Class 3 digital signature certificates as a registered partner of eMudhra and Capricorn.' },
       ].filter((s) => published(s.nav)).map((s, i) => ({
         '@type': 'ListItem',
         position: i + 1,
@@ -3044,6 +3046,90 @@ const REGISTRATIONS = [
       },
     ],
   },
+  {
+    id: 'dsc',
+    slug: 'digital-signature-certificate',
+    nav: 'reg-dsc',
+    icon: 'key',
+    name: 'Digital signature certificates',
+    fee: 1500,
+    feeFrom: true,
+    feeLabel: 'for a two-year Class 3 certificate',
+    feeAlt: { amount: 599, label: 'for a USB token, priced separately' },
+    feeNote: 'Issued by a licensed CA. We are a registered partner of eMudhra and Capricorn.',
+    offerNote: 'Starting price for a two-year Class 3 certificate. The USB token is priced separately at ₹599. Other types and validities are quoted on the same basis.',
+    tagline:
+      'Class 3 signature certificates for individuals and organisations, combo certificates for e-tendering, and DGFT certificates, with the token if you need one.',
+    warn:
+      'How we handle your token: we hand it over to you and <strong>you set the PIN</strong>. We do not keep your DSC, hold your PIN, or sign anything on your behalf. Anyone who offers to keep your token in their office and file for you is asking you to hand over your legal signature.',
+    who: 'Anyone who has to sign something electronically where a scanned signature will not do: company filings with the MCA, income tax and GST returns, e-tendering and e-procurement portals, EPFO and trademark filings, and DGFT work for importers and exporters.',
+    needs: [
+      'PAN, and a mobile number linked to Aadhaar for the verification step',
+      'A working email address, which becomes part of the certificate',
+      'The applicant available for a short video verification, which is mandatory',
+      'For an organisation certificate: GST or incorporation proof and an authorisation letter for the signatory',
+      'For DGFT: the IEC of the firm',
+    ],
+    note: 'The certificate is issued by the Certifying Authority, not by Vybe. We are a registered partner of eMudhra and of Capricorn, which is how we get you issued quickly and support you afterwards, but the certificate itself carries the CA’s name.',
+    h1: 'Digital signature certificates, issued properly.',
+    lede:
+      'Class 3 DSCs from eMudhra and Capricorn, both licensed Certifying Authorities, with Vybe as a registered partner of each. Individual, organisation, combo and DGFT certificates, with the USB token if you need one, and the token handed to you rather than kept in our drawer.',
+    metaTitle: 'Class 3 Digital Signature Certificate (DSC) & Token | From ₹1,500 | Vybe',
+    metaDescription:
+      'Class 3 digital signature certificates from eMudhra and Capricorn, with Vybe as a registered partner: individual, organisation, combo and DGFT, from ₹1,500 for two years, USB token ₹599. Bengaluru.',
+    sections: [
+      {
+        h: 'What a DSC is, and who actually issues it',
+        p: 'A digital signature certificate is the electronic equivalent of signing and sealing a document, and it holds up under the Information Technology Act because of who issues it. Certificates come from licensed Certifying Authorities working under the Controller of Certifying Authorities. Vybe is a registered partner of two of them, eMudhra and Capricorn, which lets us get an application through quickly and support you afterwards. We want to be clear about the line, though: the certificate is issued by the CA and carries its name. We are the partner who gets you there, not the issuer.',
+      },
+      {
+        h: 'Which one you need',
+        p: 'Class 3 is what gets issued now, for everything. The older Class 2 certificate was discontinued at the start of 2021 and no longer exists as an option, so if a form still asks for one, Class 3 is the answer. Within Class 3 the choice is about whose name is on it and what it does. An individual certificate sits in a person’s own name and covers income tax, GST, MCA filings and most day-to-day signing. An organisation certificate carries the organisation’s name alongside an authorised signatory. A combo certificate adds encryption on top of signing, which most e-tendering and e-procurement portals insist on. A DGFT certificate is the specific one for importers and exporters filing on the DGFT portal, and it is tied to the firm’s IEC.',
+      },
+      {
+        h: 'The token, and why it is a separate line',
+        p: 'A Class 3 certificate has to live on a certified cryptographic USB token. That is not an upsell, it is how the thing is designed: the key pair is generated inside the token and the private key cannot be copied out of it, which is exactly what makes the signature worth something. We price the token at &#8377;599 separately from the certificate for a simple reason. If you already have a compatible token with room on it, you should not be paying for another one. If you do not, you need one, and you will keep using it at renewal.',
+      },
+      {
+        h: 'How issuance actually goes',
+        p: 'Paperless, in most cases, and quicker than people expect. The application is filled in, verification runs through Aadhaar-based eKYC with an OTP to your linked mobile, and a short video verification is recorded, which is mandatory and cannot be done by somebody else on your behalf. Once the CA approves, the certificate is downloaded onto the token and you set your own PIN. A straightforward individual certificate is often the same day. Organisation and DGFT certificates take longer, because the authorisation letter and the entity documents have to be verified by the CA as well.',
+      },
+      {
+        h: 'Your signature stays yours',
+        p: 'It is common practice in this trade for a consultant to keep a client’s token in a drawer and sign things as and when needed, and it is a genuinely bad idea. That token is your legal signature. Anything signed with it is signed by you, whoever was holding the plastic at the time. So we hand the token over, you set the PIN, and you keep both. If you want us to prepare a filing, we will prepare it and you will sign it. We will not ask you to leave your DSC with us, and we would think carefully about anyone who does.',
+      },
+      {
+        h: 'Renewal, loss and what it costs',
+        p: 'Certificates are issued for one, two or three years, and the starting price of &#8377;1,500 is for a two-year Class 3 certificate, with the other durations and the organisation, combo and DGFT variants quoted on the same basis. Renewal is a fresh certificate rather than an extension, and it can go on the token you already have. If the token is lost or the PIN is forgotten past its retry limit, the certificate is gone: the key cannot be recovered by us, by the CA, or by anyone else, and a new certificate has to be issued. Tell us straight away if a token goes missing, because the existing certificate should be revoked.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'Who is the certificate actually issued by?',
+        a: 'By the Certifying Authority, either eMudhra or Capricorn, both licensed under the Controller of Certifying Authorities. Vybe is a registered partner of both, which is how we get applications processed quickly and how we support you afterwards, but the certificate carries the CA’s name and its trust chain, not ours. We mention this because we are careful elsewhere on this site about what we issue ourselves and what we do not.',
+      },
+      {
+        q: 'What does ₹1,500 cover, and what is extra?',
+        a: 'It is the starting price for a two-year Class 3 certificate. The USB token is <strong>&#8377;599 and priced separately</strong>, because if you already have a compatible token you should not be buying another one. Organisation certificates, combo certificates for e-tendering, DGFT certificates and one or three year validities are quoted on the same basis, and you will have the exact figure before anything is applied for.',
+      },
+      {
+        q: 'Do I need a Class 2 or a Class 3 certificate?',
+        a: 'Class 3, and it is not really a choice any more. Class 2 certificates were discontinued at the beginning of 2021 and are no longer issued at all, so where a portal or an old form still refers to Class 2, a Class 3 certificate is what it will accept. The question worth asking instead is whether you need signing only or a combo certificate with encryption, since most e-tendering portals require the latter.',
+      },
+      {
+        q: 'Can you keep our token and file things for us?',
+        a: 'No, and we will say no even if you ask. A DSC is your legal signature, and anything signed with it is signed by you regardless of who was holding the token. We hand the token over, you set the PIN, and it stays with you. Where we are preparing a filing, we will get it ready and you will sign it. That is the only arrangement we are willing to work under.',
+      },
+      {
+        q: 'How long does it take?',
+        a: 'An individual Class 3 certificate is often issued the same day, since the process is paperless: eKYC with an OTP to your Aadhaar-linked mobile, and a short video verification you have to do yourself. Organisation and DGFT certificates take longer because the entity documents and the authorisation letter go through the CA’s own verification. The one thing that reliably holds an application up is a mobile number that is not linked to Aadhaar, so it is worth checking that first.',
+      },
+      {
+        q: 'We lost the token. Can the certificate be recovered?',
+        a: 'No. The private key is generated inside the token and never leaves it, which is the whole point of the design, so it cannot be extracted, backed up or recovered by us or by the CA. A lost token, or a PIN entered wrongly past its retry limit, means a new certificate. Tell us as soon as a token goes missing so the existing certificate can be revoked, and do not wait to see if it turns up.',
+      },
+    ],
+  },
 ];
 
 /** Registrations that have a page of their own, which is all of them. */
@@ -3053,8 +3139,8 @@ const rupees = (n) => `&#8377;${n.toLocaleString('en-IN')}`;
 
 /* Most registrations carry a flat published fee. Consulting work is scoped
    first, so those entries set `fee: null` and show a quote line instead. */
-const regFee = (r) => (r.fee === null ? esc(r.feeQuote) : rupees(r.fee));
-const regFeeLabel = (r) => (r.fee === null ? 'professional fee, scoped first' : 'professional fee');
+const regFee = (r) => (r.fee === null ? esc(r.feeQuote) : `${r.feeFrom ? 'From ' : ''}${rupees(r.fee)}`);
+const regFeeLabel = (r) => r.feeLabel ?? (r.fee === null ? 'professional fee, scoped first' : 'professional fee');
 
 const regFaqs = [
   {
@@ -3080,6 +3166,10 @@ const regFaqs = [
   {
     q: 'Do you handle registrations other than these?',
     a: `These are what we file day to day. Other registrations and filings start at ₹499 plus government charges. Ask us what you need on <a class="text-brand font-bold" href="mailto:${ORG.legal}">${ORG.legal}</a> and we will tell you plainly whether it is something we take on, rather than take the work and learn on your file.`,
+  },
+  {
+    q: 'Do you issue the digital signature certificates yourselves?',
+    a: 'No. A DSC is issued by a licensed Certifying Authority, and we are a <strong>registered partner of eMudhra and of Capricorn</strong>. That gets your application processed quickly and gives you somebody local to call afterwards, but the certificate carries the CA’s name and trust chain, not ours. One other thing worth knowing before you buy from anybody: we hand the token over to you and you set the PIN. We do not keep client tokens.',
   },
   {
     q: 'Is the NSDC and affiliation work the same as the rest of this list?',
@@ -3174,7 +3264,7 @@ ${breadcrumbs([CRUMB_HOME, { name: 'Registrations', url: '/registrations/' }], f
             <div class="max-w-6xl mx-auto relative z-10">
                 <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-3">Legal &amp; Compliance</p>
                 <h1 class="text-5xl md:text-7xl font-black font-display tracking-tighter text-slate-900">Registrations, filed for you.</h1>
-                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">GST, Udyam (MSME), FSSAI and Startup India recognition, prepared, filed and followed up until the certificate is in your hands, plus ISO certification issued by us and consulting on NSDC, Skill India and affiliation applications. Flat professional fees, published below, with government charges separate and quoted before you commit.</p>
+                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">GST, Udyam (MSME), FSSAI and Startup India recognition, prepared, filed and followed up until the certificate is in your hands, plus ISO certification issued by us, consulting on NSDC, Skill India and affiliation applications, and Class 3 digital signature certificates. Flat professional fees, published below, with government charges separate and quoted before you commit.</p>
 
                 ${ctaRow({
                   waText: REG_ENQUIRY,
@@ -3214,11 +3304,11 @@ ${breadcrumbs([CRUMB_HOME, { name: 'Registrations', url: '/registrations/' }], f
                 <div class="mt-12 grid gap-8 sm:grid-cols-2">
                     <div class="rounded-2xl border border-white/10 bg-white/5 p-8">
                         <h3 class="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Our professional fee</h3>
-                        <p class="mt-4 text-white leading-relaxed text-sm">&#8377;199 for GST, &#8377;199 for Udyam (MSME), &#8377;299 for FSSAI, &#8377;999 for DPIIT recognition, and &#8377;2,299 for an ISO certificate, or &#8377;1,599 if you are a DPIIT-recognised startup. Flat, published, and the same whether an application goes through first time or needs a clarification answered. NSDC, Skill India and affiliation work is consulting rather than filing, so it is scoped and quoted before anything starts.</p>
+                        <p class="mt-4 text-white leading-relaxed text-sm">&#8377;199 for GST, &#8377;199 for Udyam (MSME), &#8377;299 for FSSAI, &#8377;999 for DPIIT recognition, and &#8377;2,299 for an ISO certificate, or &#8377;1,599 if you are a DPIIT-recognised startup. Flat, published, and the same whether an application goes through first time or needs a clarification answered. NSDC, Skill India and affiliation work is consulting rather than filing, so it is scoped and quoted before anything starts. Digital signature certificates start at &#8377;1,500 for two years, with the USB token at &#8377;599 if you need one.</p>
                     </div>
                     <div class="rounded-2xl border border-white/10 bg-white/5 p-8">
                         <h3 class="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Government charges</h3>
-                        <p class="mt-4 text-white leading-relaxed text-sm">Whatever the department levies for your category, charged at actuals with nothing added. GST, Udyam and DPIIT recognition carry no government fee at all. FSSAI does, and it changes with the licence type and the number of years, so we quote the exact figure before you commit. ISO certification is not a government registration, so nothing arises there either.</p>
+                        <p class="mt-4 text-white leading-relaxed text-sm">Whatever the department levies for your category, charged at actuals with nothing added. GST, Udyam and DPIIT recognition carry no government fee at all. FSSAI does, and it changes with the licence type and the number of years, so we quote the exact figure before you commit. ISO certification is not a government registration, so nothing arises there either. A digital signature certificate is priced by the Certifying Authority rather than by a department, and the figure we quote is the whole cost.</p>
                     </div>
                 </div>
             </div>
@@ -3239,9 +3329,9 @@ ${relatedSection('registrations', { dark: false })}
       url,
       nav: 'registrations',
       title: 'GST, MSME, FSSAI & Startup India Registration | From ₹199 | Vybe',
-      ogTitle: 'Business registrations: GST, Udyam, FSSAI, DPIIT and ISO',
+      ogTitle: 'Business registrations: GST, Udyam, FSSAI, DPIIT, ISO and DSC',
       description:
-        'GST and Udyam (MSME) registration at ₹199, FSSAI at ₹299, DPIIT / Startup India recognition at ₹999, non-accredited ISO certification from ₹1,599, and NSDC / Skill India and affiliation consulting on quote. Professional fees, with government charges separate. Vybe Technologies, Bengaluru.',
+        'GST and Udyam (MSME) registration at ₹199, FSSAI at ₹299, DPIIT / Startup India recognition at ₹999, non-accredited ISO certification from ₹1,599, NSDC / Skill India and affiliation consulting on quote, and Class 3 digital signature certificates from ₹1,500. Professional fees, with government charges separate. Vybe Technologies, Bengaluru.',
       lastmod,
       trail: [CRUMB_HOME, { name: 'Registrations', url }],
       faqs: regFaqs,
@@ -3252,7 +3342,7 @@ ${relatedSection('registrations', { dark: false })}
         name: 'Business registration services',
         serviceType: 'Business registration and licensing',
         description:
-          'Preparation and filing of GST registration, Udyam (MSME) registration, FSSAI registration and licences and DPIIT / Startup India recognition at a flat professional fee with government charges payable separately at actuals, plus non-accredited ISO 9001, ISO 22000 and ISO 27001 certification issued by Vybe Technologies and advisory support on NSDC / Skill India training partner registration and affiliation applications.',
+          'Preparation and filing of GST registration, Udyam (MSME) registration, FSSAI registration and licences and DPIIT / Startup India recognition at a flat professional fee with government charges payable separately at actuals, plus non-accredited ISO 9001, ISO 22000 and ISO 27001 certification issued by Vybe Technologies advisory support on NSDC / Skill India training partner registration and affiliation applications, and supply of Class 3 digital signature certificates as a registered partner of the Certifying Authorities eMudhra and Capricorn.',
         provider: { '@id': `${SITE}/#organization` },
         areaServed: { '@type': 'Country', name: 'India' },
         url: u,
@@ -3264,8 +3354,9 @@ ${relatedSection('registrations', { dark: false })}
             name: r.name,
             ...(r.fee === null ? {} : { price: String(r.fee) }),
             priceCurrency: 'INR',
-            description:
-              r.fee === null
+            description: r.offerNote
+              ? `${r.tagline} ${r.offerNote}`
+              : r.fee === null
                 ? `${r.tagline} Advisory engagement, quoted per engagement.`
                 : `${r.tagline} Professional fee only; government charges, where any apply, are payable separately at actuals.`,
             url: SITE + regHref(r),
@@ -3392,9 +3483,11 @@ ${relatedSection('registrations', { dark: false })}
         serviceType:
           r.id === 'iso'
             ? 'Management system certification (non-accredited)'
-            : r.fee === null
-              ? 'Registration and affiliation consulting'
-              : 'Business registration and licensing',
+            : r.id === 'dsc'
+              ? 'Digital signature certificate supply'
+              : r.fee === null
+                ? 'Registration and affiliation consulting'
+                : 'Business registration and licensing',
         description: r.metaDescription,
         provider: { '@id': `${SITE}/#organization` },
         areaServed: { '@type': 'Country', name: 'India' },
@@ -3404,7 +3497,7 @@ ${relatedSection('registrations', { dark: false })}
           '@type': 'Offer',
           ...(r.fee === null ? {} : { price: String(r.fee) }),
           priceCurrency: 'INR',
-          description: r.fee === null ? r.feeNote : `Professional fee. ${r.feeNote}.`,
+          description: r.offerNote ?? (r.fee === null ? r.feeNote : `Professional fee. ${r.feeNote}.`),
           url: u,
         },
       }),
@@ -3455,7 +3548,7 @@ write(
                     ${notFoundLink('/it-solutions/', 'IT &amp; Cyber', 'Custom app development and security.')}
                     ${published('cloud') ? notFoundLink('/cloud/', 'Vybe Cloud', 'Scalable servers and DDoS protection.') : ''}
                     ${notFoundLink('/printing/', 'Printing', 'Cards, banners, standees, RFID and stationery.')}
-                    ${notFoundLink('/registrations/', 'Registrations', 'GST, MSME, FSSAI and Startup India, filed for you, plus ISO and NSDC.')}
+                    ${notFoundLink('/registrations/', 'Registrations', 'GST, MSME, FSSAI and Startup India, filed for you, plus ISO, NSDC and DSC.')}
                     ${notFoundLink('/contact/', 'Contact Us', 'Phone, email and where to find us.')}
                 </div>
             </div>

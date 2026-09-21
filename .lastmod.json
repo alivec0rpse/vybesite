@@ -1,18 +1,18 @@
 {
   "/": {
-    "hash": "bb889a4b6cdf5c22",
+    "hash": "21d4081389eda167",
     "date": "2026-09-21"
   },
   "/erp/": {
-    "hash": "21b4daf7c3b1f15d",
+    "hash": "66377438e4898266",
     "date": "2026-09-21"
   },
   "/cms/": {
-    "hash": "2a8284d9d2f652e5",
+    "hash": "b4e3d79ecd0c2db3",
     "date": "2026-09-21"
   },
   "/it-solutions/": {
-    "hash": "65396381a26366d5",
+    "hash": "e5a4c39a14d88908",
     "date": "2026-09-21"
   },
   "/cloud/": {
@@ -20,11 +20,11 @@
     "date": "2026-09-19"
   },
   "/privacy-policy/": {
-    "hash": "c0a9f2ed35b42b36",
+    "hash": "30bae9f2a55b4798",
     "date": "2026-09-21"
   },
   "/terms/": {
-    "hash": "1a83ae8c94cc0400",
+    "hash": "ed0016ae6fdebb66",
     "date": "2026-09-21"
   },
   "/refund-policy/": {
@@ -36,11 +36,11 @@
     "date": "2026-09-21"
   },
   "/workspace/": {
-    "hash": "d119f68915ba34d3",
+    "hash": "7d78eefa5472a372",
     "date": "2026-09-21"
   },
   "/smart-classroom/": {
-    "hash": "000f97373fbba67c",
+    "hash": "09cb910ac22876d8",
     "date": "2026-09-21"
   },
   "/contact/": {
@@ -48,47 +48,51 @@
     "date": "2026-09-21"
   },
   "/printing/": {
-    "hash": "b74143ae0b64768b",
+    "hash": "3fc6b557469aefb3",
     "date": "2026-09-21"
   },
   "/registrations/": {
-    "hash": "597f02a7db9fd21c",
+    "hash": "97090c8c5cf319be",
     "date": "2026-09-21"
   },
   "/printing/stationery/": {
-    "hash": "49dd2aae0173d3ed",
+    "hash": "22188734443031d5",
     "date": "2026-09-21"
   },
   "/printing/cards/": {
-    "hash": "fff97f01d58ee434",
+    "hash": "f78c94df74f44a37",
     "date": "2026-09-21"
   },
   "/printing/banners-standees/": {
-    "hash": "b01a4cacbb01d759",
+    "hash": "4ec2e73805d3c59e",
     "date": "2026-09-21"
   },
   "/registrations/gst/": {
-    "hash": "506fc25988c6ca27",
+    "hash": "863c22e67a8870f2",
     "date": "2026-09-21"
   },
   "/registrations/msme/": {
-    "hash": "2eeb12c4cb2597a4",
+    "hash": "94ca2195f5e79aa6",
     "date": "2026-09-21"
   },
   "/registrations/fssai/": {
-    "hash": "7d7b9321fd0e946a",
+    "hash": "4cc670c59ca4501c",
     "date": "2026-09-21"
   },
   "/registrations/startup-india/": {
-    "hash": "aa0bb61b7b8e2248",
+    "hash": "8b687c8cd6bf0261",
     "date": "2026-09-21"
   },
   "/registrations/iso-certification/": {
-    "hash": "ca0f3b2ac9455961",
+    "hash": "85c82d45373ccb5e",
     "date": "2026-09-21"
   },
   "/registrations/nsdc-skill-india/": {
-    "hash": "f751f334c9f63c6c",
+    "hash": "5d2577e5d80ffce3",
+    "date": "2026-09-21"
+  },
+  "/registrations/digital-signature-certificate/": {
+    "hash": "7a6ca11ff19b4f38",
     "date": "2026-09-21"
   }
 }

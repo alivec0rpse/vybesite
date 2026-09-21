@@ -87,6 +87,9 @@
     { "route": "/nsdc", "redirect": "/registrations/nsdc-skill-india/", "statusCode": 301 },
     { "route": "/skill-india", "redirect": "/registrations/nsdc-skill-india/", "statusCode": 301 },
     { "route": "/affiliation", "redirect": "/registrations/nsdc-skill-india/", "statusCode": 301 },
+    { "route": "/dsc", "redirect": "/registrations/digital-signature-certificate/", "statusCode": 301 },
+    { "route": "/digital-signature", "redirect": "/registrations/digital-signature-certificate/", "statusCode": 301 },
+    { "route": "/dsc-token", "redirect": "/registrations/digital-signature-certificate/", "statusCode": 301 },
 
     { "route": "/contact", "redirect": "/contact/", "statusCode": 301 },
     { "route": "/contact-us", "redirect": "/contact/", "statusCode": 301 },
