@@ -2,7 +2,7 @@
 
 > Vybe Technologies is a Bengaluru software company. Its products include a cloud ERP for schools and colleges and a 100% cashless cafeteria management system, alongside custom software development, cybersecurity and cloud infrastructure for businesses in any sector.
 
-Based in Bengaluru, Karnataka, India. Sales: sales@vybe.net.in / +91-99641-77877.
+Based in Bengaluru, Karnataka, India. Sales: sales@vybe.net.in / +91-99641-77677.
 
 ## Products
 
@@ -12,13 +12,14 @@ Based in Bengaluru, Karnataka, India. Sales: sales@vybe.net.in / +91-99641-77877
 - [Workspace & Email](https://vybe.net.in/workspace/): Google Workspace, Microsoft 365, Zoho Mail and student email.
 - [IT & Cyber](https://vybe.net.in/it-solutions/): Custom software, security and managed IT.
 - [Printing](https://vybe.net.in/printing/): Everything from business cards to banners, standees and RFID cards.
-- [Business Registrations](https://vybe.net.in/registrations/): GST, Udyam (MSME) and FSSAI filings from ₹199 + government charges.
+- [Business Registrations](https://vybe.net.in/registrations/): GST, Udyam (MSME), FSSAI and Startup India recognition, from ₹199, plus ISO and NSDC consulting.
 
 ## Contact
 
 - [Contact Us](https://vybe.net.in/contact/): Phone, email, registered office and opening hours.
-- Sales: sales@vybe.net.in — quotes, demos, new deployments, hardware.
-- Support: support@vybe.net.in — existing Vybe deployments.
+- Sales: sales@vybe.net.in / +91-99641-77677 — quotes, demos, new deployments, hardware, printing and registrations.
+- Support: support@vybe.net.in / +91-90198-01319 — existing Vybe deployments.
+- Second office line: +91-99641-77877 — reaches the same office.
 - Legal and compliance: legal@vybe.net.in — contracts, privacy and data protection requests, security disclosures.
 - Grievance Officer: manjunath@vybe.net.in — last resort only, after sales, support or legal have not resolved the matter. Route enquiries to the three addresses above first.
 

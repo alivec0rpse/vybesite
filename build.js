@@ -17,8 +17,11 @@ const ORG = {
   name: 'Vybe Technologies',
   legalName: 'Vybe Technologies',
   slogan: 'Smart. Simple. Affordable.',
-  phone: '+91-99641-77877',
-  phoneAlt: '+91-99641-77677',
+  // Sales is the number on the site's calls to action; support has its own
+  // line; the old main number is still answered, as a second office line.
+  phone: '+91-99641-77677',
+  phoneSupport: '+91-90198-01319',
+  phoneOffice: '+91-99641-77877',
   sales: 'sales@vybe.net.in',
   support: 'support@vybe.net.in',
   legal: 'legal@vybe.net.in',
@@ -49,6 +52,14 @@ const write = (p, s) => {
 };
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const ld = (obj) => `<script type="application/ld+json">${JSON.stringify(obj).replace(/</g, '\\u003c')}</script>`;
+
+/* Numbers live in ORG in one canonical form. These two derive the dialable
+   href and the readable label from it, so a number can never be changed in
+   one place and left stale in another. */
+const telHref = (n) => `tel:${n.replace(/[^+\d]/g, '')}`;
+const telText = (n) => n.replace(/-/g, '\u00a0').replace('\u00a0', ' ');
+/** A `tel:` link, ready to drop into copy. */
+const telLink = (n, cls = 'text-brand font-bold') => `<a class="${cls}" href="${telHref(n)}">${telText(n)}</a>`;
 
 // English only. Named once so lang, og:locale and inLanguage cannot disagree.
 const LOC = { tag: 'en-IN', og: 'en_IN' };
@@ -304,21 +315,24 @@ const NAV_GROUPS = [
     blurb: 'Send us the artwork by email or WhatsApp; we print and deliver.',
     items: [
       { nav: 'printing', href: '/printing/', label: 'All printing services', blurb: 'What we print, and how to send artwork.', icon: 'print' },
-      { href: '/printing/#stationery', label: 'Paper &amp; stationery', blurb: 'Letterheads, bill books, brochures, flyers.', icon: 'description' },
-      { href: '/printing/#cards', label: 'Business &amp; RFID cards', blurb: 'Visiting cards, ID cards, RFID and NFC cards.', icon: 'badge' },
-      { href: '/printing/#large-format', label: 'Banners &amp; standees', blurb: 'Flex banners, roll-ups, backdrops, signage.', icon: 'flag' },
+      { nav: 'print-stationery', href: '/printing/stationery/', label: 'Paper &amp; stationery', blurb: 'Letterheads, bill books, brochures, flyers.', icon: 'description' },
+      { nav: 'print-cards', href: '/printing/cards/', label: 'Business &amp; RFID cards', blurb: 'Visiting cards, ID cards, RFID and NFC cards.', icon: 'badge' },
+      { nav: 'print-large-format', href: '/printing/banners-standees/', label: 'Banners &amp; standees', blurb: 'Flex banners, roll-ups, backdrops, signage.', icon: 'flag' },
       { href: '/printing/#quote', label: 'Send artwork for a quote', blurb: 'Email or WhatsApp us the file and quantity.', icon: 'forum' },
     ],
   },
   {
     id: 'legal',
     label: 'Legal',
-    blurb: 'Registrations and licences filed for you, at a flat professional fee.',
+    blurb: 'Registrations, licences and certification, at a flat professional fee.',
     items: [
-      { nav: 'registrations', href: '/registrations/', label: 'Business registrations', blurb: 'GST, Udyam (MSME) and FSSAI, end to end.', icon: 'receipt_long' },
-      { href: '/registrations/#gst', label: 'GST registration', blurb: '₹199 + government charges.', icon: 'account_balance' },
-      { href: '/registrations/#msme', label: 'MSME / Udyam', blurb: '₹199 + government charges.', icon: 'storefront' },
-      { href: '/registrations/#fssai', label: 'FSSAI licence', blurb: '₹299 + government charges.', icon: 'soup_kitchen' },
+      { nav: 'registrations', href: '/registrations/', label: 'All registrations', blurb: 'Every filing we take on, with the fees side by side.', icon: 'receipt_long' },
+      { nav: 'reg-gst', href: '/registrations/gst/', label: 'GST registration', blurb: '₹199. No government fee on this one.', icon: 'account_balance' },
+      { nav: 'reg-msme', href: '/registrations/msme/', label: 'MSME / Udyam', blurb: '₹199. No government fee on this one.', icon: 'storefront' },
+      { nav: 'reg-fssai', href: '/registrations/fssai/', label: 'FSSAI licence', blurb: '₹299 + government charges.', icon: 'soup_kitchen' },
+      { nav: 'reg-startup-india', href: '/registrations/startup-india/', label: 'DPIIT / Startup India', blurb: '₹999. Recognition itself is free.', icon: 'rocket_launch' },
+      { nav: 'reg-iso', href: '/registrations/iso-certification/', label: 'ISO certification', blurb: 'From ₹1,599. Non-accredited; we say so upfront.', icon: 'workspace_premium' },
+      { nav: 'reg-nsdc', href: '/registrations/nsdc-skill-india/', label: 'NSDC &amp; affiliation', blurb: 'Consulting on quote. We review; you file.', icon: 'school' },
     ],
   },
 ];
@@ -503,8 +517,9 @@ function footer() {
                     #103, First Floor, 10th Main<br>
                     Gaurav Nagar, J.P Nagar 7th Phase<br>
                     Bengaluru, Karnataka - ${ORG.postal}<br><br>
-                    <a href="tel:+919964177877" class="hover:text-brand transition-colors block mt-2">+91 99641 77877</a>
-                    <a href="tel:+919964177677" class="hover:text-brand transition-colors block mt-1">+91 99641 77677</a>
+                    <a href="${telHref(ORG.phone)}" class="hover:text-brand transition-colors block mt-2">${telText(ORG.phone)}</a>
+                    <a href="${telHref(ORG.phoneSupport)}" class="hover:text-brand transition-colors block mt-1">${telText(ORG.phoneSupport)}</a>
+                    <a href="${telHref(ORG.phoneOffice)}" class="hover:text-brand transition-colors block mt-1">${telText(ORG.phoneOffice)}</a>
                     <a href="mailto:${ORG.sales}" class="hover:text-brand transition-colors block mt-1">${ORG.sales}</a>
                 </address>
                 <p class="text-sm mt-4 text-slate-400">Mon&ndash;Sat, 9:00&nbsp;AM &ndash; 6:30&nbsp;PM IST</p>
@@ -542,7 +557,7 @@ const organization = {
   },
   contactPoint: [
     { '@type': 'ContactPoint', telephone: ORG.phone, contactType: 'sales', email: ORG.sales, areaServed: 'IN', availableLanguage: ['en', 'hi', 'kn'] },
-    { '@type': 'ContactPoint', telephone: ORG.phoneAlt, contactType: 'customer support', email: ORG.support, areaServed: 'IN', availableLanguage: ['en', 'hi', 'kn'] },
+    { '@type': 'ContactPoint', telephone: ORG.phoneSupport, contactType: 'customer support', email: ORG.support, areaServed: 'IN', availableLanguage: ['en', 'hi', 'kn'] },
   ],
   areaServed: { '@type': 'Country', name: 'India' },
   // Profiles we control. Each must link back here or the claim is weak.
@@ -571,7 +586,7 @@ const localBusiness = {
   name: ORG.name,
   parentOrganization: { '@id': `${SITE}/#organization` },
   url: `${SITE}/`,
-  telephone: [ORG.phone, ORG.phoneAlt],
+  telephone: [ORG.phone, ORG.phoneSupport, ORG.phoneOffice],
   email: ORG.sales,
   image: { '@id': `${SITE}/#image` },
   logo: { '@id': `${SITE}/#logo` },
@@ -637,7 +652,7 @@ const PRODUCTS = [
   { nav: 'it', href: '/it-solutions/', name: 'IT & Cyber', blurb: 'Custom software, security and managed IT.', icon: 'code_blocks' },
   { nav: 'cloud', href: '/cloud/', name: 'Vybe Cloud', blurb: 'Scalable servers, hosting and DDoS protection.', icon: 'cloud' },
   { nav: 'printing', href: '/printing/', name: 'Printing', blurb: 'Everything from business cards to banners, standees and RFID cards.', icon: 'print' },
-  { nav: 'registrations', href: '/registrations/', name: 'Business Registrations', blurb: 'GST, Udyam (MSME) and FSSAI filings from ₹199 + government charges.', icon: 'receipt_long' },
+  { nav: 'registrations', href: '/registrations/', name: 'Business Registrations', blurb: 'GST, Udyam (MSME), FSSAI and Startup India recognition, from ₹199, plus ISO and NSDC consulting.', icon: 'receipt_long' },
 ];
 
 /**
@@ -689,11 +704,13 @@ function beyondSoftwareSection() {
                       '/registrations/',
                       'receipt_long',
                       'Business registrations',
-                      'GST, Udyam (MSME) and FSSAI, prepared and filed for you at a flat professional fee. Government charges stay separate and are quoted before you commit.',
+                      'GST, Udyam (MSME), FSSAI and Startup India recognition, prepared and filed for you at a flat professional fee. Government charges stay separate and are quoted before you commit.',
                       [
-                        'GST registration: ₹199 professional fee',
-                        'MSME / Udyam registration: ₹199 professional fee',
-                        'FSSAI registration and licence: ₹299 professional fee',
+                        'GST and Udyam (MSME) registration: ₹199 each',
+                        'FSSAI registration and licence: ₹299',
+                        'DPIIT / Startup India recognition: ₹999',
+                        'ISO certification, non-accredited: from ₹1,599',
+                        'NSDC / Skill India and affiliation consulting: on quote',
                       ]
                     )}
                 </div>
@@ -1353,7 +1370,7 @@ const PAGES = [
       },
       {
         q: 'Where is Vybe Technologies located?',
-        a: `We are based in Bengaluru, Karnataka — ${esc(ORG.street)}, ${ORG.postal}. You can reach sales on <a class="text-brand font-bold" href="tel:+919964177877">+91 99641 77877</a> or <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a>.`,
+        a: `We are based in Bengaluru, Karnataka — ${esc(ORG.street)}, ${ORG.postal}. You can reach sales on ${telLink(ORG.phone)} or <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a>.`,
       },
       {
         q: 'Can Vybe build software that is specific to our campus?',
@@ -1369,7 +1386,7 @@ const PAGES = [
       },
       {
         q: 'How do we get a quote?',
-        a: `Email <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a> or call <a class="text-brand font-bold" href="tel:+919964177877">+91 99641 77877</a> with your campus size and the modules you need, and we will put together a proposal.`,
+        a: `Email <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a> or call ${telLink(ORG.phone)} with your campus size and the modules you need, and we will put together a proposal.`,
       },
     ],
     schema: (url) => ({
@@ -1385,7 +1402,7 @@ const PAGES = [
         { nav: 'it', name: 'Vybe IT Solutions', url: `${SITE}/it-solutions/`, description: 'Custom app development, penetration testing and managed security operations.' },
         { nav: 'cloud', name: 'Vybe Cloud', url: `${SITE}/cloud/`, description: 'Scalable cloud architecture, game servers and DDoS protection.' },
         { nav: 'printing', name: 'Printing Services', url: `${SITE}/printing/`, description: 'Commercial printing — business and RFID cards, letterheads, bill books, brochures, flex banners, roll-up standees and signage, printed to your artwork.' },
-        { nav: 'registrations', name: 'Business Registrations', url: `${SITE}/registrations/`, description: 'GST, Udyam (MSME) and FSSAI registrations prepared and filed at a flat professional fee, with government charges separate.' },
+        { nav: 'registrations', name: 'Business Registrations', url: `${SITE}/registrations/`, description: 'GST, Udyam (MSME) and FSSAI registrations and DPIIT / Startup India recognition, prepared and filed at a flat professional fee with government charges separate, plus non-accredited ISO certification issued by Vybe and consulting on NSDC / Skill India and affiliation applications.' },
       ].filter((s) => published(s.nav)).map((s, i) => ({
         '@type': 'ListItem',
         position: i + 1,
@@ -1919,7 +1936,7 @@ const contactFaqs = [
   },
   {
     q: 'Where are you located, and can we visit?',
-    a: `Our registered office is at ${esc(ORG.street)}, ${esc(ORG.locality)}, ${esc(ORG.region)} ${ORG.postal}. You are welcome to come and see the products running — call ahead on <a class="text-brand font-bold" href="tel:+919964177877">+91 99641 77877</a> so somebody who can answer your questions is in the office.`,
+    a: `Our registered office is at ${esc(ORG.street)}, ${esc(ORG.locality)}, ${esc(ORG.region)} ${ORG.postal}. You are welcome to come and see the products running — call ahead on ${telLink(ORG.phone)} so somebody who can answer your questions is in the office.`,
   },
   {
     q: 'Do you work with institutions outside Bengaluru?',
@@ -1948,15 +1965,15 @@ ${breadcrumbs([CRUMB_HOME, { name: 'Contact Us', url: '/contact/' }], false)}
                       blurb: 'Quotes, demos, new campuses, extra modules and hardware. The fastest way to get a proposal together.',
                       email: ORG.sales,
                       phone: ORG.phone,
-                      phoneLabel: '+91 99641 77877',
+                      phoneLabel: telText(ORG.phone),
                     })}
                     ${contactCard({
                       icon: 'support_agent',
                       label: 'Customer support',
                       blurb: 'Already running Vybe software and something is not right? This reaches the team that maintains it.',
                       email: ORG.support,
-                      phone: ORG.phoneAlt,
-                      phoneLabel: '+91 99641 77677',
+                      phone: ORG.phoneSupport,
+                      phoneLabel: telText(ORG.phoneSupport),
                     })}
                     ${contactCard({
                       icon: 'gavel',
@@ -1987,6 +2004,9 @@ ${breadcrumbs([CRUMB_HOME, { name: 'Contact Us', url: '/contact/' }], false)}
                         ${ORG.locality}, ${ORG.region} &ndash; ${ORG.postal}<br>
                         India
                     </address>
+                    <p class="mt-5 text-sm text-slate-400 leading-relaxed">Second office line: <a class="font-bold text-white hover:text-brand transition-colors" href="${telHref(
+                      ORG.phoneOffice
+                    )}">${telText(ORG.phoneOffice)}</a>. It reaches the same office, and is the number to try if the sales and support lines are both busy.</p>
                     <a href="${MAPS_URL}" target="_blank" rel="noopener"
                        class="mt-6 inline-flex items-center gap-2 text-sm font-bold text-white hover:text-brand transition-colors">
                         <span class="material-symbols-outlined text-[20px]" aria-hidden="true">location_on</span>
@@ -2049,15 +2069,114 @@ ${faqSection(contactFaqs, { dark: false })}
  * move with material, size, finish and run length, so a made-up "from" figure
  * would be wrong on most jobs.
  */
-const WA_NUMBER = '919964177877';
+const WA_NUMBER = ORG.phone.replace(/[^\d]/g, '');
 const waLink = (text) => `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`;
 
 const PRINT_ENQUIRY = 'Hi Vybe, I would like a printing quote. Here is what I need:';
 
-function printCategory({ id, icon, title, blurb, items }) {
+/* ---- shared furniture for the printing and registration sub-pages ---- */
+
+/** The pair of calls to action every one of these pages ends on. */
+function ctaRow({ waText, waLabel, email, subject, emailLabel }) {
+  return `<div class="mt-10 flex flex-col sm:flex-row gap-4">
+                    <a href="${waLink(waText)}" target="_blank" rel="noopener"
+                       class="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white px-7 py-4 rounded-full text-sm font-bold transition-all active:scale-95">
+                        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">forum</span>
+                        ${waLabel}
+                    </a>
+                    <a href="mailto:${email}?subject=${encodeURIComponent(subject)}"
+                       class="inline-flex items-center justify-center gap-2 bg-corporate hover:bg-slate-800 text-white px-7 py-4 rounded-full text-sm font-bold transition-all active:scale-95">
+                        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">mail</span>
+                        ${emailLabel}
+                    </a>
+                </div>`;
+}
+
+/** A checklist panel: the short "here is what that covers" list. */
+function checklistPanel(heading, items) {
+  return `<div class="mt-14 rounded-2xl border border-slate-200 bg-white p-8">
+                    <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">${esc(heading)}</h2>
+                    <ul class="mt-5 grid gap-3 sm:grid-cols-2 text-sm text-slate-600">
+                        ${items
+                          .map(
+                            (i) => `<li class="flex items-start gap-2">
+                            <span class="material-symbols-outlined text-brand text-[18px] shrink-0 mt-0.5" aria-hidden="true">check_circle</span>
+                            <span>${esc(i)}</span>
+                        </li>`
+                          )
+                          .join('\n                        ')}
+                    </ul>
+                </div>`;
+}
+
+/** The long-form middle of a sub-page: headed paragraphs on the dark band. */
+function proseSections({ id, eyebrow, heading, lede, sections }) {
+  return `
+        <section class="bg-corporate dark-section text-slate-300 py-20 md:py-28 px-6 relative z-10" aria-labelledby="${id}">
+            <div class="max-w-4xl mx-auto">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-2">${esc(eyebrow)}</p>
+                <h2 id="${id}" class="text-3xl md:text-4xl font-black font-display tracking-tight text-white">${esc(heading)}</h2>
+                ${lede ? `<p class="mt-5 text-lg leading-relaxed text-slate-300 max-w-3xl">${lede}</p>` : ''}
+                <div class="mt-12 space-y-10">
+                    ${sections
+                      .map(
+                        (s) => `<div class="border-t border-white/10 pt-8">
+                        <h3 class="text-xl md:text-2xl font-bold font-display tracking-tight text-white">${esc(s.h)}</h3>
+                        <p class="mt-3 leading-relaxed text-slate-300">${s.p}</p>
+                    </div>`
+                      )
+                      .join('\n                    ')}
+                </div>
+            </div>
+        </section>`;
+}
+
+/**
+ * Sideways links between the pages in one group, plus the way back up to the
+ * hub. Without it every sub-page is a leaf you can only leave by the nav.
+ */
+function siblingSection({ eyebrow, heading, items }) {
+  const cards = items
+    .map(
+      (i) => `<a href="${i.href}" class="group block rounded-2xl border border-slate-200 bg-white p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-brand/40">
+                        <span class="material-symbols-outlined text-brand text-[28px]" aria-hidden="true">${i.icon}</span>
+                        <h3 class="mt-3 text-lg font-bold font-display tracking-tight text-slate-900">${esc(i.name)}</h3>
+                        <p class="mt-1 text-sm text-slate-600 leading-relaxed">${esc(i.blurb)}</p>
+                    </a>`
+    )
+    .join('\n                    ');
+
+  return `
+        <section class="bg-surface-main border-t border-slate-200 py-20 px-6 relative z-10" aria-labelledby="siblings-heading">
+            <div class="max-w-6xl mx-auto">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-2">${esc(eyebrow)}</p>
+                <h2 id="siblings-heading" class="text-3xl md:text-4xl font-black font-display tracking-tight mb-10 text-slate-900">${esc(heading)}</h2>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    ${cards}
+                </div>
+            </div>
+        </section>`;
+}
+
+function printCategory(c) {
+  const { id, icon, title, blurb, items } = c;
+  const href = c.slug ? printHref(c) : null;
+  // Where a category has a page, the whole card is the link to it; the
+  // "anything else" card has nowhere to go, so it stays a plain card.
+  const head = href
+    ? `<a href="${href}" class="group/card">
+                            <h3 class="mt-4 text-xl font-bold font-display tracking-tight text-slate-900 group-hover/card:text-brand transition-colors">${esc(title)}</h3>
+                        </a>`
+    : `<h3 class="mt-4 text-xl font-bold font-display tracking-tight text-slate-900">${esc(title)}</h3>`;
+  const more = href
+    ? `<a href="${href}" class="mt-auto pt-6 inline-flex items-center gap-2 text-sm font-bold text-brand hover:gap-3 transition-all">
+                            ${esc(title)} in detail
+                            <span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_forward</span>
+                        </a>`
+    : '';
   return `<li id="${id}" class="flex flex-col h-full rounded-2xl border border-slate-200 bg-white p-8 scroll-mt-28 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-brand/40">
                         <span class="material-symbols-outlined text-brand text-[28px]" aria-hidden="true">${icon}</span>
-                        <h3 class="mt-4 text-xl font-bold font-display tracking-tight text-slate-900">${esc(title)}</h3>
+                        ${head}
                         <p class="mt-2 text-sm text-slate-600 leading-relaxed">${esc(blurb)}</p>
                         <ul class="mt-6 pt-6 border-t border-slate-100 grid gap-2 text-sm text-slate-600">
                             ${items
@@ -2069,12 +2188,15 @@ function printCategory({ id, icon, title, blurb, items }) {
                               )
                               .join('\n                            ')}
                         </ul>
+                        ${more}
                     </li>`;
 }
 
 const PRINT_CATEGORIES = [
   {
     id: 'stationery',
+    slug: 'stationery',
+    nav: 'print-stationery',
     icon: 'description',
     title: 'Paper & stationery',
     blurb: 'The everyday run. The things an office gets through and reorders.',
@@ -2085,9 +2207,49 @@ const PRINT_CATEGORIES = [
       'Posters, certificates, calendars and diaries',
       'Files, folders and register covers',
     ],
+    h1: 'Paper and stationery, run properly.',
+    lede:
+      'Letterheads, bill books, brochures, flyers, posters, certificates and folders. This is the work an office gets through and reorders, so it has to look the same in January and in November.',
+    metaTitle: 'Letterhead, Bill Book & Brochure Printing in Bengaluru | Vybe',
+    metaDescription:
+      'Letterheads, envelopes, bill books and invoice books, brochures, flyers, posters, certificates, files and folders, printed to your artwork in Bengaluru. Send the file for a quote.',
+    sections: [
+      {
+        h: 'Paper, and why we ask about it',
+        p: 'Most of what goes wrong with a stationery job is decided before anything is printed, by the paper. A letterhead on 100 gsm bond feels like a letter; the same design on 70 gsm feels like a photocopy of one. A brochure that has to survive a counter wants a heavier stock and a lamination, and one that goes straight into a folder does not. Tell us where the piece ends up and we will suggest a stock, or match the one you used last time if you send us a sample.',
+      },
+      {
+        h: 'Digital or offset',
+        p: 'Short runs go digital: no plates, so a hundred copies cost what a hundred copies should. Past a certain quantity offset takes over and the per-piece price drops sharply, which is why the same brochure can work out cheaper at two thousand than at eight hundred. We will tell you where that crossover sits for your job rather than quote one method and leave you wondering about the other.',
+      },
+      {
+        h: 'Finishing',
+        p: 'Matt and gloss lamination, spot UV, foiling, embossing, folding, creasing, perforation, numbering, stapling and binding. Bill books and receipt books come carbonless in two or three parts, numbered in sequence, perforated and bound the way you are used to. If you have a book from a previous printer, send a photo of it and we will match the format rather than ask you to describe it.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'Can you print carbonless bill books with running numbers?',
+        a: 'Yes. Two-part or three-part carbonless sets, numbered in sequence, perforated and bound into books of 50 or 100. Tell us the number to start from and whether the copies need to be different colours. If you want the same format as your current book, a photo of it is enough to go on.',
+      },
+      {
+        q: 'What paper weights do you normally use?',
+        a: 'As a rough guide: 70 to 100 gsm for letterheads and inner pages, 130 to 170 gsm for brochures and flyers, 250 to 300 gsm for covers, posters, certificates and folders. That is a starting point rather than a rule. The right answer depends on the piece and how it gets handled, and we will suggest one when we see the artwork.',
+      },
+      {
+        q: 'Is there a minimum quantity for stationery?',
+        a: 'Digital printing runs economically from small quantities, so a hundred letterheads is a perfectly normal order. Offset needs a larger run before the per-piece price makes sense. Ask with your quantity and we will tell you which method yours falls into and where the next price break is.',
+      },
+      {
+        q: 'Can we reorder the same job later?',
+        a: 'Yes, and it takes one message. We keep the approved file, so a repeat run needs nothing from you beyond the quantity unless something on the artwork has changed.',
+      },
+    ],
   },
   {
     id: 'cards',
+    slug: 'cards',
+    nav: 'print-cards',
     icon: 'badge',
     title: 'Business, ID & RFID cards',
     blurb: 'Everything card-sized, from a visiting card to a card that opens a door.',
@@ -2098,9 +2260,53 @@ const PRINT_CATEGORIES = [
       'Student, staff and membership cards',
       'Variable data: names, numbers, photos and QR codes',
     ],
+    h1: 'Cards, from a visiting card to one that opens a door.',
+    lede:
+      'Visiting cards, PVC ID cards, and RFID and NFC cards, tags and key fobs. All printed to your artwork, and the ones that have to work with a reader confirmed against your system before a batch is run.',
+    metaTitle: 'Business Card, PVC ID & RFID Card Printing in Bengaluru | Vybe',
+    metaDescription:
+      'Visiting cards in matt, gloss, velvet and spot UV. PVC ID cards with lanyards and holders. RFID and NFC cards, tags and key fobs carrying names, photos, numbers and QR codes. Printed in Bengaluru to your artwork.',
+    sections: [
+      {
+        h: 'Visiting cards',
+        p: 'Standard 3.5 by 2 inches unless you want otherwise, on 300 or 350 gsm, single or double sided. Matt and gloss lamination, velvet or suede touch, spot UV, foiling, embossing and rounded corners are all available, and several of them read better in the hand than they ever do on a screen. If you are choosing between finishes, say what impression you are after and we will tell you which one actually gets you there.',
+      },
+      {
+        h: 'ID cards for schools, colleges and offices',
+        p: 'PVC cards in the standard CR80 size, printed edge to edge, with names, photographs, designations, numbers, barcodes and QR codes handled as variable data. Send the list as a spreadsheet and the photographs in a folder named to match, and the whole batch is merged and printed from it. Lanyards, holders, clips and retractable reels can come with the order, so you are not sourcing them separately the week term starts.',
+      },
+      {
+        h: 'RFID and NFC cards',
+        p: 'Cards, tags, key fobs and wristbands, printed with your branding. The part worth getting right first is the chip: 125 kHz and 13.56 MHz are different technologies, and a card of the wrong sort is a coaster no matter how well it is printed. Tell us the chip your readers expect, or, if you do not know, what access control, attendance or cafeteria system you run, and we will confirm the right card before anything is ordered in bulk.',
+      },
+      {
+        h: 'Cards that have to talk to your system',
+        p: 'Whether cards can be delivered ready to use or have to be enrolled in your own software depends on the system. Some allow a supplier to write the card; others will only accept one enrolled from inside the application, by design. We will tell you which applies to yours before you order, rather than deliver a box and leave you to find out.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'Will the cards work with our existing readers?',
+        a: 'They will if we know what your readers expect. RFID comes in different frequencies and chip families, and a card of the wrong sort will not be read at all. Tell us the chip type, or the name of the access, attendance or cafeteria system you run, and we will confirm the right card first. Where it is practical we will get a sample card to you to test on your reader before the batch is printed.',
+      },
+      {
+        q: 'Can you print names, photos and QR codes on each card?',
+        a: 'Yes. Send the list as a spreadsheet and the photographs in a folder whose filenames match a column in it, and the batch is merged from that. Names, roll or employee numbers, designations, validity dates, barcodes and QR codes all work the same way.',
+      },
+      {
+        q: 'Do you supply lanyards and holders too?',
+        a: 'Yes. Lanyards in your colours, with printing if you want it, along with holders, clips and retractable reels. Ordering them with the cards means one delivery rather than two.',
+      },
+      {
+        q: 'What is the minimum order for ID or RFID cards?',
+        a: 'Small batches are fine for PVC ID cards, which is what makes mid-year joiners and replacement cards practical. RFID and NFC cards depend on the chip, because some are only sold in fixed pack sizes. Ask with your quantity and we will tell you where you stand before you commit to anything.',
+      },
+    ],
   },
   {
     id: 'large-format',
+    slug: 'banners-standees',
+    nav: 'print-large-format',
     icon: 'flag',
     title: 'Banners, standees & signage',
     blurb: 'Large format, printed and finished ready to put up.',
@@ -2110,6 +2316,48 @@ const PRINT_CATEGORIES = [
       'Canopy, table covers and event branding',
       'Foam board, sunboard and acrylic signage',
       'Wall, window and vehicle graphics',
+    ],
+    h1: 'Large format, finished and ready to put up.',
+    lede:
+      'Flex and vinyl banners, roll-up standees, backdrops, event branding and signage. Printed to size, finished with the eyelets, stands or mounting you actually need, and checked against where it is going before it runs.',
+    metaTitle: 'Flex Banner, Roll-Up Standee & Signage Printing in Bengaluru | Vybe',
+    metaDescription:
+      'Flex and vinyl banners in any size, roll-up standees, backdrops, canopy and table branding, foam board, sunboard and acrylic signage, and wall, window and vehicle graphics. Printed in Bengaluru to your artwork.',
+    sections: [
+      {
+        h: 'Banners',
+        p: 'Flex and vinyl, printed to whatever size you need rather than to a fixed list. Star flex for general outdoor use, backlit for a lit frame, blockout where light must not come through from behind. Finished with hemmed edges and eyelets as standard, and with rods or rope if you tell us how it is going up. Give us the finished size and the place it hangs, and we will flag it if the proportions are going to fight the space.',
+      },
+      {
+        h: 'Standees and backdrops',
+        p: 'Roll-up standees in the usual 6 by 3 feet, and wider where the stand allows, supplied with the stand and a carry bag. Backdrops and step-and-repeat walls for events, printed on fabric or flex with a frame if you need one. The thing worth remembering with a roll-up is that the bottom few inches sit inside the cassette, so anything important placed there disappears. We check for that before printing.',
+      },
+      {
+        h: 'Signage and graphics',
+        p: 'Foam board, sunboard and acrylic for indoor signage, name boards and directional signs. Vinyl for walls, windows and vehicles, including frosted film for glass partitions and one-way vision for windows you still want to see out of. Tell us the surface it is sticking to, because that decides which material is still there in six months.',
+      },
+      {
+        h: 'Artwork for large format',
+        p: 'Large format is more forgiving on resolution than paper is, because it gets read from a distance. It is not forgiving of a file that was already small. A logo pulled off a website, or a design forwarded through a chat app, has usually been compressed twice over, and it shows at banner size. Send the original file at whatever size it is and we will scale it. If it will not hold up, you hear that before it prints rather than after.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'What resolution does my artwork need to be?',
+        a: 'Send the original file rather than aim at a number. Large format is viewed from a distance, so it needs far less resolution than a brochure does, but that only helps if the file has not already been compressed. A screenshot or a forwarded copy has lost detail that cannot be put back. We open every file at print size before quoting and tell you plainly if it will not hold.',
+      },
+      {
+        q: 'What size are roll-up standees?',
+        a: 'The common one is 6 by 3 feet, supplied with the stand and a carry bag, and wider sizes are available where the stand allows. Keep anything important out of the bottom few inches of the design, because that strip rolls into the cassette and cannot be seen once it is set up.',
+      },
+      {
+        q: 'Do you install banners and signage?',
+        a: 'Delivery in and around Bengaluru is normal. For signage that needs mounting, tell us when you send the artwork and we will confirm whether installation can be arranged for your site and what it would involve, rather than assume it either way.',
+      },
+      {
+        q: 'How long will an outdoor banner last?',
+        a: 'It depends on the material and on the weather it takes. Star flex is the usual choice for a short outdoor campaign; vinyl on a rigid board lasts considerably longer. Tell us how long it has to stand and where, and we will recommend the material for that rather than the cheapest one on the list.',
+      },
     ],
   },
   {
@@ -2125,12 +2373,16 @@ const PRINT_CATEGORIES = [
   },
 ];
 
+/** The three categories deep enough to deserve a page of their own. */
+const PRINT_PAGES = PRINT_CATEGORIES.filter((c) => c.slug);
+const printHref = (c) => `/printing/${c.slug}/`;
+
 const PRINT_STEPS = [
   {
     h: 'Send us the file',
     p: `Email it to <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a> or WhatsApp it to <a class="text-brand font-bold" href="${waLink(
       PRINT_ENQUIRY
-    )}" target="_blank" rel="noopener">+91 99641 77877</a>. PDF, AI, CDR, PSD, PNG or JPG all work. Tell us the size, the quantity and the finish you want if you already know them.`,
+    )}" target="_blank" rel="noopener">${telText(ORG.phone)}</a>. PDF, AI, CDR, PSD, PNG or JPG all work. Tell us the size, the quantity and the finish you want if you already know them.`,
   },
   {
     h: 'We check it and quote',
@@ -2155,7 +2407,7 @@ const printingFaqs = [
     q: 'How do I send you my artwork?',
     a: `Two ways, both of which reach the same people. Email the file to <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a>, or WhatsApp it to <a class="text-brand font-bold" href="${waLink(
       PRINT_ENQUIRY
-    )}" target="_blank" rel="noopener">+91 99641 77877</a>. PDF is ideal; AI, CDR, PSD, PNG and JPG are all fine. For anything large format, send the original rather than a screenshot or a forwarded copy of it. A file that looks sharp on a phone can be well short of what a banner needs.`,
+    )}" target="_blank" rel="noopener">${telText(ORG.phone)}</a>. PDF is ideal; AI, CDR, PSD, PNG and JPG are all fine. For anything large format, send the original rather than a screenshot or a forwarded copy of it. A file that looks sharp on a phone can be well short of what a banner needs.`,
   },
   {
     q: 'What if my file is not print-ready?',
@@ -2163,7 +2415,7 @@ const printingFaqs = [
   },
   {
     q: 'What does printing cost?',
-    a: `It depends on the material, the size, the finish and how many you are running. The same design can differ several-fold across those four, so a headline price on this page would be wrong for most jobs. Send the artwork with the quantity and you will get a real figure rather than an indicative one. Email <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a> or call <a class="text-brand font-bold" href="tel:+919964177877">+91 99641 77877</a>.`,
+    a: `It depends on the material, the size, the finish and how many you are running. The same design can differ several-fold across those four, so a headline price on this page would be wrong for most jobs. Send the artwork with the quantity and you will get a real figure rather than an indicative one. Email <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a> or call ${telLink(ORG.phone)}.`,
   },
   {
     q: 'Is there a minimum quantity?',
@@ -2278,67 +2530,560 @@ ${relatedSection('printing', { dark: false })}
   });
 }
 
+/* ------------------------------------------------- printing, category pages */
+
+/**
+ * One page per print category, so a search for "roll-up standee printing" has
+ * somewhere to land that is about roll-up standees rather than a hub page
+ * mentioning them in passing. Everything here comes from PRINT_CATEGORIES, so
+ * the hub, the nav and these pages cannot describe the same category
+ * differently.
+ */
+for (const c of PRINT_PAGES) {
+  const url = printHref(c);
+  const enquiry = `Hi Vybe, I would like a quote for ${c.title.replace(/&/g, 'and').toLowerCase()}. Here is what I need:`;
+
+  const body = `<div class="w-full bg-surface-main">
+${breadcrumbs([CRUMB_HOME, { name: 'Printing', url: '/printing/' }, { name: c.title, url }], false)}
+
+        <section class="px-6 pt-12 pb-20 md:pb-28 relative overflow-hidden">
+            <div class="absolute inset-0 bg-grid-faint" aria-hidden="true"></div>
+            <div class="max-w-6xl mx-auto relative z-10">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-3">Printing &middot; ${esc(c.title)}</p>
+                <h1 class="text-5xl md:text-7xl font-black font-display tracking-tighter text-slate-900">${esc(c.h1)}</h1>
+                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">${esc(c.lede)}</p>
+
+                ${ctaRow({
+                  waText: enquiry,
+                  waLabel: 'WhatsApp us the artwork',
+                  email: ORG.sales,
+                  subject: `${c.title} enquiry`,
+                  emailLabel: `Email ${ORG.sales}`,
+                })}
+                <p class="mt-4 text-sm text-slate-500">No prices on this page on purpose. What a job costs moves with the material, the size, the finish and the quantity, so we quote the job in front of us rather than an average of other people's.</p>
+
+                ${checklistPanel(`What ${c.title.toLowerCase()} covers`, c.items)}
+            </div>
+        </section>
+
+${proseSections({
+  id: `${c.slug}-detail`,
+  eyebrow: 'In detail',
+  heading: c.title,
+  sections: c.sections,
+})}
+
+${faqSection(c.faqs, { dark: false })}
+
+${siblingSection({
+  eyebrow: 'More printing',
+  heading: 'The rest of what we print.',
+  items: [
+    { href: '/printing/', icon: 'print', name: 'All printing services', blurb: 'Everything we print, and how to send us artwork for a quote.' },
+    ...PRINT_PAGES.filter((o) => o.slug !== c.slug).map((o) => ({ href: printHref(o), icon: o.icon, name: o.title, blurb: o.blurb })),
+  ],
+})}
+${relatedSection('printing', { dark: false })}
+</div>`;
+
+  const lastmod = lastmodFor(url, [c.metaTitle, c.metaDescription, body].join('\n'));
+
+  DOCS.push({
+    file: `printing/${c.slug}/index.html`,
+    priority: '0.7',
+    changefreq: 'monthly',
+    page: {
+      url,
+      nav: c.nav,
+      title: c.metaTitle,
+      ogTitle: c.title,
+      description: c.metaDescription,
+      lastmod,
+      trail: [CRUMB_HOME, { name: 'Printing', url: '/printing/' }, { name: c.title, url }],
+      faqs: c.faqs,
+      body,
+      schema: (u) => ({
+        '@type': 'Service',
+        '@id': `${u}#service`,
+        name: c.title,
+        serviceType: 'Commercial printing',
+        description: c.metaDescription,
+        provider: { '@id': `${SITE}/#organization` },
+        areaServed: { '@type': 'Country', name: 'India' },
+        url: u,
+        isRelatedTo: { '@id': `${SITE}/printing/#service` },
+        hasOfferCatalog: {
+          '@type': 'OfferCatalog',
+          name: c.title,
+          itemListElement: c.items.map((i) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: i } })),
+        },
+      }),
+    },
+  });
+}
+
 /* ------------------------------------------------------------- registrations */
 
 /**
  * Flat professional fees, with government charges kept visibly separate. The
- * separation is repeated on every card, in the schema and in the FAQ on
- * purpose: the fee below is what Vybe charges, and it is not the whole cost of
- * the registration.
+ * separation is repeated on every card, on every page and in the schema on
+ * purpose: the fee is what Vybe charges, and for some of these it is not the
+ * whole cost of the registration.
+ *
+ * The ISO entry is the odd one out and is handled with care throughout. It is
+ * a certificate we issue ourselves, not an accredited one, and every place it
+ * appears says so in plain words. See the disclosure on its own page.
  */
 const REGISTRATIONS = [
   {
     id: 'gst',
+    slug: 'gst',
+    nav: 'reg-gst',
     icon: 'account_balance',
     name: 'GST registration',
     fee: 199,
+    feeNote: 'No government fee on this registration',
     tagline: 'GSTIN for a new business, a branch or a turnover threshold crossed.',
     who: 'Anyone crossing the turnover threshold, selling across state lines, selling on a marketplace, or being asked for a GSTIN by a customer who cannot claim input credit without one.',
-    needs: ['PAN and Aadhaar of the proprietor, partners or directors', 'Proof of business address: ownership papers, a rent agreement or an NOC', 'Bank account details or a cancelled cheque', 'Photograph, and the constitution documents for a firm or company'],
+    needs: [
+      'PAN and Aadhaar of the proprietor, partners or directors',
+      'Proof of business address: ownership papers, a rent agreement or an NOC',
+      'Bank account details or a cancelled cheque',
+      'Photograph, and the constitution documents for a firm or company',
+    ],
     note: 'The GST portal charges nothing for the registration itself. Our fee is the professional fee for preparing and filing it, and for handling any clarification the officer raises before the GSTIN is issued.',
+    h1: 'GST registration, filed and followed up.',
+    lede:
+      'A GSTIN for a new business, a new branch, or a threshold you have just crossed. We prepare the application, file it, answer whatever the officer comes back with, and hand you the certificate.',
+    metaTitle: 'GST Registration at ₹199 | New GSTIN Filed for You | Vybe',
+    metaDescription:
+      'GST registration at a flat ₹199 professional fee. Documents prepared, application filed on the GST portal, clarifications answered and the GSTIN delivered. The portal charges no government fee for the registration itself.',
+    sections: [
+      {
+        h: 'Who actually needs a GSTIN',
+        p: 'The turnover thresholds are the usual reason, and they differ for goods and for services, and again in the special category states. But turnover is not the only trigger. Supplying goods across a state line, selling through an e-commerce marketplace, running an e-commerce platform yourself, operating as a casual taxable person at an exhibition, or being liable to pay under reverse charge all require registration whatever your turnover is. Plenty of businesses also register voluntarily, because a customer who cannot claim input credit on your invoice will eventually buy from somebody whose invoice they can claim on.',
+      },
+      {
+        h: 'What we do',
+        p: 'We check first whether you need to register at all, and under which scheme, because a composition scheme registration and a regular one lead to very different lives afterwards. Then the application is prepared, verified and filed on the portal. If the officer raises a query, which happens on a large share of applications and usually concerns the address proof, we draft and file the reply. That is inside the fee, not an extra.',
+      },
+      {
+        h: 'Address proof is where applications stall',
+        p: 'More GST applications are held up by premises documents than by anything else. A rent agreement in the wrong name, an electricity bill that does not match the address on the agreement, a consent letter without the owner’s identity proof attached: any of these is enough to draw a notice. Send us what you have before you commit and we will tell you what is missing while it is still cheap to fix.',
+      },
+      {
+        h: 'After the GSTIN arrives',
+        p: 'Registration is the start of an obligation, not the end of one. Returns fall due monthly or quarterly depending on your scheme and turnover, whether or not you traded in the period, and the late fees accrue per day. We file the registration; returns are separate ongoing work. Ask and we will quote it, or tell you plainly that your accountant should keep it.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'How much does GST registration cost in total?',
+        a: '₹199, and that is the whole of it. The GST portal levies no government fee for a registration, so unlike FSSAI there is nothing payable on top. The ₹199 covers preparing the application, filing it, replying to any clarification raised on it and delivering the GSTIN.',
+      },
+      {
+        q: 'How long does it take to get a GSTIN?',
+        a: 'Filing happens within a working day of us having a complete set of documents. What follows is with the department: where no clarification is raised, a GSTIN is usually issued within about a week. Where one is raised, the clock restarts from our reply. We do not control that timeline and will not quote you one as though we did.',
+      },
+      {
+        q: 'Do we need GST registration if our turnover is below the threshold?',
+        a: 'Not on turnover grounds alone, but several other triggers apply regardless of turnover, including inter-state supply of goods, selling through an e-commerce marketplace and liability under reverse charge. Many businesses below the threshold also register voluntarily so that their customers can claim input credit. Tell us what you sell and to whom, and we will tell you which of those applies to you.',
+      },
+      {
+        q: 'Can you register an additional place of business or a new branch?',
+        a: 'Yes. Adding a branch, a godown or an additional place of business is an amendment to your existing registration rather than a fresh one, and a new state means a separate registration in that state. Send us the details and we will tell you which of the two yours is before you pay anything.',
+      },
+      {
+        q: 'What happens if the application is rejected?',
+        a: 'Rejections almost always follow an unanswered or unsatisfactory reply to a clarification, and the usual subject is the premises proof. If it happens we will tell you exactly what the department would not accept and what has to change before it is refiled, rather than refile the same papers and hope.',
+      },
+    ],
   },
   {
     id: 'msme',
+    slug: 'msme',
+    nav: 'reg-msme',
     icon: 'storefront',
     name: 'MSME / Udyam registration',
     fee: 199,
+    feeNote: 'No government fee on this registration',
     tagline: 'The Udyam certificate that unlocks MSME benefits, subsidies and tender eligibility.',
     who: 'Micro, small and medium enterprises, whether manufacturing or services, that want the Udyam certificate for bank credit, subsidy schemes, tender eligibility or the protection of the delayed-payment provisions.',
-    needs: ['Aadhaar of the proprietor, managing partner or authorised director', 'PAN of the business', 'GSTIN, where the business is registered for GST', 'Investment and turnover figures, and the NIC activity codes that fit what you actually do'],
+    needs: [
+      'Aadhaar of the proprietor, managing partner or authorised director',
+      'PAN of the business',
+      'GSTIN, where the business is registered for GST',
+      'Investment and turnover figures, and the NIC activity codes that fit what you actually do',
+    ],
     note: 'Udyam registration carries no government fee. Our fee is for classifying the activity correctly and filing it. A wrong NIC code or a mis-stated investment figure is the usual reason a certificate is later disputed.',
+    h1: 'Udyam registration, classified correctly.',
+    lede:
+      'The MSME certificate that banks, tender portals and government schemes ask for. It is free to file and easy to file wrongly, and a wrong classification is the reason most certificates are questioned later.',
+    metaTitle: 'MSME / Udyam Registration at ₹199 | Vybe Technologies',
+    metaDescription:
+      'Udyam (MSME) registration at a flat ₹199 professional fee, with no government fee payable. Correct NIC classification, investment and turnover figures filed properly, and the Udyam certificate delivered.',
+    sections: [
+      {
+        h: 'What the certificate is for',
+        p: 'Udyam is the government’s register of micro, small and medium enterprises, and the certificate is what proves you are on it. Banks ask for it before lending under priority sector norms and under the collateral-free credit guarantee scheme. Tender portals ask for it where a tender is reserved for MSEs or carries a relaxation on turnover and prior experience. Several state and central subsidy schemes ask for it as the first document. And it is what lets you invoke the delayed payment provisions, under which a buyer who holds your money past the statutory period owes interest on it.',
+      },
+      {
+        h: 'Which band you fall into',
+        p: 'Micro, small and medium are defined by two numbers together: investment in plant, machinery or equipment, and annual turnover. The limits have been revised upwards over time, most recently with effect from the 2025–26 financial year, so a business that was small under the old limits may sit differently now. Give us your figures and we will tell you which band you are in before anything is filed, rather than file first and explain afterwards.',
+      },
+      {
+        h: 'The NIC code is the part people get wrong',
+        p: 'Udyam requires you to declare your activity against National Industrial Classification codes, and the classification follows you. A trading business filed under a manufacturing code, or a consultancy filed under whatever code looked closest, is exactly the kind of mismatch that surfaces later when a bank or a tender authority compares the certificate against your GST returns. We pick the codes against what the business actually does, list them all where you do more than one thing, and tell you which is the primary.',
+      },
+      {
+        h: 'It is linked to your PAN and GST',
+        p: 'Udyam draws investment and turnover data from your PAN and GST records rather than taking your word for it, and the classification updates automatically as those figures move. That is a good reason to have the figures right at the time of filing, and a good reason not to enter numbers that your returns will contradict.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'Is there a government fee for Udyam registration?',
+        a: 'None. Udyam registration is free on the government portal, and any site charging you a government fee for it is charging you for something that does not exist. Our ₹199 is a professional fee for classifying the business correctly and filing it, and you are perfectly entitled to file it yourself instead.',
+      },
+      {
+        q: 'How long does it take?',
+        a: 'Udyam is generally issued immediately once the application is submitted with a valid Aadhaar and PAN, and the certificate can usually be downloaded the same day. The work that takes time is what comes before: getting the classification, the activity codes and the figures right.',
+      },
+      {
+        q: 'We already have a Udyog Aadhaar or an old MSME certificate. Is that enough?',
+        a: 'No. The older Udyog Aadhaar Memorandum registrations have been superseded by Udyam, and the old numbers are no longer treated as valid MSME proof. If you are still carrying one, you need a fresh Udyam registration. Send us the old certificate and we will file the new one.',
+      },
+      {
+        q: 'Can a trader register under Udyam?',
+        a: 'Retail and wholesale traders are included for the limited purpose of priority sector lending, which is not the same as the full set of MSME benefits. It is worth knowing which of the two you are getting before you register, and we will tell you plainly where your business sits.',
+      },
+      {
+        q: 'What if our turnover grows past the limit?',
+        a: 'The classification moves with your PAN and GST data, so the certificate reclassifies itself as the figures change rather than becoming invalid. There is a transition period before a change in band takes effect on benefits. Nothing needs re-filing on your side.',
+      },
+    ],
   },
   {
     id: 'fssai',
+    slug: 'fssai',
+    nav: 'reg-fssai',
     icon: 'soup_kitchen',
     name: 'FSSAI registration & licence',
     fee: 299,
+    feeNote: '+ government charges at actuals',
     tagline: 'Basic registration, or a State licence, for anyone handling food.',
     who: 'Anyone who manufactures, stores, transports, distributes or sells food: restaurants, cafeterias, caterers, cloud kitchens, retailers, traders and home-based food businesses.',
-    needs: ['Photo ID and address proof of the proprietor, partners or directors', 'Proof of business premises', 'List of food products or categories handled', 'Layout plan and a water test report, where the category calls for one'],
+    needs: [
+      'Photo ID and address proof of the proprietor, partners or directors',
+      'Proof of business premises',
+      'List of food products or categories handled',
+      'Layout plan and a water test report, where the category calls for one',
+    ],
     note: 'Which of Basic registration, a State licence or a Central licence applies depends on your turnover and where you operate, and the government fee differs for each. Tell us your turnover and we will tell you which one you need before you pay anything.',
+    h1: 'FSSAI, on the right licence.',
+    lede:
+      'Basic registration, a State licence or a Central licence: three different things that get called "the FSSAI licence" interchangeably, with different fees and different consequences for getting it wrong. We work out which one you need first.',
+    metaTitle: 'FSSAI Registration & Food Licence at ₹299 | Vybe Technologies',
+    metaDescription:
+      'FSSAI Basic registration, State licence and Central licence filed for you at a flat ₹299 professional fee, with the government fee quoted separately before you commit. For restaurants, cafeterias, cloud kitchens, caterers, traders and home food businesses.',
+    sections: [
+      {
+        h: 'Basic, State or Central',
+        p: 'Which one applies is decided mostly by turnover and partly by what you do. Very small operators take Basic registration. Most restaurants, caterers, cloud kitchens and mid-sized manufacturers fall into the State licence. A Central licence is required above the upper turnover limit, and also regardless of turnover for importers and exporters, for operations at ports, airports and on the railways, and for businesses operating across several states from a head office. Tell us your turnover and where you operate and we will tell you which of the three you are before you pay for any of them.',
+      },
+      {
+        h: 'What the government charges',
+        p: 'Unlike GST and Udyam, FSSAI carries a real government fee, and it differs by licence type and by the number of years you take it for. Taking a licence for multiple years at once is usually cheaper per year than renewing annually. We quote the exact government figure for your category up front, charge it at actuals with nothing added, and keep it on a separate line of the invoice from our own fee.',
+      },
+      {
+        h: 'Displaying and using the number',
+        p: 'The 14-digit FSSAI number is not just a certificate for a drawer. It has to be displayed at your premises, and it belongs on your packaging, your menu and your bills depending on the kind of business you run. Aggregators will ask for it before they list you. Customers increasingly check it. We tell you where yours has to appear once it is issued.',
+      },
+      {
+        h: 'Inspections and renewals',
+        p: 'Some categories draw a premises inspection before the licence is granted, and the officer looks at the things you would expect: layout, storage, water, hygiene practice and pest control. We tell you in advance whether your category is likely to be inspected and what is typically looked at, so the visit is not the first time you hear about it. Licences run for one to five years and lapse if they are not renewed in time, with a penalty for late renewal, so we flag the date well before it arrives.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'Which FSSAI licence do we need?',
+        a: 'It follows your turnover and your operations. Small operators take Basic registration; most restaurants, caterers and cloud kitchens take a State licence; importers, exporters, multi-state operations and larger manufacturers take a Central licence. Tell us your annual turnover and where you operate and we will tell you which one applies before you spend anything.',
+      },
+      {
+        q: 'What are the government charges?',
+        a: 'They vary by licence type and by the number of years you take the licence for, and they are payable on top of our ₹299 professional fee. We give you the exact figure for your category before you commit, and charge it at actuals with nothing added on.',
+      },
+      {
+        q: 'Do home-based food businesses need FSSAI?',
+        a: 'Yes. Selling food from home is a food business, and it needs at least Basic registration. Delivery platforms will ask for the number before they list you, and so will most customers ordering in any quantity.',
+      },
+      {
+        q: 'Will there be an inspection?',
+        a: 'For some categories, yes, usually before the licence is granted. The officer looks at layout, storage, water, hygiene practice and pest control. We will tell you whether your category typically draws one and what is normally looked at, so you can be ready rather than surprised.',
+      },
+      {
+        q: 'How long is the licence valid?',
+        a: 'From one to five years, whichever you choose at the time of application. Longer terms usually work out cheaper per year. A licence that lapses cannot simply be continued and attracts a late renewal penalty, so we flag the renewal date to you ahead of time.',
+      },
+    ],
+  },
+  {
+    id: 'startup-india',
+    slug: 'startup-india',
+    nav: 'reg-startup-india',
+    icon: 'rocket_launch',
+    name: 'DPIIT / Startup India recognition',
+    fee: 999,
+    feeNote: 'No government fee. DPIIT recognition is free.',
+    tagline: 'Startup India recognition, prepared and filed. The government charges nothing for it.',
+    who: 'Private limited companies, LLPs and registered partnership firms within ten years of incorporation, working on something new or on a scalable model, that want the recognition certificate for IPR rebates, tender relaxations and scheme eligibility.',
+    needs: [
+      'Certificate of incorporation or registration, and PAN of the entity',
+      'Details of the directors or partners, and the authorised signatory',
+      'A short write-up on what the business does and what is new about it',
+      'Website, pitch deck or a product video, if you have one',
+      'Details of funding raised, patents filed or awards won, where they apply',
+    ],
+    note: 'DPIIT charges no fee for recognition, so ₹999 is the whole cost. Recognition is granted by DPIIT and not by us, and the tax benefits that people associate with it are a separate application that recognition makes you eligible to file, not something recognition itself grants.',
+    h1: 'Startup India recognition, written properly.',
+    lede:
+      'DPIIT recognition is free to apply for and routinely refused for a weak write-up. The fee here buys the application being put together in a way that stands up, not access to a form that anybody can open.',
+    metaTitle: 'DPIIT / Startup India Recognition at ₹999 | Vybe Technologies',
+    metaDescription:
+      'Startup India (DPIIT) recognition prepared and filed for ₹999, with no government fee payable. Eligibility checked, the innovation write-up drafted, and the certificate followed up. Bengaluru.',
+    sections: [
+      {
+        h: 'Whether you are eligible',
+        p: 'Four conditions, and all of them have to hold. The entity has to be a private limited company, a limited liability partnership or a registered partnership firm, so a sole proprietorship does not qualify. It has to be within ten years of incorporation. Annual turnover must not have crossed ₹100 crore in any year since incorporation. And it has to be working towards innovation, development or improvement of a product, process or service, or be a scalable business model with real potential for employment or wealth creation. An entity formed by splitting up or reconstructing an existing business is excluded. We check all four before you pay anything, and will tell you if you do not qualify.',
+      },
+      {
+        h: 'What recognition actually gets you',
+        p: 'Self-certification of compliance under a set of labour and environment laws for the first years after incorporation. Substantial rebates on intellectual property filings, with fast-tracked examination and a facilitator whose fees the government bears. Relaxation of prior turnover and prior experience requirements in public procurement, along with exemption from earnest money deposits on many tenders. A faster winding-up route. And eligibility to apply for the government’s startup funding schemes, which are open only to recognised startups.',
+      },
+      {
+        h: 'What it does not get you, whatever anyone tells you',
+        p: 'Recognition is not a grant, and no money arrives with the certificate. It is not the income tax holiday either. That benefit is a separate application to an Inter-Ministerial Board, decided on its own merits, and most recognised startups do not have it. Recognition makes you eligible to apply; it does not approve you. Anyone who sells you recognition on the promise of a tax exemption is selling you something they cannot deliver.',
+      },
+      {
+        h: 'Why applications get rejected',
+        p: 'The write-up, nearly always. The application asks what problem you solve, how you solve it, and what about it is new or scalable, and an answer that reads like a company brochure gets refused. What works is specific: the problem, who has it, what you built, what is genuinely different about the approach, and what the evidence is so far, whether that is revenue, users, a patent filing or a pilot. Drafting that is the work you are paying for. If we think the business does not have a case, we will say so rather than file it and keep the fee.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'Does DPIIT charge anything for recognition?',
+        a: 'No. Recognition is free on the Startup India portal, and ₹999 is our professional fee for checking eligibility, drafting the write-up, filing the application and following it up. You are entirely free to file it yourself, and we would rather you knew that than found out afterwards.',
+      },
+      {
+        q: 'Does recognition mean we do not pay income tax?',
+        a: 'No, and this is the most common misunderstanding about it. The three-year deduction under Section 80-IAC is a separate application, decided by an Inter-Ministerial Board on its own criteria, and the large majority of recognised startups have not been granted it. Recognition makes you eligible to apply for it. Nothing more than that.',
+      },
+      {
+        q: 'Can a proprietorship get DPIIT recognition?',
+        a: 'No. The entity has to be a private limited company, an LLP or a registered partnership firm. If you are running as a proprietorship and want recognition, incorporating comes first. Tell us what you want to do and we will tell you what that would involve before you commit to either.',
+      },
+      {
+        q: 'How long does recognition take?',
+        a: 'Filing happens within a working day or two of the write-up being settled with you, which is the part that takes the real time. After that it sits with DPIIT, and the outcome typically comes back within a few weeks. We do not control that and will not put a date on it.',
+      },
+      {
+        q: 'What if the application is rejected?',
+        a: 'A rejection usually points at the write-up or at eligibility. Where it is the write-up, we will revise and refile it once at no further fee. Where the entity does not actually meet the conditions, no amount of redrafting fixes that, and we will tell you so plainly rather than keep refiling.',
+      },
+    ],
+  },
+  {
+    id: 'iso',
+    slug: 'iso-certification',
+    nav: 'reg-iso',
+    icon: 'workspace_premium',
+    name: 'ISO certification (non-accredited)',
+    fee: 2299,
+    feeAlt: { amount: 1599, label: 'for DPIIT-recognised startups' },
+    feeNote: 'Not a government registration. No government charges.',
+    tagline: 'ISO 9001, ISO 22000 and ISO 27001 certificates issued by us, verifiable on our portal, and not accredited by any accreditation body.',
+    warn:
+      'Read this before you buy: the certificate is issued by Vybe Technologies and is <strong>not accredited</strong> by NABCB, by any member of the International Accreditation Forum, or by any other accreditation body. If a customer or a tender requires an accredited certificate, this is not it.',
+    who: 'Businesses that want a documented management system and a certificate to show for it, where the people asking have not specified that the certificate must be accredited. Commonly a first step before an accredited audit.',
+    needs: [
+      'Company details, and the scope you want certified',
+      'Which standard you are after: ISO 9001, ISO 22000 or ISO 27001',
+      'Whatever policies, procedures and records you already have',
+      'A contact who can answer questions about how the work actually runs',
+    ],
+    note: 'This is our own certificate, verifiable on our portal and nowhere else. It carries no IAF, ILAC or NABCB mark and must not be presented as though it does. Ask whoever is asking you for ISO whether accreditation is required, before you buy a certificate from us or from anybody.',
+    h1: 'ISO certification, with the fine print said out loud.',
+    lede:
+      'ISO 9001, ISO 22000 and ISO 27001. We review your processes against the standard, help you write what is missing, audit the result and issue a certificate you can point anybody at. It is a non-accredited certificate, and the next panel explains exactly what that means.',
+    metaTitle: 'Non-Accredited ISO 9001, 22000 & 27001 Certification | Vybe',
+    metaDescription:
+      'Non-accredited ISO 9001, ISO 22000 and ISO 27001 certification from Vybe Technologies: gap review, documentation, audit and a certificate verifiable on our portal. Issued by us, not by an accredited certification body, and we say so plainly.',
+    sections: [
+      {
+        h: 'ISO 9001, quality management',
+        p: 'The general-purpose one, and the one most often asked for. It is about whether your business does what it says it does repeatably: defined processes, responsibilities that are written down, records that show what happened, and a habit of looking at what went wrong and changing something. It applies to any kind of business, which is why it is the certificate most tenders and vendor forms name.',
+      },
+      {
+        h: 'ISO 22000, food safety management',
+        p: 'For anyone in the food chain: manufacturing, processing, catering, storage, transport and retail. It is built around hazard analysis, the controls you put in place at the points that matter, and the records that show those controls were actually applied. It sits alongside your FSSAI licence rather than replacing it. FSSAI is the legal requirement; this is the management system.',
+      },
+      {
+        h: 'ISO 27001, information security management',
+        p: 'The one customers ask software and services companies for. Access control, asset and data handling, supplier risk, incident response, backups and continuity, all driven by a risk assessment you have actually done rather than a policy folder you downloaded. If your customers are starting to send you security questionnaires, this is the shape of the answer they are looking for.',
+      },
+      {
+        h: 'What the fee actually buys',
+        p: 'A review of how you work against the clauses of the standard, and a plain list of where the gaps are. Help writing the policies, scope statement, procedures and records you are missing, rather than a template pack emailed to you. A documented audit of the result. And then the certificate, carrying a number, a scope, a standard and an expiry date, which anybody can verify with us. The certificate number and the verification route are issued with it, so a customer can check it without coming through you.',
+      },
+      {
+        h: 'Where this is genuinely useful, and where it is not',
+        p: 'It is useful when a client or a vendor onboarding form asks for evidence of a management system without specifying accreditation, when you want the discipline of a real system at a price that makes starting possible, and as a stepping stone: the documentation work carries straight over to an accredited audit later. It is not useful, and we will not sell it to you, when a tender, a regulator, an overseas buyer or a large enterprise vendor programme requires an accredited certificate. Ask them which they need. If the answer is accredited, you need a body accredited under the IAF, and that is a different service at a different price.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'Is this the same as an accredited ISO certificate?',
+        a: 'No, and it is important that you understand the difference before you buy. An accredited certificate is issued by a certification body that has itself been assessed by an accreditation board, such as NABCB in India, under the International Accreditation Forum. That chain is what gives the certificate weight with a regulator, an overseas buyer or a large tender. Our certificate is issued by Vybe Technologies. We are not accredited by NABCB or by any other accreditation body, the certificate carries no IAF, ILAC or NABCB mark, and it must not be presented as though it does.',
+      },
+      {
+        q: 'So what is it worth?',
+        a: 'It is worth what the person asking you for it will accept. A great many vendor onboarding forms, client questionnaires and smaller tenders ask whether you are ISO certified without specifying accreditation, and a certificate with a real audit and a verifiable number behind it answers that. Beyond that, the work itself has value regardless of the certificate: most businesses that go through it end up with documented processes they did not have. What it is not worth is anything at all to somebody who requires accreditation, and we say so on every page where it appears.',
+      },
+      {
+        q: 'How is the certificate verified?',
+        a: `On our portal, and only there. Each certificate carries a number, and the number resolves to the holder, the standard, the scope and the validity dates, so a customer can confirm it themselves without asking you for a scan. The verification link is issued along with the certificate. If you want to confirm a certificate somebody has shown you, write to <a class="text-brand font-bold" href="mailto:${ORG.legal}">${ORG.legal}</a> with the number.`,
+      },
+      {
+        q: 'Can we use the ISO logo on our website?',
+        a: 'No. ISO writes the standards and does not certify anyone, and its logo is not available for use by certified organisations, whether their certificate is accredited or not. What you can do is say in words that your management system has been certified to the standard, and name who certified it. We will tell you the exact wording to use, and we would rather you used it than something that overstates the position.',
+      },
+      {
+        q: 'How long does certification take?',
+        a: 'It depends almost entirely on what you already have. A business with documented processes can be through the gap review, the corrections and the audit in a couple of weeks. A business starting from nothing takes longer, because the documentation has to be written and, more to the point, has to describe what you actually do. We will give you a realistic timeline after the gap review rather than before it.',
+      },
+      {
+        q: 'What if we need an accredited certificate later?',
+        a: 'None of the work is wasted. The management system, the documentation and the records are what an accredited body audits too, and a business that has been through this once is in a far better position going into that audit than one starting cold. Tell us that is where you are heading and we will keep the documentation in the shape an accredited auditor will expect.',
+      },
+    ],
+  },
+  {
+    id: 'nsdc',
+    slug: 'nsdc-skill-india',
+    nav: 'reg-nsdc',
+    icon: 'school',
+    name: 'NSDC / Skill India consulting',
+    fee: null,
+    feeQuote: 'On quote',
+    feeNote: 'Advisory engagement. Scoped and quoted before we start.',
+    tagline:
+      'Advisory work on NSDC and Skill India training partner registration, and on affiliation applications generally. We review the file and tell you what is missing. You file it.',
+    warn:
+      'What this is: <strong>consulting</strong>. We review your documents, tell you where the gaps are and help you prepare the application. <strong>We do not register, file or submit on your behalf</strong>, and the application, the portal login, the fees and the inspections stay with you.',
+    who: 'Training providers and institutes looking at NSDC or Skill India training partner registration, and schools and institutions preparing an affiliation application to a board or authority, who want the file checked by someone who has read the checklist properly before it goes in.',
+    needs: [
+      'What you are applying for, and to whom',
+      'Your entity documents: incorporation or registration, PAN, GST where applicable',
+      'Whatever you have already put together, including any checklist the authority has given you',
+      'Details of the premises, equipment and trainers or staff you intend to show',
+      'A contact who can actually make decisions about the application',
+    ],
+    note: 'This is advisory work, priced per engagement because the scope genuinely varies. We are not agents for NSDC, for any Sector Skill Council, or for any board or affiliating authority, and we have no influence over any of them.',
+    h1: 'NSDC, Skill India and affiliation, reviewed before you file.',
+    lede:
+      'Consulting on NSDC and Skill India training partner registration, and on affiliation applications more broadly. We go through the requirements with you, read what you have, tell you plainly what is missing, and help you get the file into shape. The filing itself stays in your hands.',
+    metaTitle: 'NSDC / Skill India Registration & Affiliation Consulting | Vybe',
+    metaDescription:
+      'Advisory support on NSDC and Skill India training partner registration and on affiliation applications: requirement review, document gap check and file preparation. Quoted per engagement. Vybe Technologies, Bengaluru.',
+    sections: [
+      {
+        h: 'What training partner registration involves',
+        p: 'Becoming a training partner under NSDC and the Skill India mission is less a form and more a file. There is an entity to establish and evidence, a portal account to create, the job roles you intend to deliver to be picked and aligned to the relevant Sector Skill Council and the national qualification framework, and then each centre to be put up for accreditation with its premises, equipment, safety arrangements and certified trainers documented. The portals and the exact steps change from time to time, so we work from what the authority is asking for now rather than from a process we memorised two years ago.',
+      },
+      {
+        h: 'What we do, and what stays with you',
+        p: 'We are consultants here, not agents. What we do is go through the current requirements with you, read everything you have already gathered, produce a plain list of what is missing or will not stand up, help you draft and structure the documents that need writing, and tell you what an inspection is likely to look at. What stays with you is the rest: creating and holding the portal login, entering the application, paying whatever fees the authority charges, signing the declarations, and hosting any inspection or audit. We will not hold your credentials or submit anything in your name.',
+      },
+      {
+        h: 'Affiliation consulting',
+        p: 'The same approach applies where an institution is preparing an affiliation application to a board or an authority. Every affiliating body publishes its own requirements, and they differ enough that the only sensible starting point is the current checklist of the body you are actually applying to. We work through that with you: what the infrastructure and staffing requirements really mean in practice, which documents have to exist before the application rather than after it, where files usually fall short, and how to present what you have. We do not claim a relationship with any board, and we will not tell you that we can get an application through.',
+      },
+      {
+        h: 'Registration is not a project',
+        p: 'Worth saying plainly, because it is where expectations usually go wrong: being registered or accredited as a training partner is not the same as being awarded government-funded training. Funded schemes run through their own empanelment rounds, allocations and tenders, each with its own criteria and its own timing. Registration is what makes you eligible to go after those. It does not bring a batch, a target or a rupee with it, and anyone telling you otherwise is selling you something they cannot deliver.',
+      },
+      {
+        h: 'Why this one is quoted rather than priced',
+        p: 'Our other filings carry a flat fee because the work is predictable. This one is not. One institute wants a second opinion on a file that is nearly complete; another is starting from an idea and a rented floor. Pricing both the same would mean overcharging the first or doing the second badly. So we look at what you are applying for and what you already have, then quote a figure and say what is included, before any work starts.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'Will you file the NSDC or Skill India application for us?',
+        a: 'No. This is consulting, and we are deliberate about that line. We review your documents, tell you what is missing, help you prepare the file and explain what the authority is looking for. You create and hold the portal account, submit the application, pay the fees and host any inspection. If you were looking for someone to take the whole thing off your hands, this is not that service, and we would rather you knew now.',
+      },
+      {
+        q: 'Why is there no price on this page?',
+        a: 'Because the work genuinely varies, and a flat fee would either overcharge the institute that just wants its file checked or shortchange the one starting from scratch. Tell us what you are applying for and send what you already have. We will come back with a figure and a clear statement of what it covers, and there is no charge for that conversation.',
+      },
+      {
+        q: 'Can you guarantee we get registered or affiliated?',
+        a: 'No, and be careful with anyone who says they can. Accreditation and affiliation decisions sit with NSDC, the relevant Sector Skill Council, or the board or authority concerned, on their own criteria and their own timelines. We have no influence with any of them and claim none. What we can do is make sure the file that reaches them is complete, accurate and presented the way they ask for it, which is the part that most applications actually fail on.',
+      },
+      {
+        q: 'Which boards and authorities do you advise on?',
+        a: 'We work from the published requirements of whichever body you are applying to, rather than keeping a list of bodies we imply a relationship with. Tell us who you are applying to and we will tell you honestly whether it is something we can usefully help with, before you pay us anything. Where it is outside what we know, we will say so rather than learn on your application.',
+      },
+      {
+        q: 'What do we actually get for the fee?',
+        a: 'A review of the current requirements against your situation, a written gap list you can work from, help drafting and structuring the documents that need writing, a read of the file before it goes in, and guidance on what an inspection tends to look at. What you get is a file that is ready. What you do not get is a submission made in your name, because we do not make those.',
+      },
+      {
+        q: 'Is this connected to your ISO certificate?',
+        a: 'No, and the two should not be confused. Our ISO certificate is issued by us and is not accredited by any accreditation body. This service is advisory work on a registration or affiliation granted by somebody else, where the decision belongs entirely to that authority. Buying one has nothing to do with the other.',
+      },
+    ],
   },
 ];
+
+/** Registrations that have a page of their own, which is all of them. */
+const REG_PAGES = REGISTRATIONS.filter((r) => r.slug);
+const regHref = (r) => `/registrations/${r.slug}/`;
+const rupees = (n) => `&#8377;${n.toLocaleString('en-IN')}`;
+
+/* Most registrations carry a flat published fee. Consulting work is scoped
+   first, so those entries set `fee: null` and show a quote line instead. */
+const regFee = (r) => (r.fee === null ? esc(r.feeQuote) : rupees(r.fee));
+const regFeeLabel = (r) => (r.fee === null ? 'professional fee, scoped first' : 'professional fee');
 
 const regFaqs = [
   {
     q: 'What do the prices on this page cover?',
-    a: 'They are our professional fee, the flat amount Vybe charges to prepare your application, file it, respond to queries raised on it and hand you the certificate at the end. <strong>Government charges are separate and are payable at actuals</strong>, whatever the department levies for your category. We tell you that figure before you commit to anything, not after.',
+    a: 'They are our professional fee, the flat amount Vybe charges to prepare your application, file it, respond to queries raised on it and hand you the certificate at the end. <strong>Government charges, where any apply, are separate and are payable at actuals.</strong> GST, Udyam and DPIIT recognition carry no government fee at all, so for those three the professional fee is the whole cost. FSSAI does carry one, and we tell you the figure before you commit rather than after.',
   },
   {
     q: 'How much are the government charges?',
-    a: 'It depends on the registration. GST registration and Udyam (MSME) registration carry no government fee at all, so for those two the professional fee is the whole cost. FSSAI does carry a statutory fee, and it varies by whether you need Basic registration, a State licence or a Central licence and for how many years you take it. Tell us your turnover and where you operate and we will give you the exact figure up front.',
+    a: 'For GST registration, Udyam (MSME) registration and DPIIT recognition: nothing. Those three are free on the government portals and our fee is the whole cost. FSSAI does carry a statutory fee, and it varies by whether you need Basic registration, a State licence or a Central licence and for how many years you take it. ISO certification is not a government registration at all, so no government charge arises. Tell us what you need and you will have the exact figure up front.',
+  },
+  {
+    q: 'Is your ISO certificate accredited?',
+    a: `No, and we would rather you heard it here than found out later. The certificate is issued by Vybe Technologies. We are not accredited by NABCB, by any member of the International Accreditation Forum, or by any other accreditation body, and the certificate carries no accreditation mark. It is verifiable on our own portal and nowhere else. If whoever is asking you for ISO requires an accredited certificate, this is not it, and we will tell you so rather than sell it to you. The full position is set out on the <a class="text-brand font-bold" href="/registrations/iso-certification/">ISO certification page</a>.`,
   },
   {
     q: 'What do you need from us to get started?',
-    a: 'For GST: PAN and Aadhaar of the proprietor, partners or directors, proof of business address, bank details and a photograph. For Udyam: Aadhaar, the business PAN and your investment and turnover figures. For FSSAI: photo ID and address proof, proof of premises and the list of food categories you handle. Send what you have on WhatsApp or by email and we will tell you what is still missing rather than send you a checklist and wait.',
+    a: 'It differs by registration, and each page lists it. Broadly: identity and address proof of the proprietor, partners or directors, proof of premises where the registration is tied to a place, the business PAN, and whatever is specific to the filing, such as food categories for FSSAI or the incorporation certificate for DPIIT. Send what you have on WhatsApp or by email and we will tell you what is still missing rather than send you a checklist and wait.',
   },
   {
     q: 'How long does a registration take?',
-    a: 'Filing happens within a working day of us having a complete set of documents. What comes after that is with the department: a GSTIN is usually issued within about a week if no clarification is raised, Udyam is generally immediate, and FSSAI depends on the category and on whether an inspection is required. We do not control those timelines and will not quote you one as though we did. What we will do is chase the file and keep you posted.',
+    a: 'Filing happens within a working day of us having a complete set of documents. What comes after that is with the department: Udyam is generally immediate, a GSTIN is usually issued within about a week if no clarification is raised, FSSAI depends on the category and on whether an inspection is required, and DPIIT recognition typically comes back within a few weeks. We do not control those timelines and will not quote you one as though we did. What we will do is chase the file and keep you posted.',
   },
   {
-    q: 'Do you handle registrations other than these three?',
-    a: `These three are what we file day to day. Other registrations and filings start at ₹499 plus government charges. Ask us what you need on <a class="text-brand font-bold" href="mailto:${ORG.legal}">${ORG.legal}</a> and we will tell you plainly whether it is something we take on, rather than take the work and learn on your file.`,
+    q: 'Do you handle registrations other than these?',
+    a: `These are what we file day to day. Other registrations and filings start at ₹499 plus government charges. Ask us what you need on <a class="text-brand font-bold" href="mailto:${ORG.legal}">${ORG.legal}</a> and we will tell you plainly whether it is something we take on, rather than take the work and learn on your file.`,
+  },
+  {
+    q: 'Is the NSDC and affiliation work the same as the rest of this list?',
+    a: 'No, and the difference matters. Everything else on this page is filing: we prepare the application, submit it and follow it up. NSDC, Skill India and affiliation work is <strong>consulting</strong>. We go through the requirements, review what you have, tell you what is missing and help you prepare the file, and then you submit it yourself. That is also why it carries a quote rather than a flat fee, since the amount of work varies enormously between one applicant and the next.',
   },
   {
     q: 'What happens if the application is rejected or a clarification is raised?',
@@ -2348,23 +3093,51 @@ const regFaqs = [
     q: 'Who should we contact about a registration?',
     a: `Email <a class="text-brand font-bold" href="mailto:${ORG.legal}">${ORG.legal}</a>, or WhatsApp us on <a class="text-brand font-bold" href="${waLink(
       'Hi Vybe, I would like help with a registration.'
-    )}" target="_blank" rel="noopener">+91 99641 77877</a> with what you are registering and roughly what the business does.`,
+    )}" target="_blank" rel="noopener">${telText(ORG.phone)}</a> with what you are registering and roughly what the business does.`,
   },
 ];
 
 const REG_ENQUIRY = 'Hi Vybe, I would like help with a registration.';
 
+/** The amber-free house style for a caveat: bordered, iconed, unmissable. */
+function noticePanel(heading, html, { dark = false } = {}) {
+  const box = dark ? 'border-white/20 bg-white/5' : 'border-brand/30 bg-brand/5';
+  const h = dark ? 'text-white' : 'text-slate-900';
+  const p = dark ? 'text-slate-300' : 'text-slate-700';
+  return `<div class="rounded-2xl border ${box} p-6 md:p-8 flex flex-col sm:flex-row gap-5 sm:items-start">
+                    <span class="material-symbols-outlined text-brand text-[28px] shrink-0" aria-hidden="true">info</span>
+                    <div>
+                        <h2 class="text-base font-bold font-display tracking-tight ${h}">${esc(heading)}</h2>
+                        <div class="mt-2 text-sm ${p} leading-relaxed max-w-3xl space-y-3">${html}</div>
+                    </div>
+                </div>`;
+}
+
 function registrationCard(r) {
+  const href = regHref(r);
   return `<li id="${r.id}" class="flex flex-col h-full rounded-2xl border border-slate-200 bg-white p-8 scroll-mt-28 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-brand/40">
                         <span class="material-symbols-outlined text-brand text-[28px]" aria-hidden="true">${r.icon}</span>
-                        <h3 class="mt-4 text-xl font-bold font-display tracking-tight text-slate-900">${esc(r.name)}</h3>
+                        <a href="${href}" class="group/card">
+                            <h3 class="mt-4 text-xl font-bold font-display tracking-tight text-slate-900 group-hover/card:text-brand transition-colors">${esc(r.name)}</h3>
+                        </a>
                         <p class="mt-2 text-sm text-slate-600 leading-relaxed">${esc(r.tagline)}</p>
 
                         <p class="mt-6 flex items-baseline gap-2">
-                            <span class="text-4xl font-black font-display tracking-tight text-slate-900">&#8377;${r.fee}</span>
-                            <span class="text-sm font-bold text-slate-500">professional fee</span>
+                            <span class="text-4xl font-black font-display tracking-tight text-slate-900">${regFee(r)}</span>
+                            <span class="text-sm font-bold text-slate-500">${regFeeLabel(r)}</span>
                         </p>
-                        <p class="mt-1 text-xs font-bold uppercase tracking-[0.15em] text-brand">+ government charges at actuals</p>
+                        ${
+                          r.feeAlt
+                            ? `<p class="mt-1 text-sm text-slate-600">${rupees(r.feeAlt.amount)} ${esc(r.feeAlt.label)}</p>`
+                            : ''
+                        }
+                        <p class="mt-1 text-xs font-bold uppercase tracking-[0.15em] text-brand">${esc(r.feeNote)}</p>
+
+                        ${
+                          r.warn
+                            ? `<p class="mt-5 rounded-xl border border-brand/30 bg-brand/5 p-4 text-sm text-slate-700 leading-relaxed">${r.warn}</p>`
+                            : ''
+                        }
 
                         <div class="mt-6 pt-6 border-t border-slate-100">
                             <h4 class="text-xs font-bold uppercase tracking-[0.15em] text-slate-400">Who needs it</h4>
@@ -2385,7 +3158,11 @@ function registrationCard(r) {
                             </ul>
                         </div>
 
-                        <p class="mt-auto pt-6 text-sm text-slate-500 leading-relaxed">${esc(r.note)}</p>
+                        <p class="mt-6 text-sm text-slate-500 leading-relaxed">${esc(r.note)}</p>
+                        <a href="${href}" class="mt-auto pt-6 inline-flex items-center gap-2 text-sm font-bold text-brand hover:gap-3 transition-all">
+                            ${esc(r.name)} in detail
+                            <span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_forward</span>
+                        </a>
                     </li>`;
 }
 
@@ -2397,30 +3174,33 @@ ${breadcrumbs([CRUMB_HOME, { name: 'Registrations', url: '/registrations/' }], f
             <div class="max-w-6xl mx-auto relative z-10">
                 <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-3">Legal &amp; Compliance</p>
                 <h1 class="text-5xl md:text-7xl font-black font-display tracking-tighter text-slate-900">Registrations, filed for you.</h1>
-                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">GST, Udyam (MSME) and FSSAI, prepared, filed and followed up until the certificate is in your hands. A flat professional fee, published below, with government charges separate and quoted to you before you commit.</p>
+                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">GST, Udyam (MSME), FSSAI and Startup India recognition, prepared, filed and followed up until the certificate is in your hands, plus ISO certification issued by us and consulting on NSDC, Skill India and affiliation applications. Flat professional fees, published below, with government charges separate and quoted before you commit.</p>
 
-                <div class="mt-10 flex flex-col sm:flex-row gap-4">
-                    <a href="${waLink(REG_ENQUIRY)}" target="_blank" rel="noopener"
-                       class="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white px-7 py-4 rounded-full text-sm font-bold transition-all active:scale-95">
-                        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">forum</span>
-                        WhatsApp us
-                    </a>
-                    <a href="mailto:${ORG.legal}?subject=Registration%20enquiry"
-                       class="inline-flex items-center justify-center gap-2 bg-corporate hover:bg-slate-800 text-white px-7 py-4 rounded-full text-sm font-bold transition-all active:scale-95">
-                        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">mail</span>
-                        Email ${ORG.legal}
-                    </a>
-                </div>
+                ${ctaRow({
+                  waText: REG_ENQUIRY,
+                  waLabel: 'WhatsApp us',
+                  email: ORG.legal,
+                  subject: 'Registration enquiry',
+                  emailLabel: `Email ${ORG.legal}`,
+                })}
 
                 <ul class="mt-16 grid gap-5 lg:grid-cols-3">
                     ${REGISTRATIONS.map(registrationCard).join('\n                    ')}
                 </ul>
 
+                <div class="mt-8">
+                    ${noticePanel(
+                      'About our ISO certificate',
+                      `<p>It is issued by Vybe Technologies and is <strong>not accredited</strong> by NABCB, by any member of the International Accreditation Forum, or by any other accreditation body. It carries no accreditation mark and is verifiable on our own portal and nowhere else.</p>
+                        <p>If a customer, a tender, a regulator or an overseas buyer requires an accredited certificate, ours is not it, and we will tell you so rather than sell it to you. Ask them whether accreditation is required before you buy an ISO certificate from us or from anybody. The whole position is set out on the <a href="/registrations/iso-certification/" class="font-bold text-brand hover:underline">ISO certification page</a>.</p>`
+                    )}
+                </div>
+
                 <div class="mt-8 rounded-2xl border border-slate-200 bg-white/70 p-6 md:p-8 flex flex-col sm:flex-row gap-5 sm:items-start">
                     <span class="material-symbols-outlined text-brand text-[28px] shrink-0" aria-hidden="true">gavel</span>
                     <div>
                         <h2 class="text-base font-bold font-display tracking-tight text-slate-900">Something else to register?</h2>
-                        <p class="mt-2 text-sm text-slate-600 leading-relaxed max-w-3xl">The three above are what we file day to day. Other registrations and filings start at <strong>&#8377;499 plus government charges</strong>. Tell us what you need at <a href="mailto:${ORG.legal}" class="font-bold text-brand hover:underline">${ORG.legal}</a> and we will say plainly whether it is something we take on. We would rather turn a filing down than learn on your paperwork.</p>
+                        <p class="mt-2 text-sm text-slate-600 leading-relaxed max-w-3xl">The list above is what we file day to day. Other registrations and filings start at <strong>&#8377;499 plus government charges</strong>. Tell us what you need at <a href="mailto:${ORG.legal}" class="font-bold text-brand hover:underline">${ORG.legal}</a> and we will say plainly whether it is something we take on. We would rather turn a filing down than learn on your paperwork.</p>
                     </div>
                 </div>
             </div>
@@ -2434,11 +3214,11 @@ ${breadcrumbs([CRUMB_HOME, { name: 'Registrations', url: '/registrations/' }], f
                 <div class="mt-12 grid gap-8 sm:grid-cols-2">
                     <div class="rounded-2xl border border-white/10 bg-white/5 p-8">
                         <h3 class="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Our professional fee</h3>
-                        <p class="mt-4 text-white leading-relaxed text-sm">&#8377;199 for GST, &#8377;199 for Udyam (MSME), &#8377;299 for FSSAI. Flat, published, and the same whether the application goes through first time or needs a clarification answered. Preparing the application, filing it, replying to departmental queries and delivering the certificate are all inside it.</p>
+                        <p class="mt-4 text-white leading-relaxed text-sm">&#8377;199 for GST, &#8377;199 for Udyam (MSME), &#8377;299 for FSSAI, &#8377;999 for DPIIT recognition, and &#8377;2,299 for an ISO certificate, or &#8377;1,599 if you are a DPIIT-recognised startup. Flat, published, and the same whether an application goes through first time or needs a clarification answered. NSDC, Skill India and affiliation work is consulting rather than filing, so it is scoped and quoted before anything starts.</p>
                     </div>
                     <div class="rounded-2xl border border-white/10 bg-white/5 p-8">
                         <h3 class="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Government charges</h3>
-                        <p class="mt-4 text-white leading-relaxed text-sm">Whatever the department levies for your category, charged at actuals with nothing added. GST and Udyam registration carry no government fee at all. FSSAI does, and it changes with the licence type and the number of years, so we quote you the exact figure before you commit.</p>
+                        <p class="mt-4 text-white leading-relaxed text-sm">Whatever the department levies for your category, charged at actuals with nothing added. GST, Udyam and DPIIT recognition carry no government fee at all. FSSAI does, and it changes with the licence type and the number of years, so we quote the exact figure before you commit. ISO certification is not a government registration, so nothing arises there either.</p>
                     </div>
                 </div>
             </div>
@@ -2458,10 +3238,10 @@ ${relatedSection('registrations', { dark: false })}
     page: {
       url,
       nav: 'registrations',
-      title: 'GST, MSME & FSSAI Registration | From ₹199 | Vybe Technologies',
-      ogTitle: 'Business registrations: GST, Udyam (MSME) and FSSAI',
+      title: 'GST, MSME, FSSAI & Startup India Registration | From ₹199 | Vybe',
+      ogTitle: 'Business registrations: GST, Udyam, FSSAI, DPIIT and ISO',
       description:
-        'GST registration and Udyam (MSME) registration at ₹199, FSSAI registration at ₹299. That is the professional fee, with government charges separate. Documents prepared, filed and followed up by Vybe Technologies, Bengaluru.',
+        'GST and Udyam (MSME) registration at ₹199, FSSAI at ₹299, DPIIT / Startup India recognition at ₹999, non-accredited ISO certification from ₹1,599, and NSDC / Skill India and affiliation consulting on quote. Professional fees, with government charges separate. Vybe Technologies, Bengaluru.',
       lastmod,
       trail: [CRUMB_HOME, { name: 'Registrations', url }],
       faqs: regFaqs,
@@ -2472,7 +3252,7 @@ ${relatedSection('registrations', { dark: false })}
         name: 'Business registration services',
         serviceType: 'Business registration and licensing',
         description:
-          'Preparation and filing of GST registration, Udyam (MSME) registration and FSSAI registration and licences, at a flat professional fee with government charges payable separately at actuals.',
+          'Preparation and filing of GST registration, Udyam (MSME) registration, FSSAI registration and licences and DPIIT / Startup India recognition at a flat professional fee with government charges payable separately at actuals, plus non-accredited ISO 9001, ISO 22000 and ISO 27001 certification issued by Vybe Technologies and advisory support on NSDC / Skill India training partner registration and affiliation applications.',
         provider: { '@id': `${SITE}/#organization` },
         areaServed: { '@type': 'Country', name: 'India' },
         url: u,
@@ -2482,12 +3262,150 @@ ${relatedSection('registrations', { dark: false })}
           itemListElement: REGISTRATIONS.map((r) => ({
             '@type': 'Offer',
             name: r.name,
-            price: String(r.fee),
+            ...(r.fee === null ? {} : { price: String(r.fee) }),
             priceCurrency: 'INR',
-            description: `${r.tagline} Professional fee only; government charges are payable separately at actuals.`,
-            url: `${u}#${r.id}`,
+            description:
+              r.fee === null
+                ? `${r.tagline} Advisory engagement, quoted per engagement.`
+                : `${r.tagline} Professional fee only; government charges, where any apply, are payable separately at actuals.`,
+            url: SITE + regHref(r),
             itemOffered: { '@type': 'Service', name: r.name, provider: { '@id': `${SITE}/#organization` } },
           })),
+        },
+      }),
+    },
+  });
+}
+
+/* -------------------------------------------- registrations, one page each */
+
+/**
+ * A page per registration. Someone searching for "FSSAI licence for a cloud
+ * kitchen" should land on a page about FSSAI, not on a hub that mentions it in
+ * a card. Content comes from REGISTRATIONS, so the hub, the nav and these
+ * cannot drift apart.
+ */
+for (const r of REG_PAGES) {
+  const url = regHref(r);
+  const enquiry = `Hi Vybe, I would like help with ${r.name.replace(/\s*\(non-accredited\)/, '')}.`;
+
+  const body = `<div class="w-full bg-surface-main">
+${breadcrumbs([CRUMB_HOME, { name: 'Registrations', url: '/registrations/' }, { name: r.name, url }], false)}
+
+        <section class="px-6 pt-12 pb-20 md:pb-28 relative overflow-hidden">
+            <div class="absolute inset-0 bg-grid-faint" aria-hidden="true"></div>
+            <div class="max-w-6xl mx-auto relative z-10">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-3">Legal &amp; Compliance</p>
+                <h1 class="text-5xl md:text-7xl font-black font-display tracking-tighter text-slate-900">${esc(r.h1)}</h1>
+                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">${esc(r.lede)}</p>
+
+                <p class="mt-8 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <span class="text-5xl font-black font-display tracking-tight text-slate-900">${regFee(r)}</span>
+                    <span class="text-sm font-bold text-slate-500">${regFeeLabel(r)}</span>
+                    ${r.feeAlt ? `<span class="text-sm text-slate-600">&middot; ${rupees(r.feeAlt.amount)} ${esc(r.feeAlt.label)}</span>` : ''}
+                </p>
+                <p class="mt-1 text-xs font-bold uppercase tracking-[0.15em] text-brand">${esc(r.feeNote)}</p>
+
+                ${ctaRow({
+                  waText: enquiry,
+                  waLabel: 'WhatsApp us',
+                  email: ORG.legal,
+                  subject: `${r.name} enquiry`,
+                  emailLabel: `Email ${ORG.legal}`,
+                })}
+
+                ${
+                  r.id === 'iso'
+                    ? `<div class="mt-12">${noticePanel(
+                        'What "non-accredited" means, in plain words',
+                        `<p>This certificate is issued by <strong>Vybe Technologies</strong>. We are <strong>not</strong> a certification body accredited by NABCB, by any other member of the International Accreditation Forum (IAF), or by any accreditation board anywhere. The certificate carries no IAF, ILAC or NABCB mark, and it must not be presented, described or displayed as though it does.</p>
+                        <p>ISO itself does not certify anybody. ISO writes the standards; certification is always done by a third party, and it is the accreditation sitting behind that third party that gives a certificate weight with a regulator, an overseas buyer or a large tender.</p>
+                        <p>Our certificate is verifiable in exactly one place: our own portal. Anyone can check the number and see who holds it, against which standard, for what scope and until when.</p>
+                        <p><strong>So, plainly:</strong> if a customer, a tender, a regulator or an overseas buyer requires an <em>accredited</em> certificate, this is not it, and we will tell you that rather than take your money. Ask them whether accreditation is required before you buy an ISO certificate from us or from anyone else.</p>`
+                      )}</div>`
+                    : ''
+                }
+
+                <div class="mt-12 grid gap-5 md:grid-cols-2">
+                    <div class="rounded-2xl border border-slate-200 bg-white p-8">
+                        <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Who needs it</h2>
+                        <p class="mt-4 text-slate-600 leading-relaxed">${esc(r.who)}</p>
+                        <p class="mt-4 text-sm text-slate-500 leading-relaxed">${esc(r.note)}</p>
+                    </div>
+                    <div class="rounded-2xl border border-slate-200 bg-white p-8">
+                        <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">What we need from you</h2>
+                        <ul class="mt-4 grid gap-3 text-sm text-slate-600">
+                            ${r.needs
+                              .map(
+                                (n) => `<li class="flex items-start gap-2">
+                                <span class="material-symbols-outlined text-brand text-[18px] shrink-0 mt-0.5" aria-hidden="true">check_circle</span>
+                                <span>${esc(n)}</span>
+                            </li>`
+                              )
+                              .join('\n                            ')}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+${proseSections({
+  id: `${r.slug}-detail`,
+  eyebrow: 'In detail',
+  heading: r.name,
+  sections: r.sections,
+})}
+
+${faqSection(r.faqs, { dark: false })}
+
+${siblingSection({
+  eyebrow: 'More from legal',
+  heading: 'The rest of what we file.',
+  items: [
+    { href: '/registrations/', icon: 'receipt_long', name: 'All registrations', blurb: 'Every filing we take on, with the fees side by side.' },
+    ...REG_PAGES.filter((o) => o.slug !== r.slug).map((o) => ({ href: regHref(o), icon: o.icon, name: o.name, blurb: o.tagline })),
+  ],
+})}
+${relatedSection('registrations', { dark: false })}
+</div>`;
+
+  const lastmod = lastmodFor(url, [r.metaTitle, r.metaDescription, body].join('\n'));
+
+  DOCS.push({
+    file: `registrations/${r.slug}/index.html`,
+    priority: '0.7',
+    changefreq: 'monthly',
+    page: {
+      url,
+      nav: r.nav,
+      title: r.metaTitle,
+      ogTitle: r.name,
+      description: r.metaDescription,
+      lastmod,
+      trail: [CRUMB_HOME, { name: 'Registrations', url: '/registrations/' }, { name: r.name, url }],
+      faqs: r.faqs,
+      body,
+      schema: (u) => ({
+        '@type': 'Service',
+        '@id': `${u}#service`,
+        name: r.name,
+        serviceType:
+          r.id === 'iso'
+            ? 'Management system certification (non-accredited)'
+            : r.fee === null
+              ? 'Registration and affiliation consulting'
+              : 'Business registration and licensing',
+        description: r.metaDescription,
+        provider: { '@id': `${SITE}/#organization` },
+        areaServed: { '@type': 'Country', name: 'India' },
+        url: u,
+        isRelatedTo: { '@id': `${SITE}/registrations/#service` },
+        offers: {
+          '@type': 'Offer',
+          ...(r.fee === null ? {} : { price: String(r.fee) }),
+          priceCurrency: 'INR',
+          description: r.fee === null ? r.feeNote : `Professional fee. ${r.feeNote}.`,
+          url: u,
         },
       }),
     },
@@ -2537,7 +3455,7 @@ write(
                     ${notFoundLink('/it-solutions/', 'IT &amp; Cyber', 'Custom app development and security.')}
                     ${published('cloud') ? notFoundLink('/cloud/', 'Vybe Cloud', 'Scalable servers and DDoS protection.') : ''}
                     ${notFoundLink('/printing/', 'Printing', 'Cards, banners, standees, RFID and stationery.')}
-                    ${notFoundLink('/registrations/', 'Registrations', 'GST, MSME and FSSAI, filed for you.')}
+                    ${notFoundLink('/registrations/', 'Registrations', 'GST, MSME, FSSAI and Startup India, filed for you, plus ISO and NSDC.')}
                     ${notFoundLink('/contact/', 'Contact Us', 'Phone, email and where to find us.')}
                 </div>
             </div>
@@ -2617,8 +3535,9 @@ ${PRODUCTS.filter((p) => published(p.nav))
 ## Contact
 
 - [Contact Us](${SITE}/contact/): Phone, email, registered office and opening hours.
-- Sales: ${ORG.sales} — quotes, demos, new deployments, hardware.
-- Support: ${ORG.support} — existing Vybe deployments.
+- Sales: ${ORG.sales} / ${ORG.phone} — quotes, demos, new deployments, hardware, printing and registrations.
+- Support: ${ORG.support} / ${ORG.phoneSupport} — existing Vybe deployments.
+- Second office line: ${ORG.phoneOffice} — reaches the same office.
 - Legal and compliance: ${ORG.legal} — contracts, privacy and data protection requests, security disclosures.
 - Grievance Officer: ${ORG.grievance} — last resort only, after sales, support or legal have not resolved the matter. Route enquiries to the three addresses above first.
 

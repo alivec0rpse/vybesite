@@ -14,21 +14,15 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
-function htmlFiles() {
+/* Page directories nest (e.g. /printing/large-format/), so this walks down
+   rather than reading one level and stopping. */
+function htmlFiles(dir = ROOT) {
   const out = [];
-  for (const entry of readdirSync(ROOT)) {
+  for (const entry of readdirSync(dir)) {
     if (entry.startsWith('.') || entry === 'node_modules' || entry === 'src') continue;
-    const p = join(ROOT, entry);
+    const p = join(dir, entry);
     if (entry.endsWith('.html')) out.push(p);
-    else if (statSync(p).isDirectory()) {
-      const idx = join(p, 'index.html');
-      try {
-        statSync(idx);
-        out.push(idx);
-      } catch {
-        /* not a page directory */
-      }
-    }
+    else if (statSync(p).isDirectory()) out.push(...htmlFiles(p));
   }
   return out;
 }

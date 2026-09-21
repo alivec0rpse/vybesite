@@ -24,7 +24,7 @@
     "fonts": "node tools/gen-fonts.mjs",
     "serve": "node tools/serve.js",
     "indexnow": "node tools/indexnow.mjs",
-    "validate": "html-validate index.html 404.html */index.html"
+    "validate": "html-validate index.html 404.html */index.html */*/index.html"
   },
   "keywords": [],
   "author": "",
