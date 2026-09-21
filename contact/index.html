@@ -67,12 +67,143 @@
 
             <nav class="hidden lg:flex items-center gap-6 xl:gap-8 text-sm font-medium text-slate-600" aria-label="Primary">
                 <a href="/" class="hover:text-brand transition-colors">Home</a>
-                <a href="/erp/" class="hover:text-brand transition-colors">ERP</a>
-                <a href="/cms/" class="hover:text-brand transition-colors">Cafeteria</a>
-                <a href="/smart-classroom/" class="hover:text-brand transition-colors">Classroom</a>
-                <a href="/workspace/" class="hover:text-brand transition-colors">Workspace</a>
-                <a href="/it-solutions/" class="hover:text-brand transition-colors">IT &amp; Cyber</a>
-                
+                <div class="relative group">
+                    <button type="button" aria-haspopup="true" class="flex items-center gap-1 hover:text-brand transition-colors">
+                        Technology
+                        <span class="material-symbols-outlined text-[18px] transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180" aria-hidden="true">expand_more</span>
+                    </button>
+                    <div class="absolute left-1/2 -translate-x-1/2 top-full pt-4 w-[21rem] invisible opacity-0 translate-y-1 transition-all duration-200 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:visible group-focus-within:opacity-100 group-focus-within:translate-y-0">
+                        <div class="rounded-2xl border border-slate-200 bg-white shadow-xl p-2">
+                            <p class="px-3 pt-2 pb-3 text-xs text-slate-400 leading-snug">Campus software, classrooms, email and custom development.</p>
+                            <ul class="flex flex-col">
+                                <li><a href="/erp/" class="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-slate-50 transition-colors">
+                                <span class="material-symbols-outlined text-brand text-[22px] shrink-0 mt-0.5" aria-hidden="true">dashboard_customize</span>
+                                <span class="min-w-0">
+                                    <span class="block font-bold text-slate-900 leading-snug">Vybe ERP</span>
+                                    <span class="block text-xs text-slate-500 leading-snug mt-0.5">School and college administration.</span>
+                                </span>
+                            </a></li>
+                                <li><a href="/cms/" class="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-slate-50 transition-colors">
+                                <span class="material-symbols-outlined text-brand text-[22px] shrink-0 mt-0.5" aria-hidden="true">fastfood</span>
+                                <span class="min-w-0">
+                                    <span class="block font-bold text-slate-900 leading-snug">Vybe CMS</span>
+                                    <span class="block text-xs text-slate-500 leading-snug mt-0.5">100% cashless cafeteria.</span>
+                                </span>
+                            </a></li>
+                                <li><a href="/smart-classroom/" class="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-slate-50 transition-colors">
+                                <span class="material-symbols-outlined text-brand text-[22px] shrink-0 mt-0.5" aria-hidden="true">smart_display</span>
+                                <span class="min-w-0">
+                                    <span class="block font-bold text-slate-900 leading-snug">Smart Classrooms</span>
+                                    <span class="block text-xs text-slate-500 leading-snug mt-0.5">Flat panels, hybrid class rigs, Extramarks.</span>
+                                </span>
+                            </a></li>
+                                <li><a href="/workspace/" class="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-slate-50 transition-colors">
+                                <span class="material-symbols-outlined text-brand text-[22px] shrink-0 mt-0.5" aria-hidden="true">alternate_email</span>
+                                <span class="min-w-0">
+                                    <span class="block font-bold text-slate-900 leading-snug">Workspace &amp; Email</span>
+                                    <span class="block text-xs text-slate-500 leading-snug mt-0.5">Google Workspace, Microsoft 365, Zoho.</span>
+                                </span>
+                            </a></li>
+                                <li><a href="/it-solutions/" class="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-slate-50 transition-colors">
+                                <span class="material-symbols-outlined text-brand text-[22px] shrink-0 mt-0.5" aria-hidden="true">code_blocks</span>
+                                <span class="min-w-0">
+                                    <span class="block font-bold text-slate-900 leading-snug">IT &amp; Cyber</span>
+                                    <span class="block text-xs text-slate-500 leading-snug mt-0.5">Custom apps, security, managed IT.</span>
+                                </span>
+                            </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button type="button" aria-haspopup="true" class="flex items-center gap-1 hover:text-brand transition-colors">
+                        Printing
+                        <span class="material-symbols-outlined text-[18px] transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180" aria-hidden="true">expand_more</span>
+                    </button>
+                    <div class="absolute left-1/2 -translate-x-1/2 top-full pt-4 w-[21rem] invisible opacity-0 translate-y-1 transition-all duration-200 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:visible group-focus-within:opacity-100 group-focus-within:translate-y-0">
+                        <div class="rounded-2xl border border-slate-200 bg-white shadow-xl p-2">
+                            <p class="px-3 pt-2 pb-3 text-xs text-slate-400 leading-snug">Send us the artwork by email or WhatsApp; we print and deliver.</p>
+                            <ul class="flex flex-col">
+                                <li><a href="/printing/" class="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-slate-50 transition-colors">
+                                <span class="material-symbols-outlined text-brand text-[22px] shrink-0 mt-0.5" aria-hidden="true">print</span>
+                                <span class="min-w-0">
+                                    <span class="block font-bold text-slate-900 leading-snug">All printing services</span>
+                                    <span class="block text-xs text-slate-500 leading-snug mt-0.5">What we print, and how to send artwork.</span>
+                                </span>
+                            </a></li>
+                                <li><a href="/printing/#stationery" class="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-slate-50 transition-colors">
+                                <span class="material-symbols-outlined text-brand text-[22px] shrink-0 mt-0.5" aria-hidden="true">description</span>
+                                <span class="min-w-0">
+                                    <span class="block font-bold text-slate-900 leading-snug">Paper &amp; stationery</span>
+                                    <span class="block text-xs text-slate-500 leading-snug mt-0.5">Letterheads, bill books, brochures, flyers.</span>
+                                </span>
+                            </a></li>
+                                <li><a href="/printing/#cards" class="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-slate-50 transition-colors">
+                                <span class="material-symbols-outlined text-brand text-[22px] shrink-0 mt-0.5" aria-hidden="true">badge</span>
+                                <span class="min-w-0">
+                                    <span class="block font-bold text-slate-900 leading-snug">Business &amp; RFID cards</span>
+                                    <span class="block text-xs text-slate-500 leading-snug mt-0.5">Visiting cards, ID cards, RFID and NFC cards.</span>
+                                </span>
+                            </a></li>
+                                <li><a href="/printing/#large-format" class="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-slate-50 transition-colors">
+                                <span class="material-symbols-outlined text-brand text-[22px] shrink-0 mt-0.5" aria-hidden="true">flag</span>
+                                <span class="min-w-0">
+                                    <span class="block font-bold text-slate-900 leading-snug">Banners &amp; standees</span>
+                                    <span class="block text-xs text-slate-500 leading-snug mt-0.5">Flex banners, roll-ups, backdrops, signage.</span>
+                                </span>
+                            </a></li>
+                                <li><a href="/printing/#quote" class="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-slate-50 transition-colors">
+                                <span class="material-symbols-outlined text-brand text-[22px] shrink-0 mt-0.5" aria-hidden="true">forum</span>
+                                <span class="min-w-0">
+                                    <span class="block font-bold text-slate-900 leading-snug">Send artwork for a quote</span>
+                                    <span class="block text-xs text-slate-500 leading-snug mt-0.5">Email or WhatsApp us the file and quantity.</span>
+                                </span>
+                            </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button type="button" aria-haspopup="true" class="flex items-center gap-1 hover:text-brand transition-colors">
+                        Legal
+                        <span class="material-symbols-outlined text-[18px] transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180" aria-hidden="true">expand_more</span>
+                    </button>
+                    <div class="absolute left-1/2 -translate-x-1/2 top-full pt-4 w-[21rem] invisible opacity-0 translate-y-1 transition-all duration-200 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:visible group-focus-within:opacity-100 group-focus-within:translate-y-0">
+                        <div class="rounded-2xl border border-slate-200 bg-white shadow-xl p-2">
+                            <p class="px-3 pt-2 pb-3 text-xs text-slate-400 leading-snug">Registrations and licences filed for you, at a flat professional fee.</p>
+                            <ul class="flex flex-col">
+                                <li><a href="/registrations/" class="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-slate-50 transition-colors">
+                                <span class="material-symbols-outlined text-brand text-[22px] shrink-0 mt-0.5" aria-hidden="true">receipt_long</span>
+                                <span class="min-w-0">
+                                    <span class="block font-bold text-slate-900 leading-snug">Business registrations</span>
+                                    <span class="block text-xs text-slate-500 leading-snug mt-0.5">GST, Udyam (MSME) and FSSAI, end to end.</span>
+                                </span>
+                            </a></li>
+                                <li><a href="/registrations/#gst" class="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-slate-50 transition-colors">
+                                <span class="material-symbols-outlined text-brand text-[22px] shrink-0 mt-0.5" aria-hidden="true">account_balance</span>
+                                <span class="min-w-0">
+                                    <span class="block font-bold text-slate-900 leading-snug">GST registration</span>
+                                    <span class="block text-xs text-slate-500 leading-snug mt-0.5">₹199 + government charges.</span>
+                                </span>
+                            </a></li>
+                                <li><a href="/registrations/#msme" class="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-slate-50 transition-colors">
+                                <span class="material-symbols-outlined text-brand text-[22px] shrink-0 mt-0.5" aria-hidden="true">storefront</span>
+                                <span class="min-w-0">
+                                    <span class="block font-bold text-slate-900 leading-snug">MSME / Udyam</span>
+                                    <span class="block text-xs text-slate-500 leading-snug mt-0.5">₹199 + government charges.</span>
+                                </span>
+                            </a></li>
+                                <li><a href="/registrations/#fssai" class="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-slate-50 transition-colors">
+                                <span class="material-symbols-outlined text-brand text-[22px] shrink-0 mt-0.5" aria-hidden="true">soup_kitchen</span>
+                                <span class="min-w-0">
+                                    <span class="block font-bold text-slate-900 leading-snug">FSSAI licence</span>
+                                    <span class="block text-xs text-slate-500 leading-snug mt-0.5">₹299 + government charges.</span>
+                                </span>
+                            </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
                 <a href="/contact/" class="hover:text-brand transition-colors text-brand font-bold" aria-current="page">Contact</a>
             </nav>
 
@@ -86,14 +217,46 @@
                         <span class="material-symbols-outlined text-[24px] group-open:hidden" aria-hidden="true">menu</span>
                         <span class="material-symbols-outlined text-[24px] hidden group-open:inline-block" aria-hidden="true">close</span>
                     </summary>
-                    <nav class="absolute right-0 top-full mt-3 w-60 rounded-2xl border border-slate-200 bg-white shadow-xl p-2 flex flex-col text-base font-medium text-slate-700" aria-label="Mobile">
+                    <nav class="absolute right-0 top-full mt-3 w-72 max-h-[75vh] overflow-y-auto overscroll-contain rounded-2xl border border-slate-200 bg-white shadow-xl p-2 flex flex-col text-base font-medium text-slate-700" aria-label="Mobile">
                         <a href="/" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">Home</a>
-                        <a href="/erp/" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">Vybe ERP</a>
-                        <a href="/cms/" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">Vybe CMS (Cafeteria)</a>
-                        <a href="/smart-classroom/" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">Smart Classrooms</a>
-                        <a href="/workspace/" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">Workspace &amp; Email</a>
-                        <a href="/it-solutions/" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">IT &amp; Cyber</a>
-                        
+                        <details class="group/sub">
+                            <summary class="list-none [&::-webkit-details-marker]:hidden cursor-pointer flex items-center justify-between px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">
+                                Technology
+                                <span class="material-symbols-outlined text-[20px] text-slate-400 transition-transform duration-200 group-open/sub:rotate-180" aria-hidden="true">expand_more</span>
+                            </summary>
+                            <div class="flex flex-col pl-3 pb-2 text-[15px]">
+                                <a href="/erp/" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">Vybe ERP</a>
+                                <a href="/cms/" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">Vybe CMS</a>
+                                <a href="/smart-classroom/" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">Smart Classrooms</a>
+                                <a href="/workspace/" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">Workspace &amp; Email</a>
+                                <a href="/it-solutions/" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">IT &amp; Cyber</a>
+                            </div>
+                        </details>
+                        <details class="group/sub">
+                            <summary class="list-none [&::-webkit-details-marker]:hidden cursor-pointer flex items-center justify-between px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">
+                                Printing
+                                <span class="material-symbols-outlined text-[20px] text-slate-400 transition-transform duration-200 group-open/sub:rotate-180" aria-hidden="true">expand_more</span>
+                            </summary>
+                            <div class="flex flex-col pl-3 pb-2 text-[15px]">
+                                <a href="/printing/" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">All printing services</a>
+                                <a href="/printing/#stationery" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">Paper &amp; stationery</a>
+                                <a href="/printing/#cards" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">Business &amp; RFID cards</a>
+                                <a href="/printing/#large-format" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">Banners &amp; standees</a>
+                                <a href="/printing/#quote" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">Send artwork for a quote</a>
+                            </div>
+                        </details>
+                        <details class="group/sub">
+                            <summary class="list-none [&::-webkit-details-marker]:hidden cursor-pointer flex items-center justify-between px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">
+                                Legal
+                                <span class="material-symbols-outlined text-[20px] text-slate-400 transition-transform duration-200 group-open/sub:rotate-180" aria-hidden="true">expand_more</span>
+                            </summary>
+                            <div class="flex flex-col pl-3 pb-2 text-[15px]">
+                                <a href="/registrations/" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">Business registrations</a>
+                                <a href="/registrations/#gst" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">GST registration</a>
+                                <a href="/registrations/#msme" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">MSME / Udyam</a>
+                                <a href="/registrations/#fssai" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">FSSAI licence</a>
+                            </div>
+                        </details>
                         <a href="/contact/" class="px-4 py-3 rounded-xl transition-colors bg-brand/10 text-brand font-bold" aria-current="page">Contact Us</a>
                     </nav>
                 </details>
@@ -282,7 +445,7 @@
             </div>
 
             <div>
-                <h2 class="text-white font-bold mb-4 uppercase tracking-widest text-xs">Products</h2>
+                <h2 class="text-white font-bold mb-4 uppercase tracking-widest text-xs">Products &amp; Services</h2>
                 <ul class="space-y-3 text-sm">
                     <li><a href="/erp/" class="hover:text-brand transition-colors">Educational ERP</a></li>
                     <li><a href="/cms/" class="hover:text-brand transition-colors">Smart Cafeteria (CMS)</a></li>
@@ -290,6 +453,8 @@
                     <li><a href="/workspace/" class="hover:text-brand transition-colors">Workspace &amp; Email</a></li>
                     <li><a href="/it-solutions/" class="hover:text-brand transition-colors">Custom App Development</a></li>
                     
+                    <li><a href="/printing/" class="hover:text-brand transition-colors">Printing Services</a></li>
+                    <li><a href="/registrations/" class="hover:text-brand transition-colors">Business Registrations</a></li>
                 </ul>
             </div>
 

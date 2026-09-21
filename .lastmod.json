@@ -1,19 +1,19 @@
 {
   "/": {
-    "hash": "058e96a628175c2c",
-    "date": "2026-09-19"
+    "hash": "cce40ac0e87d4bed",
+    "date": "2026-09-21"
   },
   "/erp/": {
-    "hash": "e851f16897dff31f",
-    "date": "2026-09-19"
+    "hash": "7b1588e7605ec73e",
+    "date": "2026-09-21"
   },
   "/cms/": {
-    "hash": "0ac6db15e4c5bde9",
-    "date": "2026-09-19"
+    "hash": "03196c82ee2059b7",
+    "date": "2026-09-21"
   },
   "/it-solutions/": {
-    "hash": "2015a5b2ae768330",
-    "date": "2026-09-19"
+    "hash": "6a12312808c56e08",
+    "date": "2026-09-21"
   },
   "/cloud/": {
     "hash": "1b19066f41872902",
@@ -36,15 +36,23 @@
     "date": "2026-09-19"
   },
   "/workspace/": {
-    "hash": "fb0a44d30a9d64a3",
-    "date": "2026-09-19"
+    "hash": "54fce595a56f74db",
+    "date": "2026-09-21"
   },
   "/smart-classroom/": {
-    "hash": "3a38c5edfa6856f4",
-    "date": "2026-09-19"
+    "hash": "79cdffb022069640",
+    "date": "2026-09-21"
   },
   "/contact/": {
     "hash": "50de4cd4266765e1",
     "date": "2026-09-19"
+  },
+  "/printing/": {
+    "hash": "6b233565ea083be0",
+    "date": "2026-09-21"
+  },
+  "/registrations/": {
+    "hash": "59f0fcda11727764",
+    "date": "2026-09-21"
   }
 }

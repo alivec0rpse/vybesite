@@ -1,0 +1,302 @@
+/* =========================================================================
+   Vybe — Microsoft Entra ID company branding / custom CSS
+   Upload: Entra admin center > Company Branding > edit layout > Layout tab >
+           Custom CSS (.css, max 300 KB) > walk the wizard to Review + save.
+
+   Written against the class list dumped from the live tenant sign-in page
+   (vertical split layout: photo on the left, form on a white right panel).
+   Selectors NOT present on that page have been removed — if you later switch
+   the layout to centered, the .ext-sign-in-box rules still apply but the
+   vertical-split ones become inert.
+
+   Palette from tailwind.config.js:
+     brand #e31837   brand-dark #b90027   corporate #0f172a   surface #f8fafc
+
+   !important is used on colour/border/background properties throughout.
+   Entra's own stylesheet loads after this one and wins on specificity
+   otherwise — this is the documented way to override it, not a code smell.
+
+   Type note: Inter / Plus Jakarta Sans are self-hosted on the marketing site
+   and can't be pulled in here, so the stack falls back to Segoe UI — the same
+   system-ui fallback your Tailwind config declares.
+   ========================================================================= */
+
+:root {
+  --vybe-brand: #e31837;
+  --vybe-brand-dark: #b90027;
+  --vybe-corporate: #0f172a;
+  --vybe-surface: #f8fafc;
+  --vybe-ink: #1e293b;
+  --vybe-muted: #64748b;
+  --vybe-line: #e2e8f0;
+  --vybe-font: 'Segoe UI Variable', 'Segoe UI', system-ui, -apple-system,
+    'Helvetica Neue', Arial, sans-serif;
+}
+
+body,
+.ext-sign-in-box,
+.ext-title,
+.ext-button,
+.ext-input,
+.ext-text-box,
+.ext-footer-links,
+.ext-footer-item {
+  font-family: var(--vybe-font) !important;
+}
+
+/* -------------------------------------------------------------------------
+   Left panel — your office photo. Warm it toward the brand and drop the
+   corporate navy in at the bottom so the image reads as deliberate rather
+   than as a stock backdrop.
+   ------------------------------------------------------------------------- */
+
+.ext-vertical-split-background-image-container {
+  background-color: var(--vybe-corporate) !important;
+}
+
+.ext-background-image {
+  object-fit: cover;
+}
+
+.ext-background-overlay {
+  background-image: linear-gradient(
+    160deg,
+    rgba(15, 23, 42, 0.30) 0%,
+    rgba(15, 23, 42, 0.10) 40%,
+    rgba(185, 0, 39, 0.35) 100%
+  ) !important;
+  opacity: 1 !important;
+}
+
+/* -------------------------------------------------------------------------
+   Right panel — the form side. Faint 30px grid from the site, plus a brand
+   gradient rule down the seam between photo and form.
+   ------------------------------------------------------------------------- */
+
+.ext-vertical-split-main-section {
+  background-color: var(--vybe-surface) !important;
+  background-image:
+    linear-gradient(to right, rgba(15, 23, 42, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.03) 1px, transparent 1px);
+  background-size: 30px 30px;
+  border-left: 3px solid transparent;
+  border-image: linear-gradient(180deg, #e31837, #ff6b3d) 1;
+}
+
+/* -------------------------------------------------------------------------
+   Sign-in box + logo
+   ------------------------------------------------------------------------- */
+
+.ext-sign-in-box {
+  background: rgba(255, 255, 255, 0.85) !important;
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--vybe-line) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 18px 44px -18px rgba(15, 23, 42, 0.28) !important;
+  padding: 36px 34px 28px !important;
+  animation: vybe-page-enter 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes vybe-page-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ext-banner-logo {
+  max-height: 40px !important;
+  margin-bottom: 8px;
+}
+
+/* -------------------------------------------------------------------------
+   Type + the "< tejas@vybe.net.in" identity banner
+   ------------------------------------------------------------------------- */
+
+.ext-title {
+  color: var(--vybe-corporate) !important;
+  font-size: 26px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.text-secondary,
+.text-13 {
+  color: var(--vybe-muted) !important;
+}
+
+.identityBanner,
+.identity {
+  color: var(--vybe-ink) !important;
+  font-weight: 600;
+}
+
+.backButton {
+  color: var(--vybe-brand) !important;
+}
+
+/* -------------------------------------------------------------------------
+   Inputs. Entra styles these as a bare bottom-ruled field (.form-control);
+   this converts them to the site's bordered, rounded control.
+   ------------------------------------------------------------------------- */
+
+.ext-input,
+.ext-text-box,
+input.form-control {
+  background: #ffffff !important;
+  border: 1px solid var(--vybe-line) !important;
+  border-radius: 12px !important;
+  color: var(--vybe-ink) !important;
+  font-size: 15px !important;
+  padding: 11px 14px !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ext-input:hover,
+.ext-text-box:hover,
+input.form-control:hover {
+  border-color: #cbd5e1 !important;
+}
+
+.ext-input:focus,
+.ext-text-box:focus,
+input.form-control:focus {
+  border-color: var(--vybe-brand) !important;
+  box-shadow: 0 0 0 3px rgba(227, 24, 55, 0.18) !important;
+  outline: none !important;
+}
+
+.ext-input::placeholder,
+.ext-text-box::placeholder {
+  color: #94a3b8 !important;
+}
+
+.ext-show-reveal-password {
+  color: var(--vybe-muted) !important;
+}
+
+/* -------------------------------------------------------------------------
+   Buttons — pill, bold, press-to-shrink, matching the site CTAs.
+   ------------------------------------------------------------------------- */
+
+.ext-button,
+.ext-button-item .ext-button,
+input.ext-button {
+  border-radius: 9999px !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  min-width: 118px !important;
+  padding: 11px 26px !important;
+  transition: background-color 0.2s ease, transform 0.1s ease,
+    box-shadow 0.2s ease;
+}
+
+.ext-button:active {
+  transform: scale(0.96);
+}
+
+.ext-button.ext-primary,
+input.ext-button.ext-primary,
+.ext-primary {
+  background-color: var(--vybe-brand) !important;
+  border: 1px solid var(--vybe-brand) !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 20px -8px rgba(227, 24, 55, 0.7) !important;
+}
+
+.ext-button.ext-primary:hover,
+.ext-button.ext-primary:focus {
+  background-color: var(--vybe-brand-dark) !important;
+  border-color: var(--vybe-brand-dark) !important;
+}
+
+.ext-button:not(.ext-primary) {
+  background-color: #ffffff !important;
+  border: 1px solid var(--vybe-line) !important;
+  color: var(--vybe-corporate) !important;
+}
+
+.ext-button:not(.ext-primary):hover {
+  background-color: var(--vybe-surface) !important;
+  border-color: #cbd5e1 !important;
+}
+
+.ext-button[disabled] {
+  background-color: #e2e8f0 !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: none !important;
+  color: #94a3b8 !important;
+}
+
+/* -------------------------------------------------------------------------
+   Links + footer
+   ------------------------------------------------------------------------- */
+
+a,
+.ext-sign-in-box a,
+.ext-password-reset-links-container a {
+  color: var(--vybe-brand) !important;
+  font-weight: 600;
+  text-decoration: none;
+  text-underline-offset: 2px;
+}
+
+a:hover,
+.ext-sign-in-box a:hover,
+.ext-password-reset-links-container a:hover {
+  color: var(--vybe-brand-dark) !important;
+  text-decoration: underline;
+}
+
+/* Footer sits over the white right panel on this layout, so it needs dark
+   text — not the white it would need on a full-bleed dark canvas. */
+.ext-footer {
+  background-color: transparent !important;
+  border-top: none !important;
+}
+
+.ext-footer-content,
+.ext-footer-item,
+.ext-footer-links,
+.ext-footer-links a {
+  color: var(--vybe-muted) !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+}
+
+.ext-footer-links a:hover {
+  color: var(--vybe-corporate) !important;
+}
+
+/* Keyboard focus ring, matching the site's :focus-visible. */
+:focus-visible {
+  outline: 3px solid var(--vybe-brand) !important;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* -------------------------------------------------------------------------
+   Narrow viewports — the split collapses and the photo is hidden.
+   ------------------------------------------------------------------------- */
+
+@media (max-width: 600px) {
+  .ext-sign-in-box {
+    border-radius: 20px !important;
+    padding: 26px 20px 22px !important;
+  }
+  .ext-title {
+    font-size: 22px !important;
+  }
+  .ext-vertical-split-main-section {
+    border-left: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ext-sign-in-box {
+    animation: none;
+  }
+  .ext-button:active {
+    transform: none;
+  }
+}

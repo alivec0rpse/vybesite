@@ -256,6 +256,7 @@ function renderView(view, page) {
 ${breadcrumbs(page.trail, view.dark)}
 ${view.inner}
 ${deepDive(page.nav, { dark: view.dark })}
+${page.nav === 'home' ? beyondSoftwareSection() : ''}
 ${page.nav === 'home' ? partnersSection() : ''}
 ${page.credentials ? credentialsSection({ dark: view.dark, standalone: true }) : ''}
 ${faqSection(page.faqs, { dark: view.dark })}
@@ -272,9 +273,114 @@ function mobileItem(href, label, id, active) {
   }"${on ? ' aria-current="page"' : ''}>${label}</a>`;
 }
 
+/**
+ * The primary nav, grouped into three lines of business. A group opens on
+ * hover and on keyboard focus (`group-focus-within`), so the panel is reachable
+ * without a pointer and without a line of JavaScript; on small screens the same
+ * data renders as nested <details>, which is what makes it tap-to-open.
+ *
+ * `nav` on an item is the page's nav id, and is what lights the group up as
+ * current. Items that are fragments of a page carry no nav id of their own.
+ */
+const NAV_GROUPS = [
+  {
+    id: 'technology',
+    label: 'Technology',
+    blurb: 'Campus software, classrooms, email and custom development.',
+    items: [
+      { nav: 'erp', href: '/erp/', label: 'Vybe ERP', blurb: 'School and college administration.', icon: 'dashboard_customize' },
+      { nav: 'cms', href: '/cms/', label: 'Vybe CMS', blurb: '100% cashless cafeteria.', icon: 'fastfood' },
+      { nav: 'classroom', href: '/smart-classroom/', label: 'Smart Classrooms', blurb: 'Flat panels, hybrid class rigs, Extramarks.', icon: 'smart_display' },
+      { nav: 'workspace', href: '/workspace/', label: 'Workspace &amp; Email', blurb: 'Google Workspace, Microsoft 365, Zoho.', icon: 'alternate_email' },
+      { nav: 'it', href: '/it-solutions/', label: 'IT &amp; Cyber', blurb: 'Custom apps, security, managed IT.', icon: 'code_blocks' },
+      ...(published('cloud')
+        ? [{ nav: 'cloud', href: '/cloud/', label: 'Vybe Cloud', blurb: 'Servers, hosting and DDoS protection.', icon: 'cloud' }]
+        : []),
+    ],
+  },
+  {
+    id: 'printing',
+    label: 'Printing',
+    blurb: 'Send us the artwork by email or WhatsApp; we print and deliver.',
+    items: [
+      { nav: 'printing', href: '/printing/', label: 'All printing services', blurb: 'What we print, and how to send artwork.', icon: 'print' },
+      { href: '/printing/#stationery', label: 'Paper &amp; stationery', blurb: 'Letterheads, bill books, brochures, flyers.', icon: 'description' },
+      { href: '/printing/#cards', label: 'Business &amp; RFID cards', blurb: 'Visiting cards, ID cards, RFID and NFC cards.', icon: 'badge' },
+      { href: '/printing/#large-format', label: 'Banners &amp; standees', blurb: 'Flex banners, roll-ups, backdrops, signage.', icon: 'flag' },
+      { href: '/printing/#quote', label: 'Send artwork for a quote', blurb: 'Email or WhatsApp us the file and quantity.', icon: 'forum' },
+    ],
+  },
+  {
+    id: 'legal',
+    label: 'Legal',
+    blurb: 'Registrations and licences filed for you, at a flat professional fee.',
+    items: [
+      { nav: 'registrations', href: '/registrations/', label: 'Business registrations', blurb: 'GST, Udyam (MSME) and FSSAI, end to end.', icon: 'receipt_long' },
+      { href: '/registrations/#gst', label: 'GST registration', blurb: '₹199 + government charges.', icon: 'account_balance' },
+      { href: '/registrations/#msme', label: 'MSME / Udyam', blurb: '₹199 + government charges.', icon: 'storefront' },
+      { href: '/registrations/#fssai', label: 'FSSAI licence', blurb: '₹299 + government charges.', icon: 'soup_kitchen' },
+    ],
+  },
+];
+
+/** Which group, if any, owns the page currently being rendered. */
+const groupOf = (active) => NAV_GROUPS.find((g) => g.items.some((i) => i.nav && i.nav === active));
+
 function navbar(active) {
   const item = (href, label, id) =>
     `<a href="${href}" class="hover:text-brand transition-colors${active === id ? ' text-brand font-bold' : ''}"${active === id ? ' aria-current="page"' : ''}>${label}</a>`;
+
+  const openGroup = groupOf(active);
+
+  // One entry in a desktop dropdown: icon, label, one line of what it is.
+  const panelItem = (i) =>
+    `<li><a href="${i.href}" class="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-slate-50 transition-colors${
+      i.nav && i.nav === active ? ' bg-brand/5' : ''
+    }"${i.nav && i.nav === active ? ' aria-current="page"' : ''}>
+                                <span class="material-symbols-outlined text-brand text-[22px] shrink-0 mt-0.5" aria-hidden="true">${i.icon}</span>
+                                <span class="min-w-0">
+                                    <span class="block font-bold text-slate-900 leading-snug">${i.label}</span>
+                                    <span class="block text-xs text-slate-500 leading-snug mt-0.5">${i.blurb}</span>
+                                </span>
+                            </a></li>`;
+
+  const group = (g) => {
+    const on = openGroup && openGroup.id === g.id;
+    return `<div class="relative group">
+                    <button type="button" aria-haspopup="true" class="flex items-center gap-1 hover:text-brand transition-colors${
+                      on ? ' text-brand font-bold' : ''
+                    }">
+                        ${g.label}
+                        <span class="material-symbols-outlined text-[18px] transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180" aria-hidden="true">expand_more</span>
+                    </button>
+                    <div class="absolute left-1/2 -translate-x-1/2 top-full pt-4 w-[21rem] invisible opacity-0 translate-y-1 transition-all duration-200 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:visible group-focus-within:opacity-100 group-focus-within:translate-y-0">
+                        <div class="rounded-2xl border border-slate-200 bg-white shadow-xl p-2">
+                            <p class="px-3 pt-2 pb-3 text-xs text-slate-400 leading-snug">${g.blurb}</p>
+                            <ul class="flex flex-col">
+                                ${g.items.map(panelItem).join('\n                                ')}
+                            </ul>
+                        </div>
+                    </div>
+                </div>`;
+  };
+
+  // Same groups, tap-to-open, inside the mobile sheet.
+  const mobileGroup = (g) => {
+    const on = openGroup && openGroup.id === g.id;
+    return `<details class="group/sub"${on ? ' open' : ''}>
+                            <summary class="list-none [&::-webkit-details-marker]:hidden cursor-pointer flex items-center justify-between px-4 py-3 rounded-xl transition-colors ${
+                              on ? 'text-brand font-bold' : 'hover:bg-slate-50'
+                            }">
+                                ${g.label}
+                                <span class="material-symbols-outlined text-[20px] text-slate-400 transition-transform duration-200 group-open/sub:rotate-180" aria-hidden="true">expand_more</span>
+                            </summary>
+                            <div class="flex flex-col pl-3 pb-2 text-[15px]">
+                                ${g.items
+                                  .map((i) => mobileItem(i.href, i.label, i.nav, i.nav ? active : null))
+                                  .join('\n                                ')}
+                            </div>
+                        </details>`;
+  };
 
   return `<header class="fixed top-0 w-full z-50 transition-all duration-300 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm" id="navbar">
         <div class="max-w-7xl mx-auto px-6 h-[72px] flex justify-between items-center">
@@ -288,12 +394,7 @@ function navbar(active) {
 
             <nav class="hidden lg:flex items-center gap-6 xl:gap-8 text-sm font-medium text-slate-600" aria-label="Primary">
                 ${item('/', 'Home', 'home')}
-                ${item('/erp/', 'ERP', 'erp')}
-                ${item('/cms/', 'Cafeteria', 'cms')}
-                ${item('/smart-classroom/', 'Classroom', 'classroom')}
-                ${item('/workspace/', 'Workspace', 'workspace')}
-                ${item('/it-solutions/', 'IT &amp; Cyber', 'it')}
-                ${published('cloud') ? item('/cloud/', 'Cloud', 'cloud') : ''}
+                ${NAV_GROUPS.map(group).join('\n                ')}
                 ${item('/contact/', 'Contact', 'contact')}
             </nav>
 
@@ -307,14 +408,9 @@ function navbar(active) {
                         <span class="material-symbols-outlined text-[24px] group-open:hidden" aria-hidden="true">menu</span>
                         <span class="material-symbols-outlined text-[24px] hidden group-open:inline-block" aria-hidden="true">close</span>
                     </summary>
-                    <nav class="absolute right-0 top-full mt-3 w-60 rounded-2xl border border-slate-200 bg-white shadow-xl p-2 flex flex-col text-base font-medium text-slate-700" aria-label="Mobile">
+                    <nav class="absolute right-0 top-full mt-3 w-72 max-h-[75vh] overflow-y-auto overscroll-contain rounded-2xl border border-slate-200 bg-white shadow-xl p-2 flex flex-col text-base font-medium text-slate-700" aria-label="Mobile">
                         ${mobileItem('/', 'Home', 'home', active)}
-                        ${mobileItem('/erp/', 'Vybe ERP', 'erp', active)}
-                        ${mobileItem('/cms/', 'Vybe CMS (Cafeteria)', 'cms', active)}
-                        ${mobileItem('/smart-classroom/', 'Smart Classrooms', 'classroom', active)}
-                        ${mobileItem('/workspace/', 'Workspace &amp; Email', 'workspace', active)}
-                        ${mobileItem('/it-solutions/', 'IT &amp; Cyber', 'it', active)}
-                        ${published('cloud') ? mobileItem('/cloud/', 'Vybe Cloud', 'cloud', active) : ''}
+                        ${NAV_GROUPS.map(mobileGroup).join('\n                        ')}
                         ${mobileItem('/contact/', 'Contact Us', 'contact', active)}
                     </nav>
                 </details>
@@ -377,7 +473,7 @@ function footer() {
             </div>
 
             <div>
-                <h2 class="text-white font-bold mb-4 uppercase tracking-widest text-xs">Products</h2>
+                <h2 class="text-white font-bold mb-4 uppercase tracking-widest text-xs">Products &amp; Services</h2>
                 <ul class="space-y-3 text-sm">
                     ${link('/erp/', 'Educational ERP')}
                     ${link('/cms/', 'Smart Cafeteria (CMS)')}
@@ -385,6 +481,8 @@ function footer() {
                     ${link('/workspace/', 'Workspace &amp; Email')}
                     ${link('/it-solutions/', 'Custom App Development')}
                     ${published('cloud') ? link('/cloud/', 'Cloud &amp; Infrastructure') : ''}
+                    ${link('/printing/', 'Printing Services')}
+                    ${link('/registrations/', 'Business Registrations')}
                 </ul>
             </div>
 
@@ -538,7 +636,70 @@ const PRODUCTS = [
   { nav: 'workspace', href: '/workspace/', name: 'Workspace & Email', blurb: 'Google Workspace, Microsoft 365, Zoho Mail and student email.', icon: 'alternate_email' },
   { nav: 'it', href: '/it-solutions/', name: 'IT & Cyber', blurb: 'Custom software, security and managed IT.', icon: 'code_blocks' },
   { nav: 'cloud', href: '/cloud/', name: 'Vybe Cloud', blurb: 'Scalable servers, hosting and DDoS protection.', icon: 'cloud' },
+  { nav: 'printing', href: '/printing/', name: 'Printing', blurb: 'Everything from business cards to banners, standees and RFID cards.', icon: 'print' },
+  { nav: 'registrations', href: '/registrations/', name: 'Business Registrations', blurb: 'GST, Udyam (MSME) and FSSAI filings from ₹199 + government charges.', icon: 'receipt_long' },
 ];
+
+/**
+ * The two lines of business that are not software. The home page hero comes
+ * from src/app.html and only knows about the products, so without this they
+ * would exist on the site but nowhere on its front door.
+ */
+function beyondSoftwareSection() {
+  const card = (href, icon, title, blurb, points) =>
+    `<a href="${href}" class="group flex flex-col h-full rounded-2xl border border-slate-200 bg-white p-8 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-brand/40">
+                        <span class="material-symbols-outlined text-brand text-[28px]" aria-hidden="true">${icon}</span>
+                        <h3 class="mt-4 text-2xl font-bold font-display tracking-tight text-slate-900">${esc(title)}</h3>
+                        <p class="mt-3 text-slate-600 leading-relaxed">${blurb}</p>
+                        <ul class="mt-6 pt-6 border-t border-slate-100 grid gap-2 text-sm text-slate-600">
+                            ${points
+                              .map(
+                                (p) => `<li class="flex items-start gap-2">
+                                <span class="material-symbols-outlined text-brand text-[18px] shrink-0 mt-0.5" aria-hidden="true">check_circle</span>
+                                <span>${esc(p)}</span>
+                            </li>`
+                              )
+                              .join('\n                            ')}
+                        </ul>
+                        <span class="mt-auto pt-8 inline-flex items-center gap-2 text-sm font-bold text-brand">
+                            Read more
+                            <span class="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
+                        </span>
+                    </a>`;
+
+  return `
+        <section id="beyond-software" class="bg-surface-main border-t border-slate-200 py-20 md:py-28 px-6 relative z-10" aria-labelledby="beyond-software-heading">
+            <div class="max-w-6xl mx-auto">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-2">Beyond the software</p>
+                <h2 id="beyond-software-heading" class="text-3xl md:text-4xl font-black font-display tracking-tight text-slate-900">Printing and registrations, under the same roof.</h2>
+                <p class="mt-5 text-lg leading-relaxed text-slate-600 max-w-3xl">Two things our customers kept asking us to sort out for them, so we do. Both run on a message rather than a meeting.</p>
+                <div class="mt-12 grid gap-5 md:grid-cols-2">
+                    ${card(
+                      '/printing/',
+                      'print',
+                      'Printing',
+                      'All types of printing, run to your artwork. Mail us the file or send it on WhatsApp with the size and quantity, and a quote comes back with a turnaround attached.',
+                      [
+                        'Business, ID, RFID and NFC cards',
+                        'Letterheads, bill books, brochures and flyers',
+                        'Flex banners, roll-up standees and signage',
+                      ]
+                    )}
+                    ${card(
+                      '/registrations/',
+                      'receipt_long',
+                      'Business registrations',
+                      'GST, Udyam (MSME) and FSSAI, prepared and filed for you at a flat professional fee. Government charges stay separate and are quoted before you commit.',
+                      [
+                        'GST registration: ₹199 professional fee',
+                        'MSME / Udyam registration: ₹199 professional fee',
+                        'FSSAI registration and licence: ₹299 professional fee',
+                      ]
+                    )}
+                </div>
+            </div>
+        </section>`;
+}
 
 /** Cross-links the product pages, so none of them is a leaf off the home page. */
 function relatedSection(currentNav, { dark = false } = {}) {
@@ -1223,6 +1384,8 @@ const PAGES = [
         { nav: 'workspace', name: 'Workspace & Email', url: `${SITE}/workspace/`, description: 'Google Workspace, Microsoft 365 and Zoho Mail setup, staff and student email, single sign-on, secure online classes and phishing training.' },
         { nav: 'it', name: 'Vybe IT Solutions', url: `${SITE}/it-solutions/`, description: 'Custom app development, penetration testing and managed security operations.' },
         { nav: 'cloud', name: 'Vybe Cloud', url: `${SITE}/cloud/`, description: 'Scalable cloud architecture, game servers and DDoS protection.' },
+        { nav: 'printing', name: 'Printing Services', url: `${SITE}/printing/`, description: 'Commercial printing — business and RFID cards, letterheads, bill books, brochures, flex banners, roll-up standees and signage, printed to your artwork.' },
+        { nav: 'registrations', name: 'Business Registrations', url: `${SITE}/registrations/`, description: 'GST, Udyam (MSME) and FSSAI registrations prepared and filed at a flat professional fee, with government charges separate.' },
       ].filter((s) => published(s.nav)).map((s, i) => ({
         '@type': 'ListItem',
         position: i + 1,
@@ -1877,6 +2040,460 @@ ${faqSection(contactFaqs, { dark: false })}
   });
 }
 
+/* ------------------------------------------------------------------ printing */
+
+/**
+ * Print jobs arrive as a file, not as a form: the artwork is the enquiry. So
+ * every call to action on this page is a mailto or a wa.me deep link with the
+ * first message already written, and nothing here quotes a price. Print costs
+ * move with material, size, finish and run length, so a made-up "from" figure
+ * would be wrong on most jobs.
+ */
+const WA_NUMBER = '919964177877';
+const waLink = (text) => `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`;
+
+const PRINT_ENQUIRY = 'Hi Vybe, I would like a printing quote. Here is what I need:';
+
+function printCategory({ id, icon, title, blurb, items }) {
+  return `<li id="${id}" class="flex flex-col h-full rounded-2xl border border-slate-200 bg-white p-8 scroll-mt-28 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-brand/40">
+                        <span class="material-symbols-outlined text-brand text-[28px]" aria-hidden="true">${icon}</span>
+                        <h3 class="mt-4 text-xl font-bold font-display tracking-tight text-slate-900">${esc(title)}</h3>
+                        <p class="mt-2 text-sm text-slate-600 leading-relaxed">${esc(blurb)}</p>
+                        <ul class="mt-6 pt-6 border-t border-slate-100 grid gap-2 text-sm text-slate-600">
+                            ${items
+                              .map(
+                                (i) => `<li class="flex items-start gap-2">
+                                <span class="material-symbols-outlined text-brand text-[18px] shrink-0 mt-0.5" aria-hidden="true">check_circle</span>
+                                <span>${esc(i)}</span>
+                            </li>`
+                              )
+                              .join('\n                            ')}
+                        </ul>
+                    </li>`;
+}
+
+const PRINT_CATEGORIES = [
+  {
+    id: 'stationery',
+    icon: 'description',
+    title: 'Paper & stationery',
+    blurb: 'The everyday run. The things an office gets through and reorders.',
+    items: [
+      'Letterheads, envelopes and compliment slips',
+      'Bill books, invoice books and receipt books',
+      'Brochures, leaflets, flyers and pamphlets',
+      'Posters, certificates, calendars and diaries',
+      'Files, folders and register covers',
+    ],
+  },
+  {
+    id: 'cards',
+    icon: 'badge',
+    title: 'Business, ID & RFID cards',
+    blurb: 'Everything card-sized, from a visiting card to a card that opens a door.',
+    items: [
+      'Visiting cards in matt, gloss, velvet and spot UV',
+      'PVC ID cards with lanyards and holders',
+      'RFID and NFC cards, tags and key fobs',
+      'Student, staff and membership cards',
+      'Variable data: names, numbers, photos and QR codes',
+    ],
+  },
+  {
+    id: 'large-format',
+    icon: 'flag',
+    title: 'Banners, standees & signage',
+    blurb: 'Large format, printed and finished ready to put up.',
+    items: [
+      'Flex and vinyl banners, any size',
+      'Roll-up standees and backdrops',
+      'Canopy, table covers and event branding',
+      'Foam board, sunboard and acrylic signage',
+      'Wall, window and vehicle graphics',
+    ],
+  },
+  {
+    id: 'anything-else',
+    icon: 'print',
+    title: 'Something not on this list?',
+    blurb: 'The list above is what we are asked for most, not the limit of what we run.',
+    items: [
+      'Send the spec and we will tell you plainly whether we can do it',
+      'Odd sizes, unusual materials and special finishes included',
+      'Repeat and bulk runs to the same file, reordered on a message',
+    ],
+  },
+];
+
+const PRINT_STEPS = [
+  {
+    h: 'Send us the file',
+    p: `Email it to <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a> or WhatsApp it to <a class="text-brand font-bold" href="${waLink(
+      PRINT_ENQUIRY
+    )}" target="_blank" rel="noopener">+91 99641 77877</a>. PDF, AI, CDR, PSD, PNG or JPG all work. Tell us the size, the quantity and the finish you want if you already know them.`,
+  },
+  {
+    h: 'We check it and quote',
+    p: 'Before anything is priced we open the file at print resolution and check the bleed, the margins, the colour mode and the resolution of every image placed in it. If something in the artwork will not survive the press, you hear about it then rather than after the run. The quote covers the job as specified, and the turnaround comes with it.',
+  },
+  {
+    h: 'You approve the proof',
+    p: 'Nothing goes on a machine until you have seen a proof and said yes to it. For a large-format job we will also confirm the finished size against where it is going up, because a banner that is right on screen and wrong on the wall is still a wasted banner.',
+  },
+  {
+    h: 'We print and deliver',
+    p: `Printed, finished and delivered in Bengaluru, or dispatched onward if you are further out. Our <a class="text-brand font-bold" href="/shipping-policy/">shipping and exchange policy</a> sets out how consignments are sent and when responsibility for one passes to you. Reordering the same job later takes one message, because we keep the approved file.`,
+  },
+];
+
+const printingFaqs = [
+  {
+    q: 'What kinds of printing do you do?',
+    a: 'Paper and stationery: letterheads, bill books, brochures, flyers, posters, certificates, files and folders. Cards of every sort: visiting cards, PVC ID cards, and RFID and NFC cards, tags and key fobs. Large format: flex and vinyl banners, roll-up standees, backdrops, event branding, foam board and acrylic signage, and wall, window and vehicle graphics. If what you need is not on that list, send us the specification anyway. It is what we are asked for most, not the limit of what we run.',
+  },
+  {
+    q: 'How do I send you my artwork?',
+    a: `Two ways, both of which reach the same people. Email the file to <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a>, or WhatsApp it to <a class="text-brand font-bold" href="${waLink(
+      PRINT_ENQUIRY
+    )}" target="_blank" rel="noopener">+91 99641 77877</a>. PDF is ideal; AI, CDR, PSD, PNG and JPG are all fine. For anything large format, send the original rather than a screenshot or a forwarded copy of it. A file that looks sharp on a phone can be well short of what a banner needs.`,
+  },
+  {
+    q: 'What if my file is not print-ready?',
+    a: 'Send it anyway. We check bleed, margins, colour mode and image resolution before quoting, and we will tell you exactly what needs to change and why. It is a short conversation before the run and an expensive one after it.',
+  },
+  {
+    q: 'What does printing cost?',
+    a: `It depends on the material, the size, the finish and how many you are running. The same design can differ several-fold across those four, so a headline price on this page would be wrong for most jobs. Send the artwork with the quantity and you will get a real figure rather than an indicative one. Email <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a> or call <a class="text-brand font-bold" href="tel:+919964177877">+91 99641 77877</a>.`,
+  },
+  {
+    q: 'Is there a minimum quantity?',
+    a: 'It varies by product. Digital work runs economically in small quantities; offset and some finishes only make sense above a certain run, and for those we will tell you the quantity at which the per-piece price actually changes. Ask with your quantity in hand and we will tell you where you stand.',
+  },
+  {
+    q: 'How long does a job take?',
+    a: 'The turnaround is confirmed with the quote, because it depends on the item, the quantity and the finishing involved. Urgent work is often possible. Say so in your first message and we will tell you honestly whether the deadline can be met, rather than accept it and miss it.',
+  },
+  {
+    q: 'Do you deliver outside Bengaluru?',
+    a: 'Yes. We deliver in and around Bengaluru and dispatch onward elsewhere in India. How consignments are sent, and the point at which responsibility for one passes to you, is set out in our <a class="text-brand font-bold" href="/shipping-policy/">shipping and exchange policy</a>.',
+  },
+  {
+    q: 'Can you print RFID and NFC cards that work with our access system?',
+    a: 'Yes. RFID and NFC cards, tags and key fobs, printed with your branding and with variable data such as names, photos, numbers and QR codes. Tell us the chip or frequency your existing readers expect, or, if you do not know, what system you are running, and we will confirm the right card before printing a batch that will not open anything.',
+  },
+];
+
+const printingBody = `<div class="w-full bg-surface-main">
+${breadcrumbs([CRUMB_HOME, { name: 'Printing', url: '/printing/' }], false)}
+
+        <section class="px-6 pt-12 pb-20 md:pb-28 relative overflow-hidden">
+            <div class="absolute inset-0 bg-grid-faint" aria-hidden="true"></div>
+            <div class="max-w-6xl mx-auto relative z-10">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-3">Printing Services</p>
+                <h1 class="text-5xl md:text-7xl font-black font-display tracking-tighter text-slate-900">If it prints, we print it.</h1>
+                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">Paper, cards, banners, standees, signage and RFID, all of it printed to your artwork. Mail us the file or send it on WhatsApp, tell us the size and the quantity, and you get a quote back with a turnaround attached to it.</p>
+
+                <div class="mt-10 flex flex-col sm:flex-row gap-4">
+                    <a href="${waLink(PRINT_ENQUIRY)}" target="_blank" rel="noopener"
+                       class="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white px-7 py-4 rounded-full text-sm font-bold transition-all active:scale-95">
+                        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">forum</span>
+                        WhatsApp us the artwork
+                    </a>
+                    <a href="mailto:${ORG.sales}?subject=Printing%20enquiry"
+                       class="inline-flex items-center justify-center gap-2 bg-corporate hover:bg-slate-800 text-white px-7 py-4 rounded-full text-sm font-bold transition-all active:scale-95">
+                        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">mail</span>
+                        Email ${ORG.sales}
+                    </a>
+                </div>
+                <p class="mt-4 text-sm text-slate-500">Mon&ndash;Sat, 9:00&nbsp;AM &ndash; 6:30&nbsp;PM IST. Files sent after hours are picked up the next working morning.</p>
+
+                <ul class="mt-16 grid gap-5 sm:grid-cols-2">
+                    ${PRINT_CATEGORIES.map(printCategory).join('\n                    ')}
+                </ul>
+            </div>
+        </section>
+
+        <section id="quote" class="bg-corporate dark-section text-slate-300 py-20 md:py-28 px-6 relative z-10 scroll-mt-20" aria-labelledby="print-process-heading">
+            <div class="max-w-4xl mx-auto">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-2">How a job runs</p>
+                <h2 id="print-process-heading" class="text-3xl md:text-4xl font-black font-display tracking-tight text-white">Send the file. That is the whole enquiry.</h2>
+                <p class="mt-5 text-lg leading-relaxed text-slate-300 max-w-3xl">There is no form to fill in, because for a print job the artwork says more than a form ever would. Four steps from your file to the finished stack.</p>
+                <ol class="mt-12 space-y-10">
+                    ${PRINT_STEPS.map(
+                      (s, i) => `<li class="border-t border-white/10 pt-8 flex gap-6">
+                        <span class="text-3xl font-black font-display text-brand shrink-0 leading-none" aria-hidden="true">${i + 1}</span>
+                        <div>
+                            <h3 class="text-xl md:text-2xl font-bold font-display tracking-tight text-white">${esc(s.h)}</h3>
+                            <p class="mt-3 leading-relaxed text-slate-300">${s.p}</p>
+                        </div>
+                    </li>`
+                    ).join('\n                    ')}
+                </ol>
+            </div>
+        </section>
+
+${faqSection(printingFaqs, { dark: false })}
+${relatedSection('printing', { dark: false })}
+</div>`;
+
+{
+  const url = '/printing/';
+  const lastmod = lastmodFor(url, printingBody);
+  DOCS.push({
+    file: 'printing/index.html',
+    priority: '0.8',
+    changefreq: 'monthly',
+    page: {
+      url,
+      nav: 'printing',
+      title: 'Printing Services in Bengaluru | Banners, Standees, Cards & RFID',
+      ogTitle: 'Vybe Printing: paper, cards, banners, standees and RFID',
+      description:
+        'All types of printing from Vybe Technologies, Bengaluru: business cards, PVC ID and RFID cards, letterheads, bill books, brochures, flyers, flex banners, roll-up standees and signage. Mail or WhatsApp us your artwork for a quote.',
+      lastmod,
+      trail: [CRUMB_HOME, { name: 'Printing', url }],
+      faqs: printingFaqs,
+      body: printingBody,
+      schema: (u) => ({
+        '@type': 'Service',
+        '@id': `${u}#service`,
+        name: 'Printing services',
+        serviceType: 'Commercial printing',
+        description:
+          'Commercial printing: business and visiting cards, PVC ID cards, RFID and NFC cards, letterheads, bill books, brochures, flyers, posters, flex banners, roll-up standees, backdrops and signage, printed to customer artwork.',
+        provider: { '@id': `${SITE}/#organization` },
+        areaServed: { '@type': 'Country', name: 'India' },
+        url: u,
+        hasOfferCatalog: {
+          '@type': 'OfferCatalog',
+          name: 'Printing',
+          itemListElement: PRINT_CATEGORIES.filter((c) => c.id !== 'anything-else').map((c) => ({
+            '@type': 'OfferCatalog',
+            name: c.title,
+            itemListElement: c.items.map((i) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: i } })),
+          })),
+        },
+      }),
+    },
+  });
+}
+
+/* ------------------------------------------------------------- registrations */
+
+/**
+ * Flat professional fees, with government charges kept visibly separate. The
+ * separation is repeated on every card, in the schema and in the FAQ on
+ * purpose: the fee below is what Vybe charges, and it is not the whole cost of
+ * the registration.
+ */
+const REGISTRATIONS = [
+  {
+    id: 'gst',
+    icon: 'account_balance',
+    name: 'GST registration',
+    fee: 199,
+    tagline: 'GSTIN for a new business, a branch or a turnover threshold crossed.',
+    who: 'Anyone crossing the turnover threshold, selling across state lines, selling on a marketplace, or being asked for a GSTIN by a customer who cannot claim input credit without one.',
+    needs: ['PAN and Aadhaar of the proprietor, partners or directors', 'Proof of business address: ownership papers, a rent agreement or an NOC', 'Bank account details or a cancelled cheque', 'Photograph, and the constitution documents for a firm or company'],
+    note: 'The GST portal charges nothing for the registration itself. Our fee is the professional fee for preparing and filing it, and for handling any clarification the officer raises before the GSTIN is issued.',
+  },
+  {
+    id: 'msme',
+    icon: 'storefront',
+    name: 'MSME / Udyam registration',
+    fee: 199,
+    tagline: 'The Udyam certificate that unlocks MSME benefits, subsidies and tender eligibility.',
+    who: 'Micro, small and medium enterprises, whether manufacturing or services, that want the Udyam certificate for bank credit, subsidy schemes, tender eligibility or the protection of the delayed-payment provisions.',
+    needs: ['Aadhaar of the proprietor, managing partner or authorised director', 'PAN of the business', 'GSTIN, where the business is registered for GST', 'Investment and turnover figures, and the NIC activity codes that fit what you actually do'],
+    note: 'Udyam registration carries no government fee. Our fee is for classifying the activity correctly and filing it. A wrong NIC code or a mis-stated investment figure is the usual reason a certificate is later disputed.',
+  },
+  {
+    id: 'fssai',
+    icon: 'soup_kitchen',
+    name: 'FSSAI registration & licence',
+    fee: 299,
+    tagline: 'Basic registration, or a State licence, for anyone handling food.',
+    who: 'Anyone who manufactures, stores, transports, distributes or sells food: restaurants, cafeterias, caterers, cloud kitchens, retailers, traders and home-based food businesses.',
+    needs: ['Photo ID and address proof of the proprietor, partners or directors', 'Proof of business premises', 'List of food products or categories handled', 'Layout plan and a water test report, where the category calls for one'],
+    note: 'Which of Basic registration, a State licence or a Central licence applies depends on your turnover and where you operate, and the government fee differs for each. Tell us your turnover and we will tell you which one you need before you pay anything.',
+  },
+];
+
+const regFaqs = [
+  {
+    q: 'What do the prices on this page cover?',
+    a: 'They are our professional fee, the flat amount Vybe charges to prepare your application, file it, respond to queries raised on it and hand you the certificate at the end. <strong>Government charges are separate and are payable at actuals</strong>, whatever the department levies for your category. We tell you that figure before you commit to anything, not after.',
+  },
+  {
+    q: 'How much are the government charges?',
+    a: 'It depends on the registration. GST registration and Udyam (MSME) registration carry no government fee at all, so for those two the professional fee is the whole cost. FSSAI does carry a statutory fee, and it varies by whether you need Basic registration, a State licence or a Central licence and for how many years you take it. Tell us your turnover and where you operate and we will give you the exact figure up front.',
+  },
+  {
+    q: 'What do you need from us to get started?',
+    a: 'For GST: PAN and Aadhaar of the proprietor, partners or directors, proof of business address, bank details and a photograph. For Udyam: Aadhaar, the business PAN and your investment and turnover figures. For FSSAI: photo ID and address proof, proof of premises and the list of food categories you handle. Send what you have on WhatsApp or by email and we will tell you what is still missing rather than send you a checklist and wait.',
+  },
+  {
+    q: 'How long does a registration take?',
+    a: 'Filing happens within a working day of us having a complete set of documents. What comes after that is with the department: a GSTIN is usually issued within about a week if no clarification is raised, Udyam is generally immediate, and FSSAI depends on the category and on whether an inspection is required. We do not control those timelines and will not quote you one as though we did. What we will do is chase the file and keep you posted.',
+  },
+  {
+    q: 'Do you handle registrations other than these three?',
+    a: `These three are what we file day to day. Other registrations and filings start at ₹499 plus government charges. Ask us what you need on <a class="text-brand font-bold" href="mailto:${ORG.legal}">${ORG.legal}</a> and we will tell you plainly whether it is something we take on, rather than take the work and learn on your file.`,
+  },
+  {
+    q: 'What happens if the application is rejected or a clarification is raised?',
+    a: 'A clarification is routine. Departments raise them on a large share of applications, and answering one is part of the fee, not an extra. We draft the reply and file it. If an application fails for something outside the filing itself, such as a premises proof the department will not accept, we will tell you exactly what has to change before it is refiled.',
+  },
+  {
+    q: 'Who should we contact about a registration?',
+    a: `Email <a class="text-brand font-bold" href="mailto:${ORG.legal}">${ORG.legal}</a>, or WhatsApp us on <a class="text-brand font-bold" href="${waLink(
+      'Hi Vybe, I would like help with a registration.'
+    )}" target="_blank" rel="noopener">+91 99641 77877</a> with what you are registering and roughly what the business does.`,
+  },
+];
+
+const REG_ENQUIRY = 'Hi Vybe, I would like help with a registration.';
+
+function registrationCard(r) {
+  return `<li id="${r.id}" class="flex flex-col h-full rounded-2xl border border-slate-200 bg-white p-8 scroll-mt-28 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-brand/40">
+                        <span class="material-symbols-outlined text-brand text-[28px]" aria-hidden="true">${r.icon}</span>
+                        <h3 class="mt-4 text-xl font-bold font-display tracking-tight text-slate-900">${esc(r.name)}</h3>
+                        <p class="mt-2 text-sm text-slate-600 leading-relaxed">${esc(r.tagline)}</p>
+
+                        <p class="mt-6 flex items-baseline gap-2">
+                            <span class="text-4xl font-black font-display tracking-tight text-slate-900">&#8377;${r.fee}</span>
+                            <span class="text-sm font-bold text-slate-500">professional fee</span>
+                        </p>
+                        <p class="mt-1 text-xs font-bold uppercase tracking-[0.15em] text-brand">+ government charges at actuals</p>
+
+                        <div class="mt-6 pt-6 border-t border-slate-100">
+                            <h4 class="text-xs font-bold uppercase tracking-[0.15em] text-slate-400">Who needs it</h4>
+                            <p class="mt-2 text-sm text-slate-600 leading-relaxed">${esc(r.who)}</p>
+                        </div>
+
+                        <div class="mt-6">
+                            <h4 class="text-xs font-bold uppercase tracking-[0.15em] text-slate-400">What we need from you</h4>
+                            <ul class="mt-3 grid gap-2 text-sm text-slate-600">
+                                ${r.needs
+                                  .map(
+                                    (n) => `<li class="flex items-start gap-2">
+                                    <span class="material-symbols-outlined text-brand text-[18px] shrink-0 mt-0.5" aria-hidden="true">check_circle</span>
+                                    <span>${esc(n)}</span>
+                                </li>`
+                                  )
+                                  .join('\n                                ')}
+                            </ul>
+                        </div>
+
+                        <p class="mt-auto pt-6 text-sm text-slate-500 leading-relaxed">${esc(r.note)}</p>
+                    </li>`;
+}
+
+const registrationsBody = `<div class="w-full bg-surface-main">
+${breadcrumbs([CRUMB_HOME, { name: 'Registrations', url: '/registrations/' }], false)}
+
+        <section class="px-6 pt-12 pb-20 md:pb-28 relative overflow-hidden">
+            <div class="absolute inset-0 bg-grid-faint" aria-hidden="true"></div>
+            <div class="max-w-6xl mx-auto relative z-10">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-3">Legal &amp; Compliance</p>
+                <h1 class="text-5xl md:text-7xl font-black font-display tracking-tighter text-slate-900">Registrations, filed for you.</h1>
+                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">GST, Udyam (MSME) and FSSAI, prepared, filed and followed up until the certificate is in your hands. A flat professional fee, published below, with government charges separate and quoted to you before you commit.</p>
+
+                <div class="mt-10 flex flex-col sm:flex-row gap-4">
+                    <a href="${waLink(REG_ENQUIRY)}" target="_blank" rel="noopener"
+                       class="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white px-7 py-4 rounded-full text-sm font-bold transition-all active:scale-95">
+                        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">forum</span>
+                        WhatsApp us
+                    </a>
+                    <a href="mailto:${ORG.legal}?subject=Registration%20enquiry"
+                       class="inline-flex items-center justify-center gap-2 bg-corporate hover:bg-slate-800 text-white px-7 py-4 rounded-full text-sm font-bold transition-all active:scale-95">
+                        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">mail</span>
+                        Email ${ORG.legal}
+                    </a>
+                </div>
+
+                <ul class="mt-16 grid gap-5 lg:grid-cols-3">
+                    ${REGISTRATIONS.map(registrationCard).join('\n                    ')}
+                </ul>
+
+                <div class="mt-8 rounded-2xl border border-slate-200 bg-white/70 p-6 md:p-8 flex flex-col sm:flex-row gap-5 sm:items-start">
+                    <span class="material-symbols-outlined text-brand text-[28px] shrink-0" aria-hidden="true">gavel</span>
+                    <div>
+                        <h2 class="text-base font-bold font-display tracking-tight text-slate-900">Something else to register?</h2>
+                        <p class="mt-2 text-sm text-slate-600 leading-relaxed max-w-3xl">The three above are what we file day to day. Other registrations and filings start at <strong>&#8377;499 plus government charges</strong>. Tell us what you need at <a href="mailto:${ORG.legal}" class="font-bold text-brand hover:underline">${ORG.legal}</a> and we will say plainly whether it is something we take on. We would rather turn a filing down than learn on your paperwork.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-corporate dark-section text-slate-300 py-20 md:py-28 px-6 relative z-10" aria-labelledby="reg-fees-heading">
+            <div class="max-w-4xl mx-auto">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-2">What you actually pay</p>
+                <h2 id="reg-fees-heading" class="text-3xl md:text-4xl font-black font-display tracking-tight text-white">Our fee, and the government's, kept apart.</h2>
+                <p class="mt-5 text-lg leading-relaxed text-slate-300 max-w-3xl">Two different things end up on one invoice everywhere else, which is how a &#8377;199 filing turns into a bill nobody recognises. Here they stay separate.</p>
+                <div class="mt-12 grid gap-8 sm:grid-cols-2">
+                    <div class="rounded-2xl border border-white/10 bg-white/5 p-8">
+                        <h3 class="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Our professional fee</h3>
+                        <p class="mt-4 text-white leading-relaxed text-sm">&#8377;199 for GST, &#8377;199 for Udyam (MSME), &#8377;299 for FSSAI. Flat, published, and the same whether the application goes through first time or needs a clarification answered. Preparing the application, filing it, replying to departmental queries and delivering the certificate are all inside it.</p>
+                    </div>
+                    <div class="rounded-2xl border border-white/10 bg-white/5 p-8">
+                        <h3 class="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Government charges</h3>
+                        <p class="mt-4 text-white leading-relaxed text-sm">Whatever the department levies for your category, charged at actuals with nothing added. GST and Udyam registration carry no government fee at all. FSSAI does, and it changes with the licence type and the number of years, so we quote you the exact figure before you commit.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+${faqSection(regFaqs, { dark: false })}
+${relatedSection('registrations', { dark: false })}
+</div>`;
+
+{
+  const url = '/registrations/';
+  const lastmod = lastmodFor(url, registrationsBody);
+  DOCS.push({
+    file: 'registrations/index.html',
+    priority: '0.8',
+    changefreq: 'monthly',
+    page: {
+      url,
+      nav: 'registrations',
+      title: 'GST, MSME & FSSAI Registration | From ₹199 | Vybe Technologies',
+      ogTitle: 'Business registrations: GST, Udyam (MSME) and FSSAI',
+      description:
+        'GST registration and Udyam (MSME) registration at ₹199, FSSAI registration at ₹299. That is the professional fee, with government charges separate. Documents prepared, filed and followed up by Vybe Technologies, Bengaluru.',
+      lastmod,
+      trail: [CRUMB_HOME, { name: 'Registrations', url }],
+      faqs: regFaqs,
+      body: registrationsBody,
+      schema: (u) => ({
+        '@type': 'Service',
+        '@id': `${u}#service`,
+        name: 'Business registration services',
+        serviceType: 'Business registration and licensing',
+        description:
+          'Preparation and filing of GST registration, Udyam (MSME) registration and FSSAI registration and licences, at a flat professional fee with government charges payable separately at actuals.',
+        provider: { '@id': `${SITE}/#organization` },
+        areaServed: { '@type': 'Country', name: 'India' },
+        url: u,
+        hasOfferCatalog: {
+          '@type': 'OfferCatalog',
+          name: 'Registrations',
+          itemListElement: REGISTRATIONS.map((r) => ({
+            '@type': 'Offer',
+            name: r.name,
+            price: String(r.fee),
+            priceCurrency: 'INR',
+            description: `${r.tagline} Professional fee only; government charges are payable separately at actuals.`,
+            url: `${u}#${r.id}`,
+            itemOffered: { '@type': 'Service', name: r.name, provider: { '@id': `${SITE}/#organization` } },
+          })),
+        },
+      }),
+    },
+  });
+}
+
 /* ------------------------------------------------------------------ 404 page */
 
 const notFoundLink = (href, label, desc) =>
@@ -1919,6 +2536,8 @@ write(
                     ${notFoundLink('/cms/', 'Vybe CMS', '100% cashless campus cafeteria system.')}
                     ${notFoundLink('/it-solutions/', 'IT &amp; Cyber', 'Custom app development and security.')}
                     ${published('cloud') ? notFoundLink('/cloud/', 'Vybe Cloud', 'Scalable servers and DDoS protection.') : ''}
+                    ${notFoundLink('/printing/', 'Printing', 'Cards, banners, standees, RFID and stationery.')}
+                    ${notFoundLink('/registrations/', 'Registrations', 'GST, MSME and FSSAI, filed for you.')}
                     ${notFoundLink('/contact/', 'Contact Us', 'Phone, email and where to find us.')}
                 </div>
             </div>
