@@ -2901,7 +2901,7 @@ const REGISTRATIONS = [
     icon: 'workspace_premium',
     name: 'ISO certification (non-accredited)',
     fee: 2299,
-    feeAlt: { amount: 1599, label: 'for DPIIT-recognised startups' },
+    feeAlt: { amount: 1599, label: 'for startups' },
     feeNote: 'Not a government registration. No government charges.',
     tagline: 'ISO 9001, ISO 22000 and ISO 27001 certificates issued by us, verifiable on our portal, and not accredited by any accreditation body.',
     warn:
@@ -3304,7 +3304,7 @@ ${breadcrumbs([CRUMB_HOME, { name: 'Registrations', url: '/registrations/' }], f
                 <div class="mt-12 grid gap-8 sm:grid-cols-2">
                     <div class="rounded-2xl border border-white/10 bg-white/5 p-8">
                         <h3 class="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Our professional fee</h3>
-                        <p class="mt-4 text-white leading-relaxed text-sm">&#8377;199 for GST, &#8377;199 for Udyam (MSME), &#8377;299 for FSSAI, &#8377;999 for DPIIT recognition, and &#8377;2,299 for an ISO certificate, or &#8377;1,599 if you are a DPIIT-recognised startup. Flat, published, and the same whether an application goes through first time or needs a clarification answered. NSDC, Skill India and affiliation work is consulting rather than filing, so it is scoped and quoted before anything starts. Digital signature certificates start at &#8377;1,500 for two years, with the USB token at &#8377;599 if you need one.</p>
+                        <p class="mt-4 text-white leading-relaxed text-sm">&#8377;199 for GST, &#8377;199 for Udyam (MSME), &#8377;299 for FSSAI, &#8377;999 for DPIIT recognition, and &#8377;2,299 for an ISO certificate, or &#8377;1,599 if you are a startup. Flat, published, and the same whether an application goes through first time or needs a clarification answered. NSDC, Skill India and affiliation work is consulting rather than filing, so it is scoped and quoted before anything starts. Digital signature certificates start at &#8377;1,500 for two years, with the USB token at &#8377;599 if you need one.</p>
                     </div>
                     <div class="rounded-2xl border border-white/10 bg-white/5 p-8">
                         <h3 class="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Government charges</h3>
