@@ -346,14 +346,14 @@ function navbar(active) {
 
   const group = (g) => {
     const on = openGroup && openGroup.id === g.id;
-    return `<div class="relative group">
-                    <button type="button" aria-haspopup="true" class="flex items-center gap-1 hover:text-brand transition-colors${
+    return `<div class="nav-group relative">
+                    <button type="button" aria-haspopup="true" aria-expanded="false" aria-controls="nav-panel-${g.id}" class="flex items-center gap-1 hover:text-brand transition-colors${
                       on ? ' text-brand font-bold' : ''
                     }">
                         ${g.label}
-                        <span class="material-symbols-outlined text-[18px] transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180" aria-hidden="true">expand_more</span>
+                        <span class="material-symbols-outlined nav-caret text-[18px]" aria-hidden="true">expand_more</span>
                     </button>
-                    <div class="absolute left-1/2 -translate-x-1/2 top-full pt-4 w-[21rem] invisible opacity-0 translate-y-1 transition-all duration-200 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:visible group-focus-within:opacity-100 group-focus-within:translate-y-0">
+                    <div class="nav-panel" id="nav-panel-${g.id}">
                         <div class="rounded-2xl border border-slate-200 bg-white shadow-xl p-2">
                             <p class="px-3 pt-2 pb-3 text-xs text-slate-400 leading-snug">${g.blurb}</p>
                             <ul class="flex flex-col">
@@ -392,7 +392,7 @@ function navbar(active) {
                 </span>
             </a>
 
-            <nav class="hidden lg:flex items-center gap-6 xl:gap-8 text-sm font-medium text-slate-600" aria-label="Primary">
+            <nav class="primary-nav hidden lg:flex items-center gap-6 xl:gap-8 text-sm font-medium text-slate-600" aria-label="Primary">
                 ${item('/', 'Home', 'home')}
                 ${NAV_GROUPS.map(group).join('\n                ')}
                 ${item('/contact/', 'Contact', 'contact')}

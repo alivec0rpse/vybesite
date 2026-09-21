@@ -41,6 +41,93 @@
     paintBar();
   }
 
+  /* -------------------------------------------------- primary nav groups */
+  // The panels open on hover and on focus in CSS, one at a time, with or
+  // without this file. What is added here is the part CSS cannot hold: a click
+  // (or a tap on a touch laptop) pins a group open after the pointer leaves,
+  // until the next click, until another group is hovered, or until Escape.
+  var navGroups = [].slice.call(document.querySelectorAll('.primary-nav .nav-group'));
+  if (navGroups.length) {
+    var pinnedGroup = null;
+    var triggerOf = function (g) {
+      return g.querySelector('button');
+    };
+
+    // aria-expanded has to follow the panel, not just the pin: a group opened
+    // by keyboard focus is as open as one that was clicked.
+    var syncExpanded = function (g) {
+      var open = g === pinnedGroup || (!g.classList.contains('is-dismissed') && g.contains(document.activeElement));
+      triggerOf(g).setAttribute('aria-expanded', open ? 'true' : 'false');
+    };
+
+    var pin = function (g) {
+      if (pinnedGroup === g) return;
+      var was = pinnedGroup;
+      pinnedGroup = g;
+      if (was) {
+        was.classList.remove('is-pinned');
+        // A click left focus on that trigger, so unpinning alone would let
+        // :focus-within reopen the panel the moment the pointer leaves.
+        if (was.contains(document.activeElement)) was.classList.add('is-dismissed');
+        syncExpanded(was);
+      }
+      if (g) {
+        g.classList.remove('is-dismissed');
+        g.classList.add('is-pinned');
+      }
+      navGroups.forEach(syncExpanded);
+    };
+
+    navGroups.forEach(function (g) {
+      triggerOf(g).addEventListener('click', function () {
+        var closing = pinnedGroup === g;
+        pin(closing ? null : g);
+        // Clicking a pinned group shut leaves its own trigger focused, and
+        // :focus-within would open it straight back up. Hold it closed until
+        // the pointer or the keyboard comes back to it.
+        if (closing) g.classList.add('is-dismissed');
+        syncExpanded(g);
+      });
+
+      // Moving onto any group releases a pin held by another one. The CSS has
+      // already hidden it; this keeps the state and aria in step.
+      g.addEventListener('pointerenter', function () {
+        if (pinnedGroup && pinnedGroup !== g) pin(null);
+        g.classList.remove('is-dismissed');
+      });
+
+      g.addEventListener('focusin', function () {
+        g.classList.remove('is-dismissed');
+        syncExpanded(g);
+      });
+      g.addEventListener('focusout', function () {
+        // Deferred: at focusout time the new target is not focused yet.
+        setTimeout(function () {
+          if (!g.contains(document.activeElement)) syncExpanded(g);
+        }, 0);
+      });
+    });
+
+    document.addEventListener('click', function (e) {
+      if (pinnedGroup && !pinnedGroup.contains(e.target)) pin(null);
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      // Escape closes but keeps focus where it is, which is why the panel needs
+      // a class to stay shut: the trigger is still focused underneath it.
+      var focused = navGroups.filter(function (g) {
+        return g.contains(document.activeElement);
+      })[0];
+      if (focused) {
+        focused.classList.add('is-dismissed');
+        triggerOf(focused).focus();
+        syncExpanded(focused);
+      }
+      if (pinnedGroup) pin(null);
+    });
+  }
+
   /* ------------------------------------------------------ mobile menu ux */
   // The menu is pure CSS (<details>). This adds click-away and Escape.
   var menu = document.getElementById('mobile-nav');

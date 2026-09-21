@@ -51,6 +51,66 @@
     font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20;
   }
 
+  /* Primary nav dropdowns.
+     Opening animates, closing is instant: a fade-out is what let the panel you
+     just left sit on top of the one you are moving to. The :has() rule is what
+     keeps exactly one open at a time — whatever the pointer is over wins, which
+     is also how a pinned (clicked) panel gets out of the way when you move on.
+     Hover and focus alone drive all of this, so it works with JS off; site.js
+     only adds click-to-pin and Escape on top. */
+  .nav-panel {
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    width: 21rem;
+    /* Bridges the gap under the trigger, so the pointer survives the journey
+       from the button to the panel without the hover dropping. */
+    padding-top: 1rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%) translateY(4px);
+    transition: none;
+  }
+  .nav-group:hover > .nav-panel,
+  .nav-group:focus-within > .nav-panel,
+  .nav-group.is-pinned > .nav-panel {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+
+  .nav-caret {
+    transition: transform 0.2s ease;
+  }
+  .nav-group:hover > button .nav-caret,
+  .nav-group:focus-within > button .nav-caret,
+  .nav-group.is-pinned > button .nav-caret {
+    transform: rotate(180deg);
+  }
+
+  /* Pointer over one group closes every other, pinned or focused included. */
+  .primary-nav:has(.nav-group:hover) .nav-group:not(:hover) > .nav-panel {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%) translateY(4px);
+    transition: none;
+  }
+  .primary-nav:has(.nav-group:hover) .nav-group:not(:hover) > button .nav-caret {
+    transform: none;
+  }
+
+  /* Escape, while the trigger keeps focus. Last rule in the cascade so it
+     beats :focus-within, which would otherwise hold the panel open. */
+  .nav-group.is-dismissed > .nav-panel {
+    opacity: 0;
+    visibility: hidden;
+    transition: none;
+  }
+  .nav-group.is-dismissed > button .nav-caret {
+    transform: none;
+  }
+
   /* Backgrounds */
   .bg-grid-faint {
     background-size: 30px 30px;
