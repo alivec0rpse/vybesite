@@ -49,6 +49,9 @@ const REQUIRED = [
   // or a security researcher goes looking and finds a 404.
   'llms.txt',
   '.well-known/security.txt',
+  // The BIMI mark. Only the DNS record points at it, so a missing file shows
+  // up as a mailbox provider quietly dropping the logo from inbox headers.
+  'logo.svg',
   // Apple Pay domain verification. Its absence is invisible until it fails.
   '.well-known/apple-developer-merchantid-domain-association',
 ];

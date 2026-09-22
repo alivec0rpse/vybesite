@@ -112,7 +112,7 @@
 
   "navigationFallback": {
     "rewrite": "/404.html",
-    "exclude": ["/assets/*", "/.well-known/*", "/*.xml", "/*.txt", "/*.ico", "/*.webmanifest", "/*.png", "/*.webp"]
+    "exclude": ["/assets/*", "/.well-known/*", "/*.xml", "/*.txt", "/*.ico", "/*.webmanifest", "/*.png", "/*.webp", "/*.svg"]
   },
 
   "responseOverrides": {
@@ -133,6 +133,7 @@
     ".webmanifest": "application/manifest+json",
     ".woff2": "font/woff2",
     ".webp": "image/webp",
+    ".svg": "image/svg+xml",
     ".xml": "application/xml",
     ".txt": "text/plain",
     ".ico": "image/x-icon"
