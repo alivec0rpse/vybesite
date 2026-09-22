@@ -373,6 +373,17 @@ const NAV_GROUPS = [
       { nav: 'reg-dsc', href: '/registrations/digital-signature-certificate/', label: 'Digital signatures', blurb: 'Class 3 DSC from ₹1,500. Token ₹599.', icon: 'key' },
     ],
   },
+  {
+    id: 'audits',
+    label: 'Audits',
+    blurb: 'Hygiene, safety and compliance audits, with a Vybe certificate at the end. Not statutory audits, and we say so up front.',
+    items: [
+      { nav: 'audits', href: '/audits/', label: 'All audits', blurb: 'Every audit we run, across kitchens, campuses and offices.', icon: 'fact_check' },
+      { nav: 'audit-kitchen', href: '/audits/kitchen-food-safety/', label: 'Kitchens &amp; food businesses', blurb: 'FSSAI Schedule 4 hygiene, layout, pest control records.', icon: 'soup_kitchen' },
+      { nav: 'audit-institutions', href: '/audits/schools-institutions/', label: 'Schools &amp; institutions', blurb: 'Fire, canteen, POCSO, transport, security, SDG &amp; sustainability.', icon: 'school' },
+      { nav: 'audit-workplace', href: '/audits/workplace-compliance/', label: 'Offices &amp; workplaces', blurb: 'POSH, software licensing, DPDP, labour law, office fire.', icon: 'corporate_fare' },
+    ],
+  },
 ];
 
 /** Which group, if any, owns the page currently being rendered. */
@@ -535,6 +546,7 @@ function footer() {
                     ${published('cloud') ? link('/cloud/', 'Cloud &amp; Infrastructure') : ''}
                     ${link('/printing/', 'Printing Services')}
                     ${link('/registrations/', 'Business Registrations')}
+                    ${link('/audits/', 'Compliance Audits')}
                 </ul>
             </div>
 
@@ -691,10 +703,11 @@ const PRODUCTS = [
   { nav: 'cloud', href: '/cloud/', name: 'Vybe Cloud', blurb: 'Scalable servers, hosting and DDoS protection.', icon: 'cloud' },
   { nav: 'printing', href: '/printing/', name: 'Printing', blurb: 'Everything from business cards to banners, standees and RFID cards.', icon: 'print' },
   { nav: 'registrations', href: '/registrations/', name: 'Business Registrations', blurb: 'GST, Udyam (MSME), FSSAI and Startup India recognition, from ₹199, plus ISO, NSDC consulting and digital signatures.', icon: 'receipt_long' },
+  { nav: 'audits', href: '/audits/', name: 'Compliance Audits', blurb: 'Hygiene, fire, child safety, SDG, POSH and data protection audits for kitchens, campuses and offices. Report, certificate and badge.', icon: 'fact_check' },
 ];
 
 /**
- * The two lines of business that are not software. The home page hero comes
+ * The three lines of business that are not software. The home page hero comes
  * from src/app.html and only knows about the products, so without this they
  * would exist on the site but nowhere on its front door.
  */
@@ -724,9 +737,9 @@ function beyondSoftwareSection() {
         <section id="beyond-software" class="bg-surface-main border-t border-slate-200 py-20 md:py-28 px-6 relative z-10" aria-labelledby="beyond-software-heading">
             <div class="max-w-6xl mx-auto">
                 <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-2">Beyond the software</p>
-                <h2 id="beyond-software-heading" class="text-3xl md:text-4xl font-black font-display tracking-tight text-slate-900">Printing and registrations, under the same roof.</h2>
-                <p class="mt-5 text-lg leading-relaxed text-slate-600 max-w-3xl">Two things our customers kept asking us to sort out for them, so we do. Both run on a message rather than a meeting.</p>
-                <div class="mt-12 grid gap-5 md:grid-cols-2">
+                <h2 id="beyond-software-heading" class="text-3xl md:text-4xl font-black font-display tracking-tight text-slate-900">Printing, registrations and audits, under the same roof.</h2>
+                <p class="mt-5 text-lg leading-relaxed text-slate-600 max-w-3xl">Three things our customers kept asking us to sort out for them, so we do. All three start with a message rather than a meeting.</p>
+                <div class="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                     ${card(
                       '/printing/',
                       'print',
@@ -750,6 +763,19 @@ function beyondSoftwareSection() {
                         'ISO certification, non-accredited: from ₹1,599',
                         'NSDC / Skill India and affiliation consulting: on quote',
                         'Class 3 digital signature certificates: from ₹1,500',
+                      ]
+                    )}
+                    ${card(
+                      '/audits/',
+                      'fact_check',
+                      'Compliance audits',
+                      'We read your kitchen, campus or office against the standard that applies to it, write down what would be found, and certify what passes. Vybe audits and Vybe certificates, not statutory ones, and every page says so.',
+                      [
+                        'Kitchens: FSSAI Schedule 4 hygiene, layout, pest records',
+                        'Campuses: fire, canteen, POCSO, buses, security, environment',
+                        'Offices: POSH, software licences, DPDP, labour law, fire',
+                        'Written report, graded findings, and a re-check',
+                        'Scoped and quoted before anything is booked',
                       ]
                     )}
                 </div>
@@ -1442,6 +1468,7 @@ const PAGES = [
         { nav: 'cloud', name: 'Vybe Cloud', url: `${SITE}/cloud/`, description: 'Scalable cloud architecture, game servers and DDoS protection.' },
         { nav: 'printing', name: 'Printing Services', url: `${SITE}/printing/`, description: 'Commercial printing — business and RFID cards, letterheads, bill books, brochures, flex banners, roll-up standees and signage, printed to your artwork.' },
         { nav: 'registrations', name: 'Business Registrations', url: `${SITE}/registrations/`, description: 'GST, Udyam (MSME) and FSSAI registrations and DPIIT / Startup India recognition, prepared and filed at a flat professional fee with government charges separate, plus non-accredited ISO certification issued by Vybe, consulting on NSDC / Skill India and affiliation applications, and Class 3 digital signature certificates as a registered partner of eMudhra and Capricorn.' },
+        { nav: 'audits', name: 'Compliance Audits', url: `${SITE}/audits/`, description: 'Advisory, non-statutory hygiene, safety and compliance audits — kitchen hygiene to the FSSAI Schedule 4 standard, kitchen layout and pest control records, fire and electrical safety to the National Building Code, canteen and mess hygiene, child safety to the POCSO standard, school transport safety, campus security, a NAAC/NIRF-ready SDG and sustainability audit, POSH Act Internal Committee compliance, software licensing and IT assets, DPDP Act data protection readiness and labour law records. Reports, certificates and badges are issued by Vybe Technologies alone and are not a licence, rating, accreditation or No Objection Certificate.' },
       ].filter((s) => published(s.nav)).map((s, i) => ({
         '@type': 'ListItem',
         position: i + 1,
@@ -3542,6 +3569,1006 @@ ${relatedSection('registrations', { dark: false })}
   });
 }
 
+/* ----------------------------------------------------------------- audits */
+
+/**
+ * Vybe audits. We read a site against a published standard and write down what
+ * would fail, then issue our own certificate and badge where it passes.
+ *
+ * Two naming rules run through this whole section and exist for legal reasons
+ * rather than stylistic ones:
+ *
+ *   1. Every audit is a *Vybe* audit. `name` carries the prefix, always. The
+ *      standard it is read against is a separate field, `standard`, rendered
+ *      as a description of the yardstick and never as a badge of approval.
+ *      "Vybe Hygiene & Food Safety Audit — FSSAI Schedule 4 standard" is a
+ *      true sentence; "FSSAI audit" is not one, and nothing here says it.
+ *
+ *   2. The certificate and badge are ours and nobody else's. We are not
+ *      accredited by, affiliated to, appointed by or recognised by FSSAI, the
+ *      fire services, any Pollution Control Board, NAAC, NIRF, the Labour
+ *      Department, the Data Protection Board or any other authority. That is
+ *      said on the hub, on every group page and on the certificate itself, in
+ *      the same words the non-accredited ISO certificate uses, because it is
+ *      the same disclosure problem.
+ *
+ * `notStatutory` on each audit carries the specific version of it: what
+ * "unofficial" means for a fire audit is not what it means for a POSH one.
+ *
+ * Grouped by who buys them rather than by which law they sit under. A school
+ * buying a fire audit is usually also buying the canteen and the bus one.
+ */
+const AUDIT_GROUPS = [
+  {
+    id: 'kitchen',
+    slug: 'kitchen-food-safety',
+    nav: 'audit-kitchen',
+    icon: 'soup_kitchen',
+    name: 'Kitchen & food business audits',
+    short: 'Kitchens & food businesses',
+    tagline: 'Restaurants, cloud kitchens, bakeries, caterers and canteens, read against Schedule 4.',
+    h1: 'Kitchen audits, before the inspection.',
+    lede:
+      'Restaurants, cloud kitchens, bakeries, caterers and contract canteens, walked through against Schedule 4 of the FSSAI regulations. You get a written report with photographs, findings graded by what actually matters, a fix list you can work down, and a Vybe certificate and badge where it passes. It is not an FSSAI inspection and the certificate is ours, not FSSAI’s.',
+    metaTitle: 'Kitchen Hygiene Audit — FSSAI Schedule 4 Standard | Vybe',
+    metaDescription:
+      'Hygiene and food safety audit to the FSSAI Schedule 4 standard, in Bengaluru. Report, graded fix list, Vybe certificate and badge. Not an FSSAI inspection.',
+    audits: [
+      {
+        id: 'fssai-hygiene',
+        icon: 'clean_hands',
+        name: 'Vybe Hygiene & Food Safety Audit',
+        standard: 'FSSAI Schedule 4 standard',
+        tagline:
+          'Your kitchen read against Schedule 4, line by line, before somebody official reads it for you.',
+        covers: [
+          'Raw material receipt, storage and the cold chain, including whether the fridge thermometer is read or just present',
+          'Food handling, segregation of raw and cooked, and temperature control through cooking, holding and service',
+          'Cleanliness: surfaces, equipment, chimney and duct, and whether a cleaning schedule exists and is signed',
+          'Pest control evidence, entry-point proofing and the condition of drains and traps',
+          'Staff hygiene: hand-wash points where they are needed, protective clothing, medical fitness records, food handler training',
+          'Potable water and its testing records, ice, and the water used for washing produce',
+          'Waste segregation, bin condition and how often waste actually leaves the premises',
+          'Records and traceability: supplier bills, batch and expiry, and the register nobody has filled in since March',
+        ],
+        basis:
+          'Schedule 4 of the Food Safety and Standards (Licensing and Registration of Food Businesses) Regulations, 2011 — the Part that applies to you depends on whether you are a petty operator, a restaurant or a manufacturer.',
+        notStatutory:
+          'This is a Vybe audit conducted to the Schedule 4 standard. It is not an FSSAI inspection, and it is not a third-party audit by an FSSAI-recognised auditing agency under the Food Safety and Standards (Food Safety Auditing) Regulations, 2018. <strong>We are not affiliated to or recognised by FSSAI</strong>, the certificate we issue is ours alone, and none of this changes your licence, your inspection history or your hygiene rating.',
+      },
+      {
+        id: 'kitchen-layout',
+        icon: 'architecture',
+        name: 'Vybe Kitchen Layout & Workflow Audit',
+        standard: 'FSSAI Schedule 4 layout & HACCP flow',
+        tagline:
+          'Where raw crosses cooked, where the bin sits, and why the same station keeps failing.',
+        covers: [
+          'Cross-contamination risk: where raw meat, cooked food, produce and allergens share a surface, a board, a sink or a hand',
+          'The line from receiving to storage to prep to cooking to plating to service, and where it doubles back on itself',
+          'Separation of vegetarian and non-vegetarian preparation where you run both, which is a commercial problem as much as a food safety one',
+          'Hand-wash point placement, because a basin at the wrong end of the kitchen is a basin nobody uses',
+          'Dishwash and pot-wash flow, and whether clean ware travels back through the dirty side',
+          'Waste route and bin siting: how far waste travels across the kitchen, and past what',
+          'Ventilation, extraction and make-up air, and the grease load in the duct',
+          'Floor drainage, gradient and standing water, which is where the pest problem usually starts',
+        ],
+        basis:
+          'Schedule 4 layout and hygiene requirements, read alongside ordinary HACCP flow logic. Where a finding needs a drawing changed, we say so and mark it as a project rather than a fix.',
+        notStatutory:
+          'A Vybe advisory review, not a statutory or structural certification, and not a substitute for a licensed architect or MEP consultant where the answer is a wall moved or a duct rerouted.',
+      },
+      {
+        id: 'pest-control',
+        icon: 'pest_control',
+        name: 'Vybe Pest Control Compliance Check',
+        standard: 'FSSAI Schedule 4 pest control records',
+        tagline:
+          'The contract, the records and the evidence of treatment, checked against what is actually on site.',
+        covers: [
+          'The contract itself, and what it commits your vendor to as against what you assumed it did',
+          'Treatment frequency against the schedule, and the gaps nobody noticed',
+          'Service records, technician sign-offs and whether the dates on paper match anything on site',
+          'Bait stations, fly-catchers and glue boards: mapped, numbered, serviced, or three of them missing',
+          'Chemicals used, their labels, and whether they are approved for use in a food area',
+          'Evidence of follow-up: a finding raised in one visit and closed in the next, or raised every visit for a year',
+          'Proofing of entry points — gaps under doors, unscreened windows, service penetrations, drain covers',
+          'The exact documents an auditor or an inspector asks to see, and whether you could produce them today',
+        ],
+        basis:
+          'Schedule 4 pest control requirements, and the record-keeping any food safety auditor will ask for.',
+        notStatutory:
+          'We audit the pest control programme. We are not a pest control operator, we do not carry out treatment, and we have no arrangement with any vendor whose records we review.',
+      },
+    ],
+    sections: [
+      {
+        h: 'Why a Vybe audit is worth anything',
+        p: 'Because the official one is not a conversation. An FSSAI inspection, a customer’s audit or an aggregator’s hygiene check arrives, looks, and writes down what it finds, and by then the finding exists. A Vybe audit is the same walk with none of the consequences attached: the same cupboards opened, the same records asked for, the same questions put to the same staff, and a written answer you can act on while acting on it is still cheap. The value is entirely in the gap between the two, and nothing about our certificate is meant to close that gap on paper instead of in the kitchen.',
+      },
+      {
+        h: 'What we actually do on site',
+        p: 'We walk the whole line, from where deliveries land to where waste leaves, in service hours rather than after a deep clean, because a kitchen that has been scrubbed for a visitor tells you nothing. Fridges get opened and temperatures read. Records get asked for — supplier bills, water test reports, medical fitness certificates, the pest control file, the cleaning schedule — and the answer "it is with the accountant" is itself a finding. We talk to the people actually handling food, not only to the manager, because the gap between the written procedure and the practised one is most of what an audit is for.',
+      },
+      {
+        h: 'What the report looks like',
+        p: 'A written report with photographs, delivered within a few working days. Every finding names the Schedule 4 requirement it is read against, so it is arguable rather than a matter of opinion, and is graded: things that would fail an inspection or make somebody ill, things that would draw a comment, and things worth doing when you next have the kitchen closed. The fix list is ordered the same way. We would rather hand you six findings you will act on than sixty you will file.',
+      },
+      {
+        h: 'Where our opinion stops',
+        p: 'We read a kitchen against a published standard and we tell you what we see. We do not test food, we do not test water — we look at whether you have had it tested and by whom — and we do not certify anything to anybody else’s standard but our own. Where a finding needs a licensed professional, an electrical contractor, a food technologist, a structural engineer, we say so and we say to bring one in. The report and the certificate are documents from us, for you and for whoever you choose to show them to, and they carry no standing with any regulator.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'Is this an FSSAI audit?',
+        a: 'No. It is a <strong>Vybe</strong> audit conducted to the FSSAI Schedule 4 standard, which is a different sentence and we are careful to say it that way. Under the Food Safety and Standards (Food Safety Auditing) Regulations, 2018 a third-party food safety audit is carried out by an auditing agency recognised by FSSAI, and the result feeds back to the authority. <strong>We are not a recognised auditing agency and we are not affiliated to FSSAI in any way.</strong> What we do is read your kitchen against the same Schedule 4 requirements and tell you what would be found. It does not go to FSSAI, it does not change your inspection history, and it does not affect your hygiene rating.',
+      },
+      {
+        q: 'Is the certificate an FSSAI certificate?',
+        a: 'No, and it does not look like one. It is a <strong>Vybe Hygiene &amp; Food Safety Certificate</strong>, issued by Vybe Technologies, carrying our name, our verification number and nobody else’s mark. It says your kitchen was audited by us to the Schedule 4 standard on a date and met our threshold. It is not an FSSAI licence, an FSSAI approval or an FSSAI hygiene rating, it must not be displayed or described as though it were, and your actual FSSAI licence is a separate thing we can also <a class="text-brand font-bold" href="/registrations/fssai/">file for you</a>.',
+      },
+      {
+        q: 'Will the audit shut the kitchen for a day?',
+        a: 'No. We walk a working kitchen during working hours, which is the whole point — a kitchen cleaned for a visitor is not the kitchen an inspector sees. A typical single-outlet audit is two to four hours on site, most of which is us staying out of the way. The records review usually takes longer than the walk.',
+      },
+      {
+        q: 'What does it cost?',
+        a: `It is quoted rather than published, because a twelve-seat café and a central production kitchen feeding four outlets are not the same job. The things that move the number are floor area, how many kitchens and stores there are, whether the pest control and records review is included, and whether you want the re-check afterwards. Tell us what you run on <a class="text-brand font-bold" href="${waLink(
+          'Hi Vybe, I would like a quote for a kitchen hygiene audit.'
+        )}" target="_blank" rel="noopener">WhatsApp</a> and you will have a figure before anything is booked.`,
+      },
+      {
+        q: 'Do you fix what you find?',
+        a: 'Some of it. Signage, records, schedules, the display material Schedule 4 asks for and the training register are things we can put right as part of the work. Anything that needs a contractor — a new exhaust, a floor regraded, a wall tiled — we describe precisely enough that you can get it quoted, and we do not take a cut from whoever quotes it. We also do not require you to use us for the fixes to get the re-check.',
+      },
+      {
+        q: 'Can you audit a cloud kitchen or a home-based food business?',
+        a: 'Yes, and the smaller ones are often where it matters most, because a cloud kitchen carries all the food safety risk of a restaurant with none of the staff to spread the work across. The standard is the same Schedule 4; what changes is how much of it applies. If you are also still unregistered, an <a class="text-brand font-bold" href="/registrations/fssai/">FSSAI registration or licence</a> is a separate piece of work and we will say which one you need.',
+      },
+    ],
+  },
+
+  {
+    id: 'institutions',
+    slug: 'schools-institutions',
+    nav: 'audit-institutions',
+    icon: 'school',
+    name: 'School, college & institute audits',
+    short: 'Schools & institutions',
+    tagline: 'Fire, canteen, child safety, transport, campus security and a NAAC/NIRF-ready SDG audit, on one campus visit.',
+    h1: 'Campus audits, read against the rules that apply.',
+    lede:
+      'Fire and electrical safety, the canteen or mess, child protection, the bus fleet, campus security, and an SDG and sustainability audit built the way NAAC and NIRF ask for it. Most campuses need several of these and most of them are found by the same walk, so they are usually done together. Every one is a Vybe audit: the certificate at the end is ours, not an NOC, an accreditation or a government approval.',
+    metaTitle: 'School Safety & SDG Audits: Fire, POCSO, Bus, NAAC | Vybe',
+    metaDescription:
+      'Audits for schools and colleges in Bengaluru: fire, canteen hygiene, child safety, bus safety, security and a NAAC/NIRF-ready SDG audit. Not a fire NOC.',
+    audits: [
+      {
+        id: 'fire-safety',
+        icon: 'local_fire_department',
+        name: 'Vybe Fire Safety Audit',
+        standard: 'NBC 2016 Part 4 standard',
+        tagline:
+          'Preparation and assessment: exits, extinguishers, alarms, drills and the wiring behind all of it.',
+        covers: [
+          'Exit routes, travel distances, staircase widths and whether the second exit is a door or a store room',
+          'Extinguisher type against the risk, placement, pressure, refill dates, and whether anyone on the floor can use one',
+          'Hose reels, wet risers, pumps, tanks and detection, and whether the system has been tested rather than installed',
+          'Alarm audibility in every block, including the ones added later, and manual call point placement',
+          'Emergency lighting, exit signage and the assembly point nobody has actually walked to',
+          'Evacuation drill records, dates, timings and who was counted — this is the single most common gap on a campus',
+          'Electrical: load against sanctioned, DB and panel condition, earthing, visible wiring, extension boards, lab supplies',
+          'Generator, transformer and panel rooms, and what is being stored in them',
+          'Kitchen, lab, library and store rooms, which carry a different fire load from a classroom',
+        ],
+        basis:
+          'The National Building Code of India 2016, Part 4 (Fire and Life Safety), which sets the requirements for educational occupancies and is the basis on which a fire NOC is granted. Buildings above the occupancy and height thresholds in Part 4 — commonly cited as 500 or more occupants for an educational building — are the ones where a fire clearance is insisted upon.',
+        notStatutory:
+          'A Vybe audit to the NBC standard: preparation for, not a substitute for, the statutory process. <strong>We are not the fire department and we are not affiliated to it.</strong> We do not conduct the inspection that leads to a No Objection Certificate and we cannot issue one — in Karnataka that is the Fire and Emergency Services Department. Our certificate is not an NOC and must never be shown as one. What the audit does is find what they would find, while there is still time to fix it.',
+      },
+      {
+        id: 'canteen-hygiene',
+        icon: 'restaurant',
+        name: 'Vybe Canteen & Mess Hygiene Audit',
+        standard: 'FSSAI Schedule 4 standard',
+        tagline:
+          'The same Schedule 4 walk as a commercial kitchen, plus the contractor sitting between you and it.',
+        covers: [
+          'Everything in the kitchen hygiene audit: storage, handling, temperatures, cleaning, pest control, staff hygiene, water, waste and records',
+          'The contractor’s own FSSAI licence, its validity, and whether it names your premises',
+          'Medical fitness and food handler training for staff the contractor employs but who work on your campus',
+          'The food actually served against the menu that was approved, and the portion and quality complaints behind it',
+          'Serving temperature, holding times and what happens to leftovers',
+          'Sampling and retention of a serving, which matters enormously the day somebody falls ill',
+          'Drinking water, coolers, RO units and their service records',
+          'Whether the contract gives you the right to inspect, and what it says happens when you find something',
+        ],
+        basis:
+          'Schedule 4 of the FSS (Licensing and Registration) Regulations, 2011, read alongside your contract with the canteen operator and any mid-day meal or hostel mess requirement that applies.',
+        notStatutory:
+          'A Vybe audit to the Schedule 4 standard. Not an FSSAI inspection of the contractor, not affiliated to FSSAI, and it does not affect their licence. It does give you something in writing to put in front of them.',
+      },
+      {
+        id: 'child-safety',
+        icon: 'child_care',
+        name: 'Vybe Child Safety Audit',
+        standard: 'POCSO Act 2012 standard',
+        tagline:
+          'Police verification, a policy people have read, visitor control, camera coverage and safe dispersal.',
+        covers: [
+          'Police verification of teaching staff, non-teaching staff, drivers, attendants, housekeeping and every contract worker on campus',
+          'A written child protection policy that exists, is current, and that staff can tell you the contents of',
+          'POCSO mandatory reporting: who reports, to whom, within what time, and whether the staff who would first hear something know that failing to report is itself an offence',
+          'Visitor entry, identity checks, badging and escort, including for parents and for vendors',
+          'CCTV coverage of corridors, gates, stairwells and the blind spots nobody mapped; retention period; and who is able to view footage',
+          'Safe dispersal: gate handover, who is allowed to collect a child, and what happens when somebody else arrives',
+          'Complaint routes a child could actually use, and whether anything has ever come through them',
+          'Awareness sessions for children and for staff, and the records of them',
+        ],
+        basis:
+          'The Protection of Children from Sexual Offences Act, 2012, particularly the mandatory reporting obligation in section 19, the Juvenile Justice (Care and Protection of Children) Act, 2015, and the school safety guidelines issued by CBSE and by state authorities.',
+        notStatutory:
+          'A Vybe review of your arrangements against the POCSO standard. It is not a legal opinion, not an investigation of any incident or allegation, and it does not discharge any obligation the law places on you. <strong>No certificate from us makes a campus safe or compliant</strong> — it records what we found on a date. Where something we find looks like it needs a lawyer or a report to the authorities, we will say so in plain words on the day and we will not sit on it.',
+      },
+      {
+        id: 'transport-safety',
+        icon: 'directions_bus',
+        name: 'Vybe Transport Safety Audit',
+        standard: 'CMVR & school bus rules standard',
+        tagline:
+          'Papers, speed governors, GPS, attendants and drivers, checked against the fleet as it stands today.',
+        covers: [
+          'Fitness certificate, permit, insurance and PUC for every vehicle, with the expiry dates in one place',
+          'Speed governor fitment, seal and whether it works, rather than whether it is fitted',
+          'GPS tracking, the panic button, and who is watching the screen it reports to',
+          'CCTV inside the vehicle, its recording and its retention',
+          'Driver licence, badge, endorsement, years of experience, police verification and medical and eyesight checks',
+          'A female attendant on routes carrying young children, and whether she is verified too',
+          'First aid kit, fire extinguisher, emergency exit, and whether the exit opens',
+          'Seating capacity against the number of children actually carried, which is where most fleets fail',
+          'Route plans, stop locations, timings, and pick-up and drop registers that are signed rather than printed',
+          'Driver conduct, phone use and the complaint route a parent would use',
+        ],
+        basis:
+          'The Central Motor Vehicles Rules and the state school bus and school cab rules made under them, together with the school transport safety directions issued by the transport department and the courts.',
+        notStatutory:
+          'We check papers and condition against the requirements and report what is missing. This is not an RTO fitness inspection, we are not affiliated to the transport department, we do not issue or renew any vehicle certificate, and our certificate is not a fitness certificate.',
+      },
+      {
+        id: 'campus-security',
+        icon: 'shield',
+        name: 'Vybe Campus Security Audit',
+        standard: 'Campus safety guidance standard',
+        tagline:
+          'Camera coverage that is really coverage, access control, boundaries and what happens in an incident.',
+        covers: [
+          'A camera-by-camera coverage map, the blind spots it reveals, and whether the recorder is actually recording',
+          'Retention period, storage health, and who holds the password',
+          'Gate and access control, staff and student identification, and after-hours access',
+          'Visitor management, vendor access and deliveries',
+          'Boundary wall, fencing, gates and the informal entrance everybody uses',
+          'Controlled areas: labs, terrace, water tanks, electrical rooms, sports equipment stores and the chemistry store in particular',
+          'Security staffing, shift cover, night cover and what the guard is actually instructed to do',
+          'Incident and lockdown procedure, the emergency contact tree, and whether anyone has tested it',
+          'First aid provision, the infirmary and the nearest hospital, with the route and the time',
+        ],
+        basis:
+          'Campus safety guidance from CBSE and state education departments, read alongside ordinary physical security practice. Where the finding touches fire or transport, it is cross-referenced to those audits rather than repeated.',
+        notStatutory:
+          'A Vybe advisory audit. Not a police or regulatory inspection, and not a penetration test of your IT systems — if that is what you want, it sits under <a class="text-brand font-bold" href="/it-solutions/">IT and cyber</a> rather than here.',
+      },
+      {
+        id: 'sdg-sustainability',
+        icon: 'eco',
+        name: 'Vybe SDG & Sustainability Audit',
+        standard: 'NAAC / NIRF-ready, mapped to the UN SDGs',
+        tagline:
+          'The green audit, evidenced the way NAAC and NIRF ask for it: energy, waste, water and curriculum, each tied to the Goal it answers to.',
+        covers: [
+          'Energy consumption and efficiency: block-by-block load, connected against sanctioned, lighting and HVAC retrofits, solar generation against what it was sized for, and the meters nobody reads — SDG 7 and SDG 13',
+          'Waste management and recycling: segregation at source, the wet, dry, e-waste and sanitary streams, who collects each and under what authorisation, composting, and what actually happens after the gate — SDG 11 and SDG 12',
+          'Water conservation: consumption per head, rainwater harvesting structures and whether they are connected to anything, the STP and its log, treated water reuse, leaks and borewell dependence — SDG 6',
+          'Campus sustainability practice: single-use plastic across the canteen, events and the stationery store, green cover and tree census, biodiversity register, procurement, and emissions from the fleet',
+          'Curriculum and pedagogy: where sustainability actually appears in teaching, projects, eco-club activity and student research, which is the part NAAC asks about and the part a generic green audit skips — SDG 4',
+          'Governance: the environment policy, the committee behind it, the budget line, and whether last year’s actions were ever closed',
+          'The SDG map itself: every finding tied to the specific Goal and target it answers to, so it can be quoted rather than paraphrased',
+          'The evidence file assembled in one place, rather than reconstructed the week before a submission is due',
+        ],
+        basis:
+          'The UN Sustainable Development Goals, structured against the environment, energy and sustainability expectations in NAAC’s Criterion 7 and the criteria NIRF scores, and read alongside the Solid Waste Management Rules 2016, E-Waste (Management) Rules 2022 and Plastic Waste Management Rules 2016 so far as they apply to a campus.',
+        notStatutory:
+          '"NAAC/NIRF-ready" means the audit is structured and evidenced the way those frameworks ask for. It does not mean either body has approved, endorsed or scored anything. <strong>We are not NAAC, not NIRF, not a Pollution Control Board and not an accredited environmental auditor, and we are not affiliated to any of them.</strong> This is also not the statutory Environmental Statement (Form V) filed under the Environment (Protection) Rules, 1986, not a Consent to Operate, and not an eco-label. The certificate is a Vybe certificate and contributes no marks to any accreditation of itself.',
+      },
+    ],
+    sections: [
+      {
+        h: 'Most campuses buy these together, and should',
+        p: 'The audits above are separated because they answer to different rules, not because they are different visits. The walk that finds a fire exit chained shut is the walk that finds the chemistry store unlocked, the camera pointing at a wall and the mess storing rice on the floor. Doing them in one go costs less than doing them in four, and it produces one report with one fix list rather than four that contradict each other on priority. Where a campus wants only one, it is usually fire, and that is a reasonable place to start.',
+      },
+      {
+        h: 'Fire is where the gap is widest',
+        p: 'Almost every campus we have walked has extinguishers. Rather fewer have extinguishers of the right type in the right places with current refill dates, and fewer still have anybody on the floor who has held one. The pattern repeats: the hardware exists because somebody bought it, and the practice does not because nobody owns it. Drill records are the clearest tell. A campus that drills twice a year, times it, and writes down what went wrong is a campus that will be fine in an inspection and, far more to the point, in a fire. A campus with a drill photograph from 2022 is neither.',
+      },
+      {
+        h: 'The child safety audit is the uncomfortable one',
+        p: 'It has to be. Police verification is where it usually starts and it is usually incomplete — teaching staff are verified, the housekeeping contractor’s people are not, and the van driver is somebody’s cousin. Then there is the policy, which exists as a PDF nobody has read, and mandatory reporting under section 19 of POCSO, which a surprising number of staff do not know binds them personally. We ask these questions of the people who would actually receive a disclosure from a child, because asking the principal tells you what the school intends rather than what it does. Where we find something serious, you will hear it from us immediately and in plain words, not in a report three days later.',
+      },
+      {
+        h: 'Why the SDG audit is not a generic green audit',
+        p: 'Because a generic green audit produces a folder about waste bins, and an accreditation team asks a different question. NAAC wants sustainability evidenced across governance, practice and, critically, curriculum — what students are actually taught and what they actually do — with a policy, a committee, a budget line and closed actions behind it. NIRF wants numbers you can defend. So the audit is built to produce that: energy, waste and water measured rather than described, every finding mapped to the specific Sustainable Development Goal and target it answers to, and the evidence assembled in one file instead of reconstructed the week before a submission. Institutions that already have a green audit report usually find the gap is not the environment work, it is that none of it is written down in a form anybody can score.',
+      },
+      {
+        h: 'What you get, and what it is worth',
+        p: 'A written report per audit with photographs, delivered within a few working days of the visit. Every finding cites the rule, the code clause, the guideline or the Goal it is read against, so it can be argued with on its merits rather than taken on our say-so. Findings are graded, the fix list is ordered, and where the audit closes at or above our threshold you get a Vybe certificate and a digital badge. What that certificate is not is an NOC, an accreditation, an affiliation document or anything carrying an authority’s mark. If somebody is asking your institution for an official clearance, this is preparation for getting one, and we will tell you which department issues it.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'Does the fire safety audit get us a fire NOC?',
+        a: 'No, and be careful of anybody who says theirs does. A No Objection Certificate is issued by the state fire services department after its own inspection — in Karnataka, the Karnataka State Fire and Emergency Services. <strong>We are not the fire department, we are not affiliated to it, and we cannot issue or arrange a clearance.</strong> The Vybe Fire Safety Certificate records that we audited you to the NBC standard and what we found; it is not an NOC and must not be presented as one. What the audit does is find the things that would hold a clearance up, while there is still time and budget to fix them.',
+      },
+      {
+        q: 'Is the SDG audit recognised by NAAC or NIRF?',
+        a: 'No. <strong>We have no affiliation with NAAC, NIRF, the UGC or any accrediting body, and nothing we issue carries marks or standing with them.</strong> "NAAC/NIRF-ready" describes how the audit is built — measured, evidenced and mapped to specific Sustainable Development Goals, in the structure those frameworks ask questions in — so that your team is not assembling it from scratch at submission time. The assessment, the score and the accreditation remain entirely theirs to give.',
+      },
+      {
+        q: 'Which buildings actually need a fire clearance?',
+        a: 'Part 4 of the National Building Code 2016 sets the thresholds by occupancy type, height and occupant load, and educational buildings are treated as a high-priority occupancy because the occupants are children. The commonly cited figure for an educational building is an occupant load of 500 or more, but height, number of floors and basement use pull buildings in below that, and state rules add their own requirements on top. Tell us the building and we will tell you which way it falls before you commission anything.',
+      },
+      {
+        q: 'How long does a campus audit take?',
+        a: 'A single audit on a single-building school is usually most of a day. A full campus taking fire, canteen, child safety, transport, security and the SDG audit together is typically two to three days on site, depending on the number of blocks and the size of the fleet, plus the records review. The transport audit needs the buses on campus, so it is normally done early morning or after the afternoon run, and the SDG audit needs meter readings and bills, so it helps if somebody pulls the last twelve months out before we arrive.',
+      },
+      {
+        q: 'Do you need to speak to our staff and see our records?',
+        a: 'Yes, and an audit that does not is not worth buying. We ask for staff police verification records, drill logs, the AMC and service records for fire equipment, vehicle papers, the canteen contract and the contractor’s FSSAI licence, the child protection policy, and for the SDG audit twelve months of electricity and water bills and your waste vendor’s authorisation. We speak to the people who would actually be involved — the gate, the drivers, the mess staff, class teachers — rather than only to the management, because the difference between the two answers is most of what the audit finds.',
+      },
+      {
+        q: 'Will you tell us what you find, or just write it down?',
+        a: 'Both, and in that order. Anything urgent is said on the day, on site, to whoever can act on it. Anything that looks like it needs a lawyer, a licensed contractor or a report to an authority is flagged as such rather than left to be inferred from a paragraph in a report. The written report follows within a few working days.',
+      },
+      {
+        q: 'What does a campus audit cost?',
+        a: `It is scoped before it is quoted. Number of blocks, number of students, how many kitchens and buses, and how many of the six audits you want all change the number, so a published figure would be a fiction. Tell us the campus on <a class="text-brand font-bold" href="${waLink(
+          'Hi Vybe, I would like a quote for a campus safety audit.'
+        )}" target="_blank" rel="noopener">WhatsApp</a> or by email and you will have a scope and a figure before anything is booked.`,
+      },
+    ],
+  },
+
+  {
+    id: 'workplace',
+    slug: 'workplace-compliance',
+    nav: 'audit-workplace',
+    icon: 'corporate_fare',
+    name: 'Office & workplace compliance audits',
+    short: 'Offices & workplaces',
+    tagline: 'POSH, software licensing, DPDP, labour law and the office fire basics.',
+    h1: 'Workplace compliance, checked before it is checked.',
+    lede:
+      'The five things an office is quietly out of compliance with and does not find out about until a complaint, a vendor audit, a notice or an inspection. POSH is the one with a penalty attached and a hard trigger — ten employees — so it is where most of these start.',
+    metaTitle: 'POSH, DPDP, Labour Law & Software Licence Audits | Vybe',
+    metaDescription:
+      'Workplace audits in Bengaluru: POSH Act and Internal Committee, DPDP data protection, software licensing, labour law and office fire safety.',
+    audits: [
+      {
+        id: 'posh',
+        icon: 'balance',
+        name: 'Vybe POSH Compliance Audit',
+        standard: 'POSH Act 2013 standard',
+        tagline:
+          'Internal Committee, policy, training and the annual report — mandatory at ten employees, with a penalty behind it.',
+        covers: [
+          'Whether an Internal Committee exists at all, and whether one exists at every office with ten or more employees rather than only at head office',
+          'Its composition: a Presiding Officer who is a woman employed at a senior level, at least half the members women, and an external member from an NGO or with experience of issues relating to sexual harassment',
+          'Whether the external member is genuinely external and is being paid the fees the Rules provide for',
+          'The written policy: whether it exists, whether it says what the Act requires, and whether it has reached anybody',
+          'Display at a conspicuous place of the penal consequences and the Internal Committee’s constitution, which the Act requires and almost nobody does',
+          'The annual report to the District Officer, whether it has been filed, and for which years',
+          'Awareness programmes for employees and orientation for IC members, and the records of both',
+          'The complaint register, the procedure and the statutory timelines, and whether a complaint could be handled without improvising',
+          'Coverage of interns, trainees, contract staff, probationers and people working from home, all of whom count',
+        ],
+        basis:
+          'The Sexual Harassment of Women at Workplace (Prevention, Prohibition and Redressal) Act, 2013 and the Rules made under it. The obligation to constitute an Internal Committee bites at ten or more employees.',
+        penalty:
+          'Failure to constitute an Internal Committee or to comply with the Act carries a fine of up to ₹50,000 for a first contravention. On a repeat, the penalty is doubled and the licence or registration under which the business operates can be cancelled or not renewed.',
+        notStatutory:
+          'We review your arrangements and report on them. We do not sit on your Internal Committee, we do not conduct inquiries into complaints, and neither the audit nor the certificate files your annual report or discharges any obligation under the Act. <strong>A Vybe certificate is not a finding of compliance by any authority</strong> and would not answer a District Officer. Where you need an external IC member or a lawyer, we will say so.',
+      },
+      {
+        id: 'software-licence',
+        icon: 'verified_user',
+        name: 'Vybe Software Licence & IT Asset Audit',
+        standard: 'Licence terms & Copyright Act 1957',
+        tagline:
+          'What is installed against what is paid for, counted by you before it is counted by somebody else.',
+        covers: [
+          'An inventory of what is actually installed across machines, against what has actually been bought',
+          'Invoices, licence keys and proof of purchase matched to specific devices rather than kept in a folder called Software',
+          'Per-user versus per-device licensing, and whether the count is genuinely met under the metric that applies',
+          'OEM, retail and volume licensing, and the OEM licence that left with the laptop it was tied to',
+          'Operating system licensing, server licences and client access licences, which is where the money usually is',
+          'Unlicensed, cracked or key-generated installs, including the one on the machine in the corner',
+          'Open-source components used commercially, and whether their licence terms are being met',
+          'Fonts, stock photography and design files, which are licensed assets and are almost never tracked',
+          'Subscriptions being paid for and not used, which is the part of this audit that pays for it',
+          'What happens to a licence when a laptop is reassigned, and when an employee leaves',
+        ],
+        basis:
+          'Your own licence agreements and the terms of the products you run. The exposure is contractual and under the Copyright Act, 1957, and it typically arrives as a letter from a vendor or from an industry body such as the BSA rather than as a government inspection.',
+        notStatutory:
+          'We are not the BSA, not a Microsoft SAM engagement, and not an OEM auditor, and we are not affiliated to any software vendor. Nothing we find is reported to anybody. Our certificate records our own count on a date; it is not a vendor’s clearance and would not settle a vendor’s claim. This is your count, done privately, so that somebody else’s does not surprise you.',
+      },
+      {
+        id: 'dpdp',
+        icon: 'encrypted',
+        name: 'Vybe Data Protection Audit',
+        standard: 'DPDP Act 2023 standard',
+        tagline:
+          'What personal data you hold, why, on whose consent, for how long, and who else has it.',
+        covers: [
+          'A map of the personal data you actually collect, where it lives, and why you have it',
+          'Notice and consent at the point of collection, in the form the Act requires, rather than a line in a footer',
+          'Where you are relying on a legitimate use rather than consent, and whether that reliance holds',
+          'Retention and deletion: how long you keep things, and whether anything is ever actually deleted',
+          'Processors and vendors — payroll, CRM, cloud, analytics, that WhatsApp group — and what your contracts with them say',
+          'A data principal’s rights: access, correction, erasure, nomination and grievance, and whether anybody at your end would answer',
+          'Breach readiness: who is told, by whom, in what time, and whether the Board would be notified',
+          'Children’s data and verifiable parental consent, which is a hard requirement and a live problem for anyone running a school or an ed-tech product',
+          'Cross-border transfer, and where your data has quietly been all along',
+          'Employee data, CCTV footage and recruitment records, which are the categories most often forgotten',
+        ],
+        basis: 'The Digital Personal Data Protection Act, 2023 and the Rules made under it.',
+        notStatutory:
+          'A Vybe gap assessment to the DPDP standard. It is not the independent Data Auditor engagement that a Significant Data Fiduciary must arrange under the Act, <strong>we are not appointed or recognised by the Data Protection Board</strong>, and it is not a legal opinion. Neither the audit nor the certificate makes you compliant — they tell you where you are not.',
+      },
+      {
+        id: 'labour-law',
+        icon: 'badge',
+        name: 'Vybe Labour Law & HR Compliance Audit',
+        standard: 'EPF, ESI & Shops Act standard',
+        tagline:
+          'PF, ESI, Shops and Establishments, contracts and the statutory registers nobody maintains.',
+        covers: [
+          'EPF and ESI: registration, coverage, whether everybody who should be on it is, and whether contributions match the wages actually paid',
+          'Shops and Commercial Establishments registration, its renewal, and the establishment details on it still being true',
+          'Professional Tax registration for the establishment and deduction for employees',
+          'Appointment letters, and whether their terms match what is actually paid and worked',
+          'Statutory registers: muster roll, wage register, leave, overtime, fines and deductions, and the advances register',
+          'Minimum wages against the rates notified for your scheduled employment and zone',
+          'Working hours, weekly off, overtime rates and the leave the Act entitles people to',
+          'Gratuity and bonus eligibility and provisioning',
+          'Contract labour, and the liability that sits with you as principal employer whatever the contract says',
+          'Maternity benefit, and the crèche requirement above the employee threshold',
+          'The abstracts and notices that have to be displayed, and the ones that have to be filed annually',
+        ],
+        basis:
+          'The EPF & MP Act 1952, the ESI Act 1948, the Karnataka Shops and Commercial Establishments Act 1961, the Payment of Wages, Minimum Wages, Payment of Bonus, Payment of Gratuity, Maternity Benefit and Contract Labour Acts, and the registers and returns prescribed under them.',
+        notStatutory:
+          'A Vybe advisory review. Not a Labour Department inspection, not a statutory audit, and not legal advice; we are not affiliated to any labour authority and our certificate would not answer an inspector. Where a finding needs a lawyer or a labour law consultant to resolve rather than a form to be filed, we say which.',
+      },
+      {
+        id: 'office-fire',
+        icon: 'fire_extinguisher',
+        name: 'Vybe Office Fire & Workplace Safety Audit',
+        standard: 'NBC 2016 Part 4 standard',
+        tagline: 'The same fire and electrical basics as a campus, scaled to a floor plate.',
+        covers: [
+          'Exit routes and whether they are clear, which is where an office fails almost every time — cartons in the corridor, a fire door wedged, a second exit that opens into a locked lobby',
+          'Extinguisher type against the risk, placement, pressure and refill dates, and whether anybody on the floor has used one',
+          'Detection and alarm, its audibility in meeting rooms and washrooms, and manual call points',
+          'Emergency lighting, exit signage and the route to the assembly point',
+          'Evacuation drill records, and the fact that most offices have none',
+          'Electrical load against sanctioned load, the DB, and the extension board tree under somebody’s desk',
+          'Server room, UPS and battery room: ventilation, suppression, and what is being stored in there',
+          'Pantry equipment, which is the most likely ignition source in a normal office',
+          'First aid box contents and expiry, and who is trained to use it',
+          'Where you are a tenant: what the building’s fire systems cover, what they do not, and which of the findings are the landlord’s',
+        ],
+        basis:
+          'The National Building Code of India 2016, Part 4, so far as it applies to a business occupancy, together with the fire requirements in the Shops and Commercial Establishments rules and your building’s own occupancy certificate and fire clearance.',
+        notStatutory:
+          'Preparation and assessment only. We are not the fire department and are not affiliated to it, and neither the audit nor the certificate produces or renews a fire NOC for you or for your building.',
+      },
+    ],
+    sections: [
+      {
+        h: 'POSH is the one with a deadline already passed',
+        p: 'Every other audit here is prudent. POSH is overdue. The obligation to constitute an Internal Committee applies to every employer with ten or more employees, it applied from 2013, and it applies at each office separately rather than once for the company. The penalty for not having one is up to ₹50,000, and for a repeat it doubles and brings the possibility of the licence or registration the business trades under being cancelled. The part that catches people is not the committee, though — it is the rest of it: the external member who has to come from outside, the display of the committee’s constitution at a conspicuous place, the annual report to the District Officer, and the awareness sessions. We have yet to walk into an office that had all five and could show the records.',
+      },
+      {
+        h: 'The software audit usually pays for itself',
+        p: 'Not because of the exposure, although a letter from a vendor or from an industry body is an unpleasant way to spend a quarter, but because of what the inventory turns up in the other direction. Almost every office of any size is paying for seats nobody uses, for a subscription renewed by standing instruction for a product replaced two years ago, and for licences tied to laptops that left the building. The count runs in both directions and the second direction is usually the larger number. What we will not do is tell you the exposure is bigger than it is in order to sell you something: where the answer is that you are fine, the report says you are fine.',
+      },
+      {
+        h: 'DPDP is a gap assessment, not a certificate of compliance',
+        p: 'Nobody can make you DPDP compliant in a week, and anybody offering to should be shown the door. What is achievable is knowing exactly where you stand: what personal data you hold, whose it is, what you told them when you took it, who you have since given it to, how long you keep it, and what would happen if somebody asked for it back or if it leaked. Most organisations cannot answer more than two of those. The audit produces the answers and a prioritised list, and the first items on that list are usually unglamorous — a retention rule, a vendor contract clause, a grievance address that reaches a person. The certificate at the end says we audited you against the Act on a date. It does not say you are compliant, because that is not ours to say.',
+      },
+      {
+        h: 'What you get, and what our opinion is worth',
+        p: 'A written report per audit with a graded finding list, the provision each finding is read against, and a fix list ordered by exposure rather than by ease. Where the fix is a form, a register, a notice or a policy, we can do it as part of the work. Where it needs a lawyer, a chartered accountant, a licensed electrical contractor or an external IC member, we say so and we say it early. None of this is legal advice, none of it is a statutory audit, and the certificate is ours rather than any authority’s. It is a competent outside reading of your position, in writing, before somebody with the power to fine you forms their own.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'We have fewer than ten employees. Does POSH apply to us?',
+        a: 'The obligation to constitute an Internal Committee starts at ten. Below that you still owe your employees a workplace free of sexual harassment, complaints go to the Local Committee constituted by the District Officer rather than to an internal one, and it is worth having a policy and knowing where to send somebody. If you are near the threshold, the sensible time to set the committee up is before you cross it, not after somebody counts.',
+      },
+      {
+        q: 'Does this audit make us POSH compliant?',
+        a: 'No. It tells you precisely where you are not, and it can produce the missing pieces — a policy that says what the Act requires, the display notice, the committee constitution, the annual report format, the awareness session. <strong>What it cannot do is serve on your Internal Committee, conduct an inquiry, or file anything on your behalf as though we were you.</strong> The external member of your IC has to come from outside the organisation and must not be us reviewing our own arrangement. The certificate records that we audited you against the Act; it is not a finding of compliance by any authority.',
+      },
+      {
+        q: 'Is the software licence audit reported to anyone?',
+        a: 'No. Nothing leaves your organisation. We are not the BSA, not a vendor’s SAM programme and not an OEM auditor, we are not affiliated to any software vendor, and we have no obligation or incentive to tell anybody what we found. That is the entire point of counting it yourself first.',
+      },
+      {
+        q: 'Is the DPDP audit legal advice?',
+        a: 'No. It is a technical and procedural gap assessment against the Act and Rules, written by people who read them carefully, and it will tell you where your practice and the text do not line up. Where the answer turns on a question of law — whether a legitimate use applies to you, how a contract should be drafted, whether you are a Significant Data Fiduciary — we will tell you that it is a lawyer’s question rather than answer it ourselves.',
+      },
+      {
+        q: 'Can you do these remotely?',
+        a: 'Partly. The POSH, software licence, DPDP and labour law audits are mostly documents, systems and conversations, and a good deal of that can be done remotely with a shorter visit at the end. The fire and workplace safety audit cannot be done remotely at all and we will not pretend otherwise. Outside Bengaluru, the document-led audits travel fine; for the site-based ones, ask and we will tell you honestly whether the travel is worth it to you.',
+      },
+      {
+        q: 'What does a workplace audit cost?',
+        a: `Scoped first, then quoted. Headcount, number of offices, how many of the five audits you want and how much of it can be done remotely are what move the number. A single POSH review for one office is a small piece of work; a five-audit engagement across three locations is not. Tell us the shape of it at <a class="text-brand font-bold" href="mailto:${ORG.legal}">${ORG.legal}</a> and a scope and figure come back before anything starts.`,
+      },
+    ],
+  },
+];
+
+const AUDIT_ENQUIRY = 'Hi Vybe, I would like to talk about an audit.';
+const auditHref = (g) => `/audits/${g.slug}/`;
+const AUDIT_COUNT = AUDIT_GROUPS.reduce((n, g) => n + g.audits.length, 0);
+
+/** Every audit name ends in Audit or Check; the certificate takes its place. */
+const certificateName = (a) => a.name.replace(/(Audit|Check)$/, 'Certificate');
+
+/**
+ * The disclosure that sits above the fold on every audit page. It is the same
+ * text everywhere on purpose: a reader who has seen it once should recognise
+ * it, and one who has not should not be able to miss it. Naming a standard is
+ * a description of the yardstick; the second paragraph exists so that nobody
+ * can read it as anything else.
+ */
+function auditNotice({ dark = false } = {}) {
+  return noticePanel(
+    'Vybe audits, Vybe certificates. Read this first.',
+    `<p>We read your premises, your records and your arrangements against the standard that applies to them, write down what we find, and where the audit passes we issue a certificate and a badge. <strong>Every audit here is a Vybe audit and every certificate is issued by Vybe Technologies.</strong></p>
+                        <p>Where an audit names a standard — FSSAI Schedule 4, the National Building Code, POCSO, the POSH Act, the DPDP Act, the UN SDGs — that names the yardstick we read you against. It is not a claim of approval, affiliation or recognition by whoever wrote it. <strong>We are not accredited by, affiliated to, appointed by or recognised by FSSAI, the Fire and Emergency Services, any Pollution Control Board, NAAC, NIRF, the Labour Department, the Data Protection Board or any other authority or certification body.</strong></p>
+                        <p>So our certificate is not a licence, an NOC, a hygiene rating, an accreditation or a finding of legal compliance, it carries no authority’s mark, and it must not be displayed or described as though it did. It is verifiable on our own portal and nowhere else. If somebody is asking your organisation for an official certificate, ours is not it, and we will tell you which body issues the one they want rather than sell you ours instead.</p>`,
+    { dark }
+  );
+}
+
+/** One audit, as a card. `notStatutory` is part of the card, not a footnote. */
+function auditCard(a) {
+  return `<li id="${a.id}" class="flex flex-col h-full rounded-2xl border border-slate-200 bg-white p-8 scroll-mt-28 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-brand/40">
+                        <span class="material-symbols-outlined text-brand text-[28px]" aria-hidden="true">${a.icon}</span>
+                        <p class="mt-4 text-xs font-bold uppercase tracking-[0.15em] text-brand">${esc(a.standard)}</p>
+                        <h3 class="mt-1 text-xl font-bold font-display tracking-tight text-slate-900">${esc(a.name)}</h3>
+                        <p class="mt-2 text-sm text-slate-600 leading-relaxed">${esc(a.tagline)}</p>
+
+                        <div class="mt-6 pt-6 border-t border-slate-100">
+                            <h4 class="text-xs font-bold uppercase tracking-[0.15em] text-slate-400">What it covers</h4>
+                            <ul class="mt-3 grid gap-2 text-sm text-slate-600">
+                                ${a.covers
+                                  .map(
+                                    (c) => `<li class="flex items-start gap-2">
+                                    <span class="material-symbols-outlined text-brand text-[18px] shrink-0 mt-0.5" aria-hidden="true">check_circle</span>
+                                    <span>${esc(c)}</span>
+                                </li>`
+                                  )
+                                  .join('\n                                ')}
+                            </ul>
+                        </div>
+
+                        <div class="mt-6">
+                            <h4 class="text-xs font-bold uppercase tracking-[0.15em] text-slate-400">Read against</h4>
+                            <p class="mt-2 text-sm text-slate-600 leading-relaxed">${esc(a.basis)}</p>
+                        </div>
+
+                        <div class="mt-6">
+                            <h4 class="text-xs font-bold uppercase tracking-[0.15em] text-slate-400">If it passes</h4>
+                            <p class="mt-2 text-sm text-slate-600 leading-relaxed">${esc(certificateName(a))} and badge, issued by Vybe Technologies, valid one year.</p>
+                        </div>
+                        ${
+                          a.penalty
+                            ? `<p class="mt-5 rounded-xl border border-brand/30 bg-brand/5 p-4 text-sm text-slate-700 leading-relaxed">${esc(a.penalty)}</p>`
+                            : ''
+                        }
+
+                        <p class="mt-auto pt-6 text-sm text-slate-500 leading-relaxed"><span class="font-bold uppercase tracking-[0.15em] text-xs text-slate-400 block mb-1">What it is not</span>${
+                          a.notStatutory
+                        }</p>
+                    </li>`;
+}
+
+/**
+ * The certificate and badge, set out at length. Same treatment as the
+ * non-accredited ISO certificate on the registrations side, and for the same
+ * reason: the value of saying it plainly is that nobody can say later that
+ * they were not told.
+ */
+function certificateSection() {
+  const point = (icon, h, p) =>
+    `<div class="rounded-2xl border border-slate-200 bg-white p-8">
+                        <span class="material-symbols-outlined text-brand text-[28px]" aria-hidden="true">${icon}</span>
+                        <h3 class="mt-4 text-lg font-bold font-display tracking-tight text-slate-900">${esc(h)}</h3>
+                        <p class="mt-3 text-sm text-slate-600 leading-relaxed">${p}</p>
+                    </div>`;
+
+  return `
+        <section class="bg-surface-main border-t border-slate-200 py-20 md:py-28 px-6 relative z-10" aria-labelledby="audit-certificate-heading">
+            <div class="max-w-6xl mx-auto">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-2">Report, certificate, badge</p>
+                <h2 id="audit-certificate-heading" class="text-3xl md:text-4xl font-black font-display tracking-tight text-slate-900">What you walk away with.</h2>
+                <p class="mt-5 text-lg leading-relaxed text-slate-600 max-w-3xl">Every audit produces a report. Where it closes at or above our threshold it also produces a certificate and a badge — both issued by us, and both described below in the plainest words we can find, so that nobody displays one thinking it is something it is not.</p>
+
+                <div class="mt-12 grid gap-5 md:grid-cols-3">
+                    ${point(
+                      'description',
+                      'The assessment report',
+                      'The substance of the engagement. Findings with photographs, each cited to the clause, rule or Goal it is read against, graded into what would fail an inspection or hurt somebody, what would draw a comment, and what is worth doing next time round. Then a fix list in that order. This is the part worth paying for.'
+                    )}
+                    ${point(
+                      'workspace_premium',
+                      'The Vybe certificate',
+                      'Issued where the audit closes at or above our threshold. It names the audit, the standard we read you against, the scope, the site, the date and an expiry a year out, and it carries a verification number checkable on our own portal. Signed by us, on our paper, with our name on it and nobody else’s.'
+                    )}
+                    ${point(
+                      'verified',
+                      'The digital badge',
+                      'A web and print asset for your site footer, your reception wall, an admission brochure or a tender file, carrying the same audit name, date and verification number. It expires when the certificate does, and we ask that it comes down when it does.'
+                    )}
+                </div>
+
+                <div class="mt-8">
+                    ${noticePanel(
+                      'What the certificate and badge are not',
+                      `<p>They are issued by <strong>Vybe Technologies</strong> and by nobody else. <strong>We are not accredited by, affiliated to, appointed by, empanelled with or recognised by</strong> FSSAI, the Karnataka State Fire and Emergency Services or any fire authority, any State Pollution Control Board, NAAC, NIRF, the UGC, the Labour Department, the Data Protection Board of India, the BSA, any software vendor, NABCB, any member of the International Accreditation Forum, or any other regulator, accreditation body or certification body.</p>
+                        <p>So the certificate is <strong>not</strong> an FSSAI licence, approval or hygiene rating; <strong>not</strong> a fire No Objection Certificate; <strong>not</strong> a pollution control consent; <strong>not</strong> a NAAC or NIRF accreditation, score or endorsement; <strong>not</strong> a vehicle fitness certificate; <strong>not</strong> a vendor’s licensing clearance; and <strong>not</strong> a finding by any authority that your organisation is legally compliant. It carries no government, regulatory or accreditation mark, and it must not be presented, described or displayed as though it does.</p>
+                        <p>What it does say is exactly this: that Vybe Technologies audited a named site against a named standard on a named date, and that it met the threshold we publish for that audit. That is a real and checkable statement, and it is the only one being made.</p>
+                        <p>It is verifiable in one place: our own portal. Anyone can check the number and see who holds it, for which audit, against which standard, for what scope and until when. If a customer, a parent body, a tender, a regulator or an accreditation team requires an <em>official</em> or <em>accredited</em> certificate, ours is not it — ask them what they need before you buy one from us or from anybody, and we will tell you which body issues it.</p>`
+                    )}
+                </div>
+            </div>
+        </section>`;
+}
+
+/** How the engagement runs, in four steps. Shared by the hub and every group. */
+const AUDIT_STEPS = [
+  {
+    icon: 'forum',
+    h: 'Scope and quote',
+    p: 'Tell us what you run and which audits you want. We come back with a scope that says exactly what will be looked at and what will not, and a figure. Nothing is booked until you have both.',
+  },
+  {
+    icon: 'search',
+    h: 'The visit',
+    p: 'On site, during working hours, with the place running as it normally does. We open cupboards, read thermometers, ask for records and talk to the people doing the work rather than only to whoever is showing us around.',
+  },
+  {
+    icon: 'description',
+    h: 'The report',
+    p: 'Within a few working days: findings with photographs, each cited to the rule or clause it is read against, graded by severity, and a fix list ordered by what actually matters. Anything urgent you will have heard on the day.',
+  },
+  {
+    icon: 'workspace_premium',
+    h: 'Re-check, then certificate',
+    p: 'Work down the list and we come back to confirm in writing what has closed. Pass our threshold and the Vybe certificate and badge are issued, valid a year. Fall short and we say so — a certificate nobody can fail is worth nothing.',
+  },
+];
+
+function auditStepsSection({ heading, lede }) {
+  return `
+        <section class="bg-corporate dark-section text-slate-300 py-20 md:py-28 px-6 relative z-10" aria-labelledby="audit-steps-heading">
+            <div class="max-w-6xl mx-auto">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-2">How it runs</p>
+                <h2 id="audit-steps-heading" class="text-3xl md:text-4xl font-black font-display tracking-tight text-white">${esc(heading)}</h2>
+                <p class="mt-5 text-lg leading-relaxed text-slate-300 max-w-3xl">${lede}</p>
+                <ol class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                    ${AUDIT_STEPS.map(
+                      (s, i) => `<li class="rounded-2xl border border-white/10 bg-white/5 p-8">
+                        <span class="material-symbols-outlined text-brand text-[28px]" aria-hidden="true">${s.icon}</span>
+                        <p class="mt-4 text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Step ${i + 1}</p>
+                        <h3 class="mt-2 text-lg font-bold font-display tracking-tight text-white">${esc(s.h)}</h3>
+                        <p class="mt-3 text-sm leading-relaxed text-slate-300">${esc(s.p)}</p>
+                    </li>`
+                    ).join('\n                    ')}
+                </ol>
+            </div>
+        </section>`;
+}
+
+const auditFaqs = [
+  {
+    q: 'Are these official audits?',
+    a: 'No, and that is the first thing we say rather than the last. <strong>Every audit here is a Vybe audit and none of them is a statutory or regulatory audit.</strong> We are not the fire department, not an FSSAI-recognised auditing agency under the Food Safety Auditing Regulations, 2018, not a Labour Department inspector, not an appointed Data Auditor under the DPDP Act, and not connected to NAAC or NIRF. When an audit names a standard, that names what we read you against — it is not a claim that whoever wrote the standard has approved us or you.',
+  },
+  {
+    q: 'Then what is the point of an unofficial audit?',
+    a: 'That the official one is not a conversation. When a fire inspection, a food safety audit, a vendor’s licence review or a POSH complaint arrives, it looks, it finds, and the finding exists from that moment. A Vybe audit is the same walk with none of the consequences attached, early enough that fixing things is a line item rather than a crisis. The entire value sits in the gap between our visit and the one that counts.',
+  },
+  {
+    q: 'You issue certificates. What are they worth?',
+    a: 'They are worth exactly what they say, which is a real thing and a limited one. A Vybe certificate says that we audited a named site against a named standard on a named date and that it met the threshold we publish for that audit. It carries our name, a verification number checkable on our own portal, and an expiry a year out. <strong>It is not a licence, an NOC, a hygiene rating, an accreditation or a finding of legal compliance, it carries no authority’s mark, and it must not be displayed or described as though it does.</strong> Plenty of parents, customers, tender committees and franchise partners are satisfied by a credible third party having looked and written it down. Anybody who needs an official certificate needs a different document, and we will tell you which body issues it.',
+  },
+  {
+    q: 'Are you affiliated to FSSAI, NAAC, the fire department or any certifying body?',
+    a: 'No, to all of them and to any others you can name. We are not accredited by, affiliated to, appointed by, empanelled with or recognised by FSSAI, any fire authority, any Pollution Control Board, NAAC, NIRF, the UGC, the Labour Department, the Data Protection Board, the BSA, any software vendor, NABCB or any member of the International Accreditation Forum. We do not claim that our certificates are recognised by any of them, and if you ever see anybody suggesting otherwise on our behalf, tell us and we will correct it.',
+  },
+  {
+    q: 'Does everybody pass?',
+    a: 'No, and a certificate nobody can fail is worth nothing to the people you would show it to. Where an audit closes below the threshold we say so in writing, we tell you exactly what stands between you and it, and the re-check is there for when you have closed those items. We would rather issue you a certificate in three months that means something than one today that does not.',
+  },
+  {
+    q: 'What do we actually get at the end?',
+    a: 'A written report per audit, delivered within a few working days of the visit, with photographs of what we found. Each finding cited to the clause, rule or Goal it is read against, so you can argue with it on the merits instead of taking our word. Findings graded into what would fail an inspection or hurt somebody, what would draw a comment, and what is worth doing when you next have the chance. A fix list in that order. And where the audit passes, the Vybe certificate and digital badge described above.',
+  },
+  {
+    q: 'What does an audit cost?',
+    a: `It is scoped first and then quoted, and we do not publish a figure because there is no honest one to publish. A single POSH review for one office and a six-audit engagement across a campus with four blocks and fourteen buses are not the same work. Floor area, number of sites, fleet size, headcount, how many audits you want and whether you want the re-check are what move it. Tell us what you run on <a class="text-brand font-bold" href="${waLink(
+      AUDIT_ENQUIRY
+    )}" target="_blank" rel="noopener">WhatsApp</a> or at <a class="text-brand font-bold" href="mailto:${ORG.legal}">${ORG.legal}</a> and you will have a scope and a figure before anything is booked.`,
+  },
+  {
+    q: 'Do you fix what you find?',
+    a: 'The paperwork, yes: policies, registers, schedules, display notices, the documentation an application or an inspection asks for, and the training records behind them. That can be included in the scope. Anything needing a contractor — an exhaust replaced, a floor regraded, a distribution board rewired, a camera moved — we describe precisely enough for you to get it quoted, and we take nothing from whoever quotes it. You are not required to use us for the fixes to get the re-check or the certificate.',
+  },
+  {
+    q: 'Who carries out the audit?',
+    a: 'Our own team, working to a written checklist per audit so that two visits to the same place produce comparable reports. Where a finding needs a licensed professional to resolve or to sign off — a chartered electrical safety inspector, a structural engineer, a food technologist, a lawyer, an external Internal Committee member — we say so in the report and we say to bring one in. We would rather mark the boundary of our competence than blur it.',
+  },
+  {
+    q: 'Is what you find confidential?',
+    a: 'Yes. The report is yours. Nothing goes to any regulator, vendor, industry body or third party from us, and nothing is used as a reference without your written agreement. The one exception is the certificate, which exists to be shown and is checkable by anybody you give the number to. The one thing we will not do is stay quiet about an immediate danger to a person, or about something that looks like it triggers a mandatory reporting obligation — a POCSO disclosure in particular. In that situation you will hear it from us on the day, in plain words, along with what the law expects of you.',
+  },
+  {
+    q: 'Do you audit outside Bengaluru?',
+    a: 'Bengaluru and the surrounding districts are the normal working area and there is no travel charge inside it. Further afield is possible, with travel quoted separately and openly in the scope. For the document-led audits — POSH, software licensing, DPDP, labour law — a good part of the work is records, systems and conversations, so distance matters less. The site-based ones cannot be done remotely and we will not pretend they can.',
+  },
+  {
+    q: 'We already had an audit. Why another one?',
+    a: 'If it was recent, thorough and you have worked through it, you may not need one. Send us the report and we will tell you plainly whether a second opinion is worth your money — sometimes the answer is that a re-check against the existing list is all you need, and that is a much smaller piece of work. What is usually worth revisiting is anything older than a year, anything from before a building, a block, a kitchen or a fleet changed, and anything covering only one of the areas you are now being asked about.',
+  },
+];
+
+/* ---------------------------------------------------------- audits, the hub */
+
+const auditsBody = `<div class="w-full bg-surface-main">
+${breadcrumbs([CRUMB_HOME, { name: 'Audits', url: '/audits/' }], false)}
+
+        <section class="px-6 pt-12 pb-20 md:pb-28 relative overflow-hidden">
+            <div class="absolute inset-0 bg-grid-faint" aria-hidden="true"></div>
+            <div class="max-w-6xl mx-auto relative z-10">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-3">Compliance &amp; Safety</p>
+                <h1 class="text-5xl md:text-7xl font-black font-display tracking-tighter text-slate-900">Audits, before somebody official does one.</h1>
+                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">${AUDIT_COUNT} Vybe audits for kitchens, campuses and offices: hygiene to the FSSAI Schedule 4 standard, fire to the National Building Code, child safety to POCSO, bus safety, a NAAC/NIRF-ready SDG audit, POSH, software licensing, data protection under the DPDP Act and labour law. We read your site against the standard, write down what would be found, and certify what passes.</p>
+
+                ${ctaRow({
+                  waText: AUDIT_ENQUIRY,
+                  waLabel: 'WhatsApp us',
+                  email: ORG.legal,
+                  subject: 'Audit enquiry',
+                  emailLabel: `Email ${ORG.legal}`,
+                })}
+
+                <div class="mt-12">
+                    ${auditNotice()}
+                </div>
+
+                ${AUDIT_GROUPS.map(
+                  (g) => `<section class="mt-20" aria-labelledby="audit-group-${g.id}">
+                    <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-2">${esc(g.short)}</p>
+                    <h2 id="audit-group-${g.id}" class="text-3xl md:text-4xl font-black font-display tracking-tight text-slate-900">${esc(g.name)}</h2>
+                    <p class="mt-4 text-lg text-slate-600 leading-relaxed max-w-3xl">${esc(g.tagline)}</p>
+                    <ul class="mt-10 grid gap-5 lg:grid-cols-3">
+                        ${g.audits.map(auditCard).join('\n                        ')}
+                    </ul>
+                    <a href="${auditHref(g)}" class="mt-8 inline-flex items-center gap-2 text-sm font-bold text-brand hover:gap-3 transition-all">
+                        ${esc(g.name)} in detail
+                        <span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_forward</span>
+                    </a>
+                </section>`
+                ).join('\n                ')}
+
+                <div class="mt-20 rounded-2xl border border-slate-200 bg-white/70 p-6 md:p-8 flex flex-col sm:flex-row gap-5 sm:items-start">
+                    <span class="material-symbols-outlined text-brand text-[28px] shrink-0" aria-hidden="true">fact_check</span>
+                    <div>
+                        <h2 class="text-base font-bold font-display tracking-tight text-slate-900">Something else you are being asked to prove?</h2>
+                        <p class="mt-2 text-sm text-slate-600 leading-relaxed max-w-3xl">The list above is what we audit regularly and know well. If a customer, a tender, a parent body or a regulator is asking your organisation for something not on it, tell us at <a href="mailto:${ORG.legal}" class="font-bold text-brand hover:underline">${ORG.legal}</a> and we will say plainly whether it is work we can do properly. Where the honest answer is that you need an accredited body or a licensed professional, we will name the kind of body to look for instead of taking the work.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+${certificateSection()}
+
+${auditStepsSection({
+  heading: 'Scoped, walked, written down, re-checked, certified.',
+  lede: 'The same five beats whatever is being audited. No engagement starts before you have a written scope and a figure, nothing urgent waits for the report, and no certificate is issued before the findings are closed.',
+})}
+
+${faqSection(auditFaqs, { dark: false })}
+${relatedSection('audits', { dark: false })}
+</div>`;
+
+{
+  const url = '/audits/';
+  const lastmod = lastmodFor(url, auditsBody);
+  DOCS.push({
+    file: 'audits/index.html',
+    priority: '0.8',
+    changefreq: 'monthly',
+    page: {
+      url,
+      nav: 'audits',
+      title: 'Compliance & Safety Audits in Bengaluru | Vybe Technologies',
+      ogTitle: 'Vybe audits: kitchen hygiene, campus safety and workplace compliance',
+      description:
+        'Audits for kitchens, schools and offices in Bengaluru: FSSAI-standard hygiene, fire safety, POCSO, bus safety, NAAC/NIRF SDG, POSH, DPDP and labour law.',
+      lastmod,
+      trail: [CRUMB_HOME, { name: 'Audits', url }],
+      faqs: auditFaqs,
+      body: auditsBody,
+      schema: (u) => ({
+        '@type': 'Service',
+        '@id': `${u}#service`,
+        name: 'Vybe compliance and safety audits',
+        serviceType: 'Advisory compliance, hygiene and safety auditing',
+        description:
+          'Advisory (non-statutory) compliance and safety audits for food businesses, educational institutions and offices in Bengaluru, covering kitchen hygiene to the FSSAI Schedule 4 standard, kitchen layout and cross-contamination, pest control records, fire and electrical safety to the National Building Code 2016 standard, canteen and mess hygiene, child safety to the POCSO standard, school transport safety, campus security, a NAAC/NIRF-ready SDG and sustainability audit covering energy, waste, water and curriculum, POSH Act Internal Committee compliance, software licensing and IT asset compliance, Digital Personal Data Protection Act readiness, and labour law and HR statutory records. Certificates and badges are issued by Vybe Technologies alone. Vybe Technologies is not accredited by, affiliated to, appointed by or recognised by FSSAI, any fire authority, any Pollution Control Board, NAAC, NIRF, the Labour Department, the Data Protection Board or any other regulator, accreditation body or certification body, and these audits and certificates are not a statutory audit, licence, rating, accreditation or No Objection Certificate.',
+        provider: { '@id': `${SITE}/#organization` },
+        areaServed: { '@type': 'City', name: 'Bengaluru' },
+        url: u,
+        hasOfferCatalog: {
+          '@type': 'OfferCatalog',
+          name: 'Audits',
+          itemListElement: AUDIT_GROUPS.flatMap((g) =>
+            g.audits.map((a) => ({
+              '@type': 'Offer',
+              name: a.name,
+              priceCurrency: 'INR',
+              description: `${a.tagline} Audited to the ${a.standard}. Advisory audit, scoped and quoted per engagement; not a statutory audit, and any certificate issued is a Vybe Technologies certificate carrying no regulatory or accreditation recognition.`,
+              url: `${SITE}${auditHref(g)}#${a.id}`,
+              itemOffered: { '@type': 'Service', name: a.name, provider: { '@id': `${SITE}/#organization` } },
+            }))
+          ),
+        },
+      }),
+    },
+  });
+}
+
+/* --------------------------------------------------- audits, one page each */
+
+/**
+ * A page per audience rather than per audit. Somebody searching for a school
+ * fire safety audit and somebody searching for a POSH audit want different
+ * pages; somebody searching for a fire audit and a canteen audit is usually
+ * the same person on the same campus. Content comes from AUDIT_GROUPS, so the
+ * hub, the nav and these cannot drift apart.
+ */
+for (const g of AUDIT_GROUPS) {
+  const url = auditHref(g);
+  const enquiry = `Hi Vybe, I would like to talk about ${g.short.toLowerCase()} audits.`;
+
+  const body = `<div class="w-full bg-surface-main">
+${breadcrumbs([CRUMB_HOME, { name: 'Audits', url: '/audits/' }, { name: g.name, url }], false)}
+
+        <section class="px-6 pt-12 pb-20 md:pb-28 relative overflow-hidden">
+            <div class="absolute inset-0 bg-grid-faint" aria-hidden="true"></div>
+            <div class="max-w-6xl mx-auto relative z-10">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-3">Compliance &amp; Safety</p>
+                <h1 class="text-5xl md:text-7xl font-black font-display tracking-tighter text-slate-900">${esc(g.h1)}</h1>
+                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">${esc(g.lede)}</p>
+
+                <p class="mt-8 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <span class="text-5xl font-black font-display tracking-tight text-slate-900">On quote</span>
+                    <span class="text-sm font-bold text-slate-500">scoped before anything is booked</span>
+                </p>
+                <p class="mt-1 text-xs font-bold uppercase tracking-[0.15em] text-brand">${g.audits.length} audit${
+                  g.audits.length === 1 ? '' : 's'
+                } in this group &middot; take one or take the set</p>
+
+                ${ctaRow({
+                  waText: enquiry,
+                  waLabel: 'WhatsApp us',
+                  email: ORG.legal,
+                  subject: `${g.name} enquiry`,
+                  emailLabel: `Email ${ORG.legal}`,
+                })}
+
+                <div class="mt-12">
+                    ${auditNotice()}
+                </div>
+
+                <ul class="mt-12 grid gap-5 lg:grid-cols-3">
+                    ${g.audits.map(auditCard).join('\n                    ')}
+                </ul>
+            </div>
+        </section>
+
+${proseSections({
+  id: `${g.slug}-detail`,
+  eyebrow: 'In detail',
+  heading: g.name,
+  sections: g.sections,
+})}
+
+${certificateSection()}
+
+${auditStepsSection({
+  heading: 'Scoped, walked, written down, re-checked, certified.',
+  lede: 'The same five beats whatever is being audited. No engagement starts before you have a written scope and a figure, nothing urgent waits for the report, and no certificate is issued before the findings are closed.',
+})}
+
+${faqSection(g.faqs, { dark: false })}
+
+${siblingSection({
+  eyebrow: 'More audits',
+  heading: 'The rest of what we audit.',
+  items: [
+    { href: '/audits/', icon: 'fact_check', name: 'All audits', blurb: `Every audit we run, across kitchens, campuses and offices.` },
+    ...AUDIT_GROUPS.filter((o) => o.slug !== g.slug).map((o) => ({
+      href: auditHref(o),
+      icon: o.icon,
+      name: o.name,
+      blurb: o.tagline,
+    })),
+    { href: '/registrations/', icon: 'receipt_long', name: 'Business registrations', blurb: 'GST, Udyam, FSSAI, DPIIT and more, filed for you at a flat professional fee.' },
+  ],
+})}
+${relatedSection('audits', { dark: false })}
+</div>`;
+
+  const lastmod = lastmodFor(url, [g.metaTitle, g.metaDescription, body].join('\n'));
+
+  DOCS.push({
+    file: `audits/${g.slug}/index.html`,
+    priority: '0.7',
+    changefreq: 'monthly',
+    page: {
+      url,
+      nav: g.nav,
+      title: g.metaTitle,
+      ogTitle: g.name,
+      description: g.metaDescription,
+      lastmod,
+      trail: [CRUMB_HOME, { name: 'Audits', url: '/audits/' }, { name: g.name, url }],
+      faqs: g.faqs,
+      body,
+      schema: (u) => ({
+        '@type': 'Service',
+        '@id': `${u}#service`,
+        name: g.name,
+        serviceType: 'Advisory compliance, hygiene and safety auditing',
+        description: `${g.metaDescription} Audits and any certificate issued are by Vybe Technologies alone; Vybe Technologies is not accredited by, affiliated to or recognised by FSSAI, any fire authority, NAAC, NIRF, the Labour Department, the Data Protection Board or any other regulator, accreditation body or certification body.`,
+        provider: { '@id': `${SITE}/#organization` },
+        areaServed: { '@type': 'City', name: 'Bengaluru' },
+        url: u,
+        isRelatedTo: { '@id': `${SITE}/audits/#service` },
+        hasOfferCatalog: {
+          '@type': 'OfferCatalog',
+          name: g.name,
+          itemListElement: g.audits.map((a) => ({
+            '@type': 'Offer',
+            name: a.name,
+            priceCurrency: 'INR',
+            description: `${a.tagline} Audited to the ${a.standard}. Advisory audit, scoped and quoted per engagement; not a statutory audit, and any certificate issued is a Vybe Technologies certificate carrying no regulatory or accreditation recognition.`,
+            url: `${u}#${a.id}`,
+            itemOffered: { '@type': 'Service', name: a.name, provider: { '@id': `${SITE}/#organization` } },
+          })),
+        },
+      }),
+    },
+  });
+}
+
 /* ------------------------------------------------------------------ 404 page */
 
 const notFoundLink = (href, label, desc) =>
@@ -3588,6 +4615,7 @@ write(
                     ${published('cloud') ? notFoundLink('/cloud/', 'Vybe Cloud', 'Scalable servers and DDoS protection.') : ''}
                     ${notFoundLink('/printing/', 'Printing', 'Cards, banners, standees, RFID and stationery.')}
                     ${notFoundLink('/registrations/', 'Registrations', 'GST, MSME, FSSAI and Startup India, filed for you, plus ISO, NSDC and DSC.')}
+                    ${notFoundLink('/audits/', 'Audits', 'Hygiene, fire, child safety, SDG, POSH and data protection audits.')}
                     ${notFoundLink('/contact/', 'Contact Us', 'Phone, email and where to find us.')}
                 </div>
             </div>

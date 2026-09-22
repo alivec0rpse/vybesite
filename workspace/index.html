@@ -9,10 +9,10 @@
 <link rel="canonical" href="https://vybe.net.in/workspace/">
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 
-<link rel="preload" href="/assets/fonts/inter-var.woff2?v=3100e775" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/assets/fonts/plus-jakarta-sans-var.woff2?v=153fc85b" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/assets/fonts/material-symbols-subset.woff2?v=a2018857" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=21c85e48">
+<link rel="preload" href="/assets/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/plus-jakarta-sans-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/material-symbols-subset.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css">
 
 <!-- Icons & PWA -->
 <link rel="icon" href="/favicon.ico" sizes="32x32">
@@ -232,6 +232,47 @@
                         </div>
                     </div>
                 </div>
+                <div class="nav-group relative">
+                    <button type="button" aria-haspopup="true" aria-expanded="false" aria-controls="nav-panel-audits" class="flex items-center gap-1 hover:text-brand transition-colors">
+                        Audits
+                        <span class="material-symbols-outlined nav-caret text-[18px]" aria-hidden="true">expand_more</span>
+                    </button>
+                    <div class="nav-panel" id="nav-panel-audits">
+                        <div class="nav-panel-card rounded-2xl border border-slate-200 bg-white shadow-xl p-2">
+                            <p class="px-3 pt-2 pb-3 text-xs text-slate-400 leading-snug">Hygiene, safety and compliance audits, with a Vybe certificate at the end. Not statutory audits, and we say so up front.</p>
+                            <ul class="flex flex-col">
+                                <li><a href="/audits/" class="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-slate-50 transition-colors">
+                                <span class="material-symbols-outlined text-brand text-[22px] shrink-0 mt-0.5" aria-hidden="true">fact_check</span>
+                                <span class="min-w-0">
+                                    <span class="block font-bold text-slate-900 leading-snug">All audits</span>
+                                    <span class="block text-xs text-slate-500 leading-snug mt-0.5">Every audit we run, across kitchens, campuses and offices.</span>
+                                </span>
+                            </a></li>
+                                <li><a href="/audits/kitchen-food-safety/" class="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-slate-50 transition-colors">
+                                <span class="material-symbols-outlined text-brand text-[22px] shrink-0 mt-0.5" aria-hidden="true">soup_kitchen</span>
+                                <span class="min-w-0">
+                                    <span class="block font-bold text-slate-900 leading-snug">Kitchens &amp; food businesses</span>
+                                    <span class="block text-xs text-slate-500 leading-snug mt-0.5">FSSAI Schedule 4 hygiene, layout, pest control records.</span>
+                                </span>
+                            </a></li>
+                                <li><a href="/audits/schools-institutions/" class="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-slate-50 transition-colors">
+                                <span class="material-symbols-outlined text-brand text-[22px] shrink-0 mt-0.5" aria-hidden="true">school</span>
+                                <span class="min-w-0">
+                                    <span class="block font-bold text-slate-900 leading-snug">Schools &amp; institutions</span>
+                                    <span class="block text-xs text-slate-500 leading-snug mt-0.5">Fire, canteen, POCSO, transport, security, SDG &amp; sustainability.</span>
+                                </span>
+                            </a></li>
+                                <li><a href="/audits/workplace-compliance/" class="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-slate-50 transition-colors">
+                                <span class="material-symbols-outlined text-brand text-[22px] shrink-0 mt-0.5" aria-hidden="true">corporate_fare</span>
+                                <span class="min-w-0">
+                                    <span class="block font-bold text-slate-900 leading-snug">Offices &amp; workplaces</span>
+                                    <span class="block text-xs text-slate-500 leading-snug mt-0.5">POSH, software licensing, DPDP, labour law, office fire.</span>
+                                </span>
+                            </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
                 <a href="/contact/" class="hover:text-brand transition-colors">Contact</a>
             </nav>
 
@@ -287,6 +328,18 @@
                                 <a href="/registrations/iso-certification/" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">ISO certification</a>
                                 <a href="/registrations/nsdc-skill-india/" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">NSDC &amp; affiliation</a>
                                 <a href="/registrations/digital-signature-certificate/" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">Digital signatures</a>
+                            </div>
+                        </details>
+                        <details class="group/sub">
+                            <summary class="list-none [&::-webkit-details-marker]:hidden cursor-pointer flex items-center justify-between px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">
+                                Audits
+                                <span class="material-symbols-outlined text-[20px] text-slate-400 transition-transform duration-200 group-open/sub:rotate-180" aria-hidden="true">expand_more</span>
+                            </summary>
+                            <div class="flex flex-col pl-3 pb-2 text-[15px]">
+                                <a href="/audits/" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">All audits</a>
+                                <a href="/audits/kitchen-food-safety/" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">Kitchens &amp; food businesses</a>
+                                <a href="/audits/schools-institutions/" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">Schools &amp; institutions</a>
+                                <a href="/audits/workplace-compliance/" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">Offices &amp; workplaces</a>
                             </div>
                         </details>
                         <a href="/contact/" class="px-4 py-3 rounded-xl transition-colors hover:bg-slate-50">Contact Us</a>
@@ -594,6 +647,11 @@
                         <h3 class="mt-3 text-lg font-bold font-display tracking-tight text-slate-900">Business Registrations</h3>
                         <p class="mt-1 text-sm text-slate-600 leading-relaxed">GST, Udyam (MSME), FSSAI and Startup India recognition, from ₹199, plus ISO, NSDC consulting and digital signatures.</p>
                     </a>
+                    <a href="/audits/" class="group block rounded-2xl border bg-white border-slate-200 hover:border-brand/40 p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                        <span class="material-symbols-outlined text-brand text-[28px]" aria-hidden="true">fact_check</span>
+                        <h3 class="mt-3 text-lg font-bold font-display tracking-tight text-slate-900">Compliance Audits</h3>
+                        <p class="mt-1 text-sm text-slate-600 leading-relaxed">Hygiene, fire, child safety, SDG, POSH and data protection audits for kitchens, campuses and offices. Report, certificate and badge.</p>
+                    </a>
                 </div>
             </div>
         </section>
@@ -633,6 +691,7 @@
                     
                     <li><a href="/printing/" class="hover:text-brand transition-colors">Printing Services</a></li>
                     <li><a href="/registrations/" class="hover:text-brand transition-colors">Business Registrations</a></li>
+                    <li><a href="/audits/" class="hover:text-brand transition-colors">Compliance Audits</a></li>
                 </ul>
             </div>
 
@@ -668,6 +727,6 @@
         </div>
     </footer>
 
-<script src="/assets/site.js?v=6a827fe1" defer></script>
+<script src="/assets/site.js" defer></script>
 </body>
 </html>

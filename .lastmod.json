@@ -1,18 +1,18 @@
 {
   "/": {
-    "hash": "b531d8bdf78ed85f",
+    "hash": "e6cc824284395a81",
     "date": "2026-09-22"
   },
   "/erp/": {
-    "hash": "91cf78ac840e1686",
+    "hash": "4f37379461237ab1",
     "date": "2026-09-22"
   },
   "/cms/": {
-    "hash": "90255fce89c04caf",
+    "hash": "fd460a7b62c05a59",
     "date": "2026-09-22"
   },
   "/it-solutions/": {
-    "hash": "ef4797d53aac4d97",
+    "hash": "6fd344e2dbbf3917",
     "date": "2026-09-22"
   },
   "/cloud/": {
@@ -36,11 +36,11 @@
     "date": "2026-09-21"
   },
   "/workspace/": {
-    "hash": "ab99ed9a2b7c06e9",
+    "hash": "c6d9dc6d0729b874",
     "date": "2026-09-22"
   },
   "/smart-classroom/": {
-    "hash": "0f6349baeb8d8129",
+    "hash": "6d4c1f5c7d6309fc",
     "date": "2026-09-22"
   },
   "/contact/": {
@@ -48,51 +48,67 @@
     "date": "2026-09-21"
   },
   "/printing/": {
-    "hash": "3fc6b557469aefb3",
-    "date": "2026-09-21"
+    "hash": "4647d63d011172df",
+    "date": "2026-09-22"
   },
   "/registrations/": {
-    "hash": "27d3f53254a7c66b",
-    "date": "2026-09-21"
+    "hash": "f918cae7bb4624cc",
+    "date": "2026-09-22"
   },
   "/printing/stationery/": {
-    "hash": "a914e515be996c3b",
+    "hash": "8fd2d6f0bdc2b42e",
     "date": "2026-09-22"
   },
   "/printing/cards/": {
-    "hash": "ab151dfa67beefab",
+    "hash": "7c3211c292cad456",
     "date": "2026-09-22"
   },
   "/printing/banners-standees/": {
-    "hash": "f364e0f1ee291b25",
+    "hash": "b31a13f3c283532d",
     "date": "2026-09-22"
   },
   "/registrations/gst/": {
-    "hash": "5f30e25f4dd7fae8",
+    "hash": "dc42c5ec9669610d",
     "date": "2026-09-22"
   },
   "/registrations/msme/": {
-    "hash": "79f30c9a60cff072",
+    "hash": "f7b03a5ec2ac0fdc",
     "date": "2026-09-22"
   },
   "/registrations/fssai/": {
-    "hash": "0816d34347c84a73",
+    "hash": "1af88f4a3277a78b",
     "date": "2026-09-22"
   },
   "/registrations/startup-india/": {
-    "hash": "b27f154978884380",
+    "hash": "c8582b00452e02dd",
     "date": "2026-09-22"
   },
   "/registrations/iso-certification/": {
-    "hash": "7ee4415a3cf73744",
+    "hash": "b6796564f89d0cd3",
     "date": "2026-09-22"
   },
   "/registrations/nsdc-skill-india/": {
-    "hash": "9cb5592734a72832",
+    "hash": "ade08e0f3bf8ea49",
     "date": "2026-09-22"
   },
   "/registrations/digital-signature-certificate/": {
-    "hash": "7320a45157bedb67",
+    "hash": "c74c45b817a42a02",
+    "date": "2026-09-22"
+  },
+  "/audits/": {
+    "hash": "b0b0edbb0d20f850",
+    "date": "2026-09-22"
+  },
+  "/audits/kitchen-food-safety/": {
+    "hash": "a70e03c0566e9559",
+    "date": "2026-09-22"
+  },
+  "/audits/schools-institutions/": {
+    "hash": "21550473ee5d43da",
+    "date": "2026-09-22"
+  },
+  "/audits/workplace-compliance/": {
+    "hash": "29d01fc67f6f6507",
     "date": "2026-09-22"
   }
 }
