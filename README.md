@@ -22,13 +22,24 @@ Edit the sources, not the output.
 ## Commands
 
 ```sh
-npm run build      # build.js + minified Tailwind  <- the one you want
-npm run css        # stylesheet only
-npm run images     # regenerate logos, icons, favicon set and the OG image
-npm run fonts      # re-subset the Material Symbols font to the icons in use
-npm run validate   # html-validate across every page
-npm run serve      # preview on http://localhost:8099
+npm run build        # build.js + Tailwind + asset stamping  <- the one you want
+npm run css          # stylesheet only
+npm run images       # regenerate logos, icons, favicon set and the OG image
+npm run fonts        # re-subset the Material Symbols font to the icons in use
+npm run validate     # html-validate across every page
+npm run serve        # preview on http://localhost:8099
+npm run audit:seo    # titles, descriptions, canonicals, headings, sitemap, links
+npm run audit:mobile # renders every page at 390x844 (needs `npm run serve`)
+npm run audit:icons  # every icon ligature still in the subset font
 ```
+
+`npm run build` ends with `tools/stamp-assets.js`, which appends a content
+hash to the stylesheet, script and font URLs. `/assets/*` is served
+`immutable` for a year, so without that stamp a returning visitor keeps an old
+stylesheet and an old icon font indefinitely — which is how icons added since
+their last visit end up rendering as their literal ligature names. Never
+reference `/assets/site.css` or a font by its bare path in a template; let the
+stamp add the query string.
 
 Run `npm run build` before every deploy and commit the output — Azure Static
 Web Apps serves these files directly (`app_location: "/"`, no build step).

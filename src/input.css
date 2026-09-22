@@ -285,6 +285,26 @@ body {
   50% { transform: translateY(-15px) rotate(2deg); }
 }
 
+/* The decorative orbs are up to 800px wide under a 100-150px blur, and the
+   keyframes scale() them — so a phone GPU re-rasterises that blur every single
+   frame, for the whole time the section is on screen. Freezing them on touch
+   devices keeps the exact same look (they are a soft background wash) and
+   hands the scroll back its frame budget. */
+@media (hover: none), (pointer: coarse) {
+  .animate-orb {
+    animation: none;
+  }
+}
+
+/* iOS counts 100vh as the viewport with the address bar hidden, so min-h-screen
+   makes every page a little taller than the screen actually is and leaves a
+   stray scroll on short pages. svh is the same number with the bar showing. */
+@supports (min-height: 100svh) {
+  .min-h-screen {
+    min-height: 100svh;
+  }
+}
+
 /* WCAG 2.3.3, and it stops the canvas burning battery for users who opted out. */
 @media (prefers-reduced-motion: reduce) {
   *,

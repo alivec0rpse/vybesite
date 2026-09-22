@@ -261,6 +261,43 @@ function transformView(view, { dark = false } = {}) {
 }
 
 /** Wrap a transformed view in its original container, breadcrumbs first. */
+/**
+ * Close the gap between <h1> and the first <h2>.
+ *
+ * The hero block on most pages was styled before it was outlined: its cards
+ * are <h3>/<h4> because that is the size they wanted, so the document opens
+ * h1 -> h3 and the first real <h2> only turns up further down. Assistive
+ * technology reads that as a missing level, and it misrepresents which
+ * headings are the page's top-level sections.
+ *
+ * The headings are reused across sections by shared components, so the level
+ * cannot simply be corrected at the source without also changing the ones that
+ * sit below an <h2> correctly. Promoting only the run that precedes the first
+ * <h2> fixes the outline wherever it appears and leaves the rest untouched.
+ * Classes are not touched, so nothing moves on screen.
+ */
+function liftLeadingHeadings(html) {
+  const H = /<h([1-6])\b([^>]*)>([\s\S]*?)<\/h\1>/g;
+  const found = [...html.matchAll(H)];
+  const firstH2 = found.findIndex((m) => m[1] === '2');
+  // No <h2> at all, or one already in the lead: nothing to line up.
+  if (firstH2 < 0) return html;
+  const lead = found.slice(0, firstH2).filter((m) => Number(m[1]) > 2);
+  if (!lead.length) return html;
+
+  // Rebuild rather than replace in place: the same heading text can occur
+  // again later in the page, where its level is already right.
+  const cut = new Map(lead.map((m) => [m.index, m]));
+  let out = '';
+  let at = 0;
+  for (const [index, m] of cut) {
+    const to = Number(m[1]) - 1;
+    out += html.slice(at, index) + `<h${to}${m[2]}>${m[3]}</h${to}>`;
+    at = index + m[0].length;
+  }
+  return out + html.slice(at);
+}
+
 function renderView(view, page) {
   const cls = [view.wrapperClass, 'w-full'].filter(Boolean).join(' ');
   return `<div class="${dedupe(cls)}">
@@ -1356,7 +1393,7 @@ const PAGES = [
     title: 'Vybe Technologies | Campus ERP, Cashless Cafeteria & Cloud',
     ogTitle: 'Vybe Technologies — Smart. Simple. Affordable.',
     description:
-      'Campus software for schools, colleges and corporate campuses in India: cloud ERP, a 100% cashless cafeteria system, custom apps, cybersecurity and cloud servers.',
+      'Campus software for schools, colleges and corporate campuses in India: cloud ERP, a 100% cashless cafeteria, custom apps, cybersecurity and cloud servers.',
     trail: [CRUMB_HOME],
     priority: '1.0',
     view: home,
@@ -1510,10 +1547,10 @@ const PAGES = [
     url: '/smart-classroom/',
     file: 'smart-classroom/index.html',
     nav: 'classroom',
-    title: 'Smart Classroom Setup | Interactive Flat Panels & Online Classes',
+    title: 'Smart Classroom Setup | Interactive Flat Panels | Vybe',
     ogTitle: 'Smart Classrooms — panels, cameras, power and content',
     description:
-      'Smart classroom setup for schools and colleges: interactive flat panel installation, online class systems with camera and lighting, UPS-backed power and cabling.',
+      'Smart classroom setup for schools and colleges: interactive flat panels, online class systems with camera and lighting, UPS-backed power and cabling.',
     trail: [CRUMB_HOME, { name: 'Smart Classrooms', url: '/smart-classroom/' }],
     priority: '0.9',
     dark: true,
@@ -1603,7 +1640,7 @@ const PAGES = [
     url: '/workspace/',
     file: 'workspace/index.html',
     nav: 'workspace',
-    title: 'Google Workspace & Student Email Setup | Microsoft 365, Zoho Mail',
+    title: 'Google Workspace & Student Email Setup | Microsoft 365',
     ogTitle: 'Workspace & Email — set up properly, secured properly',
     description:
       'Google Workspace, Microsoft 365 and Zoho Mail setup: staff and student email on your own domain, single sign-on, secure online classes and phishing training.',
@@ -1703,7 +1740,7 @@ const PAGES = [
     title: 'Custom App Development & Cybersecurity | Vybe IT Solutions',
     ogTitle: 'Vybe IT Solutions — Custom software and cybersecurity',
     description:
-      'Bespoke web and mobile apps — portals, business ERPs, retail POS and custom SaaS — secured with penetration testing, DPDP Act compliance and 24/7 managed SecOps.',
+      'Bespoke web and mobile apps — portals, business ERPs, retail POS and SaaS — secured with penetration testing, DPDP Act compliance and managed SecOps.',
     trail: [CRUMB_HOME, { name: 'IT & Cyber', url: '/it-solutions/' }],
     priority: '0.8',
     dark: true,
@@ -2051,7 +2088,7 @@ ${faqSection(contactFaqs, { dark: false })}
       title: 'Contact Vybe Technologies | Bengaluru Office, Phone & Email',
       ogTitle: 'Contact Vybe Technologies',
       description:
-        'Talk to Vybe Technologies in Bengaluru. Sales, support and legal contacts, our grievance escalation route, phone numbers, registered office address and opening hours.',
+        'Talk to Vybe Technologies in Bengaluru. Sales, support and legal contacts, grievance escalation, phone numbers, office address and opening hours.',
       lastmod,
       trail: [CRUMB_HOME, { name: 'Contact Us', url }],
       faqs: contactFaqs,
@@ -2212,9 +2249,9 @@ const PRINT_CATEGORIES = [
     h1: 'Paper and stationery, run properly.',
     lede:
       'Letterheads, bill books, brochures, flyers, posters, certificates and folders. This is the work an office gets through and reorders, so it has to look the same in January and in November.',
-    metaTitle: 'Letterhead, Bill Book & Brochure Printing in Bengaluru | Vybe',
+    metaTitle: 'Letterhead, Bill Book & Brochure Printing, Bengaluru',
     metaDescription:
-      'Letterheads, envelopes, bill books and invoice books, brochures, flyers, posters, certificates, files and folders, printed to your artwork in Bengaluru. Send the file for a quote.',
+      'Letterheads, envelopes, bill books, brochures, flyers, posters, certificates, files and folders, printed to your artwork in Bengaluru. Send the file.',
     sections: [
       {
         h: 'Paper, and why we ask about it',
@@ -2265,9 +2302,9 @@ const PRINT_CATEGORIES = [
     h1: 'Cards, from a visiting card to one that opens a door.',
     lede:
       'Visiting cards, PVC ID cards, and RFID and NFC cards, tags and key fobs. All printed to your artwork, and the ones that have to work with a reader confirmed against your system before a batch is run.',
-    metaTitle: 'Business Card, PVC ID & RFID Card Printing in Bengaluru | Vybe',
+    metaTitle: 'Business Card, PVC ID & RFID Printing in Bengaluru',
     metaDescription:
-      'Visiting cards in matt, gloss, velvet and spot UV. PVC ID cards with lanyards and holders. RFID and NFC cards, tags and key fobs carrying names, photos, numbers and QR codes. Printed in Bengaluru to your artwork.',
+      'Visiting cards in matt, gloss, velvet and spot UV. PVC ID cards with lanyards. RFID and NFC cards, tags and key fobs, printed in Bengaluru to your artwork.',
     sections: [
       {
         h: 'Visiting cards',
@@ -2322,9 +2359,9 @@ const PRINT_CATEGORIES = [
     h1: 'Large format, finished and ready to put up.',
     lede:
       'Flex and vinyl banners, roll-up standees, backdrops, event branding and signage. Printed to size, finished with the eyelets, stands or mounting you actually need, and checked against where it is going before it runs.',
-    metaTitle: 'Flex Banner, Roll-Up Standee & Signage Printing in Bengaluru | Vybe',
+    metaTitle: 'Flex Banner, Standee & Signage Printing in Bengaluru',
     metaDescription:
-      'Flex and vinyl banners in any size, roll-up standees, backdrops, canopy and table branding, foam board, sunboard and acrylic signage, and wall, window and vehicle graphics. Printed in Bengaluru to your artwork.',
+      'Flex and vinyl banners in any size, roll-up standees, backdrops, canopy and table branding, foam board and acrylic signage, printed in Bengaluru.',
     sections: [
       {
         h: 'Banners',
@@ -2500,10 +2537,10 @@ ${relatedSection('printing', { dark: false })}
     page: {
       url,
       nav: 'printing',
-      title: 'Printing Services in Bengaluru | Banners, Standees, Cards & RFID',
+      title: 'Printing Services in Bengaluru | Cards, Banners & Signage',
       ogTitle: 'Vybe Printing: paper, cards, banners, standees and RFID',
       description:
-        'All types of printing from Vybe Technologies, Bengaluru: business cards, PVC ID and RFID cards, letterheads, bill books, brochures, flyers, flex banners, roll-up standees and signage. Mail or WhatsApp us your artwork for a quote.',
+        'Printing in Bengaluru: business cards, PVC ID and RFID cards, letterheads, bill books, brochures, flyers, flex banners, standees and signage. Send us artwork.',
       lastmod,
       trail: [CRUMB_HOME, { name: 'Printing', url }],
       faqs: printingFaqs,
@@ -2659,7 +2696,7 @@ const REGISTRATIONS = [
       'A GSTIN for a new business, a new branch, or a threshold you have just crossed. We prepare the application, file it, answer whatever the officer comes back with, and hand you the certificate.',
     metaTitle: 'GST Registration at ₹199 | New GSTIN Filed for You | Vybe',
     metaDescription:
-      'GST registration at a flat ₹199 professional fee. Documents prepared, application filed on the GST portal, clarifications answered and the GSTIN delivered. The portal charges no government fee for the registration itself.',
+      'GST registration at a flat ₹199 professional fee. Documents prepared, application filed, clarifications answered and the GSTIN delivered. No government fee.',
     sections: [
       {
         h: 'Who actually needs a GSTIN',
@@ -2723,7 +2760,7 @@ const REGISTRATIONS = [
       'The MSME certificate that banks, tender portals and government schemes ask for. It is free to file and easy to file wrongly, and a wrong classification is the reason most certificates are questioned later.',
     metaTitle: 'MSME / Udyam Registration at ₹199 | Vybe Technologies',
     metaDescription:
-      'Udyam (MSME) registration at a flat ₹199 professional fee, with no government fee payable. Correct NIC classification, investment and turnover figures filed properly, and the Udyam certificate delivered.',
+      'Udyam (MSME) registration at a flat ₹199 professional fee, no government fee. Correct NIC classification and turnover figures filed, certificate delivered.',
     sections: [
       {
         h: 'What the certificate is for',
@@ -2785,9 +2822,9 @@ const REGISTRATIONS = [
     h1: 'FSSAI, on the right licence.',
     lede:
       'Basic registration, a State licence or a Central licence: three different things that get called "the FSSAI licence" interchangeably, with different fees and different consequences for getting it wrong. We work out which one you need first.',
-    metaTitle: 'FSSAI Registration & Food Licence at ₹299 | Vybe Technologies',
+    metaTitle: 'FSSAI Registration & Food Licence at ₹299 | Vybe',
     metaDescription:
-      'FSSAI Basic registration, State licence and Central licence filed for you at a flat ₹299 professional fee, with the government fee quoted separately before you commit. For restaurants, cafeterias, cloud kitchens, caterers, traders and home food businesses.',
+      'FSSAI Basic, State and Central licences filed at a flat ₹299 professional fee, government fee quoted separately. For restaurants, cloud kitchens and caterers.',
     sections: [
       {
         h: 'Basic, State or Central',
@@ -2850,9 +2887,9 @@ const REGISTRATIONS = [
     h1: 'Startup India recognition, written properly.',
     lede:
       'DPIIT recognition is free to apply for and routinely refused for a weak write-up. The fee here buys the application being put together in a way that stands up, not access to a form that anybody can open.',
-    metaTitle: 'DPIIT / Startup India Recognition at ₹999 | Vybe Technologies',
+    metaTitle: 'DPIIT / Startup India Recognition at ₹999 | Vybe',
     metaDescription:
-      'Startup India (DPIIT) recognition prepared and filed for ₹999, with no government fee payable. Eligibility checked, the innovation write-up drafted, and the certificate followed up. Bengaluru.',
+      'Startup India (DPIIT) recognition filed for ₹999, no government fee. Eligibility checked, innovation write-up drafted, certificate followed up. Bengaluru.',
     sections: [
       {
         h: 'Whether you are eligible',
@@ -2919,7 +2956,7 @@ const REGISTRATIONS = [
       'ISO 9001, ISO 22000 and ISO 27001. We review your processes against the standard, help you write what is missing, audit the result and issue a certificate you can point anybody at. It is a non-accredited certificate, and the next panel explains exactly what that means.',
     metaTitle: 'Non-Accredited ISO 9001, 22000 & 27001 Certification | Vybe',
     metaDescription:
-      'Non-accredited ISO 9001, ISO 22000 and ISO 27001 certification from Vybe Technologies: gap review, documentation, audit and a certificate verifiable on our portal. Issued by us, not by an accredited certification body, and we say so plainly.',
+      'Non-accredited ISO 9001, 22000 and 27001 certification: gap review, documentation, audit and a verifiable certificate. Issued by us, not an accredited body.',
     sections: [
       {
         h: 'ISO 9001, quality management',
@@ -2994,9 +3031,9 @@ const REGISTRATIONS = [
     h1: 'NSDC, Skill India and affiliation, reviewed before you file.',
     lede:
       'Consulting on NSDC and Skill India training partner registration, and on affiliation applications more broadly. We go through the requirements with you, read what you have, tell you plainly what is missing, and help you get the file into shape. The filing itself stays in your hands.',
-    metaTitle: 'NSDC / Skill India Registration & Affiliation Consulting | Vybe',
+    metaTitle: 'NSDC / Skill India Registration & Affiliation | Vybe',
     metaDescription:
-      'Advisory support on NSDC and Skill India training partner registration and on affiliation applications: requirement review, document gap check and file preparation. Quoted per engagement. Vybe Technologies, Bengaluru.',
+      'Advisory support on NSDC and Skill India training partner registration and affiliation: requirement review, document gap check and file preparation. Bengaluru.',
     sections: [
       {
         h: 'What training partner registration involves',
@@ -3074,9 +3111,9 @@ const REGISTRATIONS = [
     h1: 'Digital signature certificates, issued properly.',
     lede:
       'Class 3 DSCs from eMudhra and Capricorn, both licensed Certifying Authorities, with Vybe as a registered partner of each. Individual, organisation, combo and DGFT certificates, with the USB token if you need one, and the token handed to you rather than kept in our drawer.',
-    metaTitle: 'Class 3 Digital Signature Certificate (DSC) & Token | From ₹1,500 | Vybe',
+    metaTitle: 'Class 3 Digital Signature Certificate & Token | From ₹1,500',
     metaDescription:
-      'Class 3 digital signature certificates from eMudhra and Capricorn, with Vybe as a registered partner: individual, organisation, combo and DGFT, from ₹1,500 for two years, USB token ₹599. Bengaluru.',
+      'Class 3 digital signature certificates from eMudhra and Capricorn: individual, organisation, combo and DGFT, from ₹1,500 for two years, USB token ₹599.',
     sections: [
       {
         h: 'What a DSC is, and who actually issues it',
@@ -3328,10 +3365,10 @@ ${relatedSection('registrations', { dark: false })}
     page: {
       url,
       nav: 'registrations',
-      title: 'GST, MSME, FSSAI & Startup India Registration | From ₹199 | Vybe',
+      title: 'GST, MSME & FSSAI Registration from ₹199 | Vybe',
       ogTitle: 'Business registrations: GST, Udyam, FSSAI, DPIIT, ISO and DSC',
       description:
-        'GST and Udyam (MSME) registration at ₹199, FSSAI at ₹299, DPIIT / Startup India recognition at ₹999, non-accredited ISO certification from ₹1,599, NSDC / Skill India and affiliation consulting on quote, and Class 3 digital signature certificates from ₹1,500. Professional fees, with government charges separate. Vybe Technologies, Bengaluru.',
+        'GST and Udyam (MSME) at ₹199, FSSAI at ₹299, Startup India at ₹999, ISO from ₹1,599 and Class 3 DSC from ₹1,500. Professional fees, government charges separate.',
       lastmod,
       trail: [CRUMB_HOME, { name: 'Registrations', url }],
       faqs: regFaqs,
@@ -3516,6 +3553,8 @@ const notFoundLink = (href, label, desc) =>
 /* ------------------------------------------------------------- write it out */
 
 for (const doc of DOCS) {
+  // Every document, however its body was assembled, gets one outline pass.
+  doc.page.body = liftLeadingHeadings(doc.page.body);
   write(doc.file, shell(doc.page));
   emitted.push({
     url: doc.page.url,

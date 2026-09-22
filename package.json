@@ -16,7 +16,7 @@
     "tailwindcss": "^3.4.17"
   },
   "scripts": {
-    "build": "node build.js && npm run css",
+    "build": "node build.js && npm run css && node tools/stamp-assets.js",
     "stage": "node tools/stage.js",
     "css": "tailwindcss -i src/input.css -o assets/site.css --minify",
     "images": "node tools/gen-images.mjs",
@@ -24,7 +24,10 @@
     "fonts": "node tools/gen-fonts.mjs",
     "serve": "node tools/serve.js",
     "indexnow": "node tools/indexnow.mjs",
-    "validate": "html-validate index.html 404.html */index.html */*/index.html"
+    "validate": "html-validate index.html 404.html */index.html */*/index.html",
+    "audit:seo": "node tools/audit-seo.js",
+    "audit:mobile": "node tools/audit-mobile.js",
+    "audit:icons": "node tools/audit-icons.js"
   },
   "keywords": [],
   "author": "",

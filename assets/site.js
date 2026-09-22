@@ -265,6 +265,12 @@
     var canvas = document.getElementById(canvasId);
     if (!canvas || reducedMotion) return;
 
+    // The whole effect is driven by cursor proximity, so on a touch device it
+    // renders several hundred motionless dots at 60fps and nothing else. That
+    // is pure battery and main-thread cost competing with the scroll, which is
+    // what made the hero feel janky on phones.
+    if (window.matchMedia('(hover: none), (pointer: coarse)').matches) return;
+
     var ctx = canvas.getContext('2d');
     var dots = [];
     var mouse = { x: -1000, y: -1000, radius: 120 };
@@ -322,10 +328,20 @@
 
     init();
 
+    /* Only a width change can alter the dot grid. Listening to every resize
+       meant the address bar sliding away mid-scroll fired one, and init()
+       clears the canvas and rebuilds the whole array — a visible stutter at
+       exactly the moment the user was scrolling. */
     var resizeTimer;
+    var lastWidth = width;
     window.addEventListener('resize', function () {
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(init, 150);
+      resizeTimer = setTimeout(function () {
+        var parent = canvas.parentElement;
+        if (!parent || parent.offsetWidth === lastWidth) return;
+        lastWidth = parent.offsetWidth;
+        init();
+      }, 150);
     });
 
     window.addEventListener(
