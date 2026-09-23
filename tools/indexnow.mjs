@@ -1,17 +1,14 @@
 /*
- * Tell the IndexNow engines which pages actually changed. Bing, Yandex,
- * Seznam, Naver and DuckDuckGo all consume the shared api.indexnow.org
- * endpoint. Google does not, so this adds to the sitemap, never replaces it.
+ * Tell the IndexNow engines which pages changed. Bing, Yandex, Seznam, Naver
+ * and DuckDuckGo share the api.indexnow.org endpoint. Google does not, so this
+ * adds to the sitemap rather than replacing it.
  *
- * Submitting every URL on every deploy is treated as spam, and a CSS tweak
- * does not change nine pages. .lastmod.json only moves a date when a page's
- * content hash moves, so this diffs it against the copy in the last commit
- * and submits exactly the pages that changed.
+ * Submitting every URL on every deploy is treated as spam, so this diffs
+ * .lastmod.json against the copy in the last commit and submits only the pages
+ * whose content hash moved.
  *
- * The key is public by design: the engines fetch it from the site root to
- * prove the submitter controls the domain, so it is committed, not held in CI.
+ * The key is public by design, so it is committed rather than held in CI.
  *
- * Usage:
  *   node tools/indexnow.mjs              # changed pages only
  *   node tools/indexnow.mjs --all        # every URL in the sitemap
  *   node tools/indexnow.mjs --dry-run    # print the payload, send nothing
@@ -35,10 +32,7 @@ const die = (msg) => {
 
 /* ------------------------------------------------------------------ key */
 
-/**
- * The key file is named for the key it contains, as the protocol expects.
- * Found by pattern, so rotating the key is one rename and nothing else.
- */
+// Named for the key it holds, so rotating it is one rename and nothing else.
 const keyFiles = fs.readdirSync(ROOT).filter((f) => /^[a-f0-9]{8,128}\.txt$/i.test(f));
 if (keyFiles.length !== 1) {
   die(
@@ -65,11 +59,7 @@ if (!sitemapUrls.length) die('sitemap.xml contains no <loc> entries.');
 const origin = new URL(sitemapUrls[0]).origin;
 const host = new URL(origin).host;
 
-/**
- * Git is the only record of the previous build. If .lastmod.json is
- * unreachable (shallow clone, fresh repo) there is no diff to take, and the
- * full list is the safe fallback rather than silently submitting nothing.
- */
+/** Null on a shallow or fresh clone; callers fall back to the full list. */
 function previousLastmod() {
   try {
     const raw = execFileSync('git', ['show', 'HEAD:.lastmod.json'], { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
@@ -130,17 +120,14 @@ const res = await fetch(ENDPOINT, {
 
 const body = await res.text();
 
-/**
- * 200 and 202 are both successes. Nothing here fails a deploy: the pages are
- * already live and in the sitemap. This is a hint to the engines, not a gate.
- */
+// 200 and 202 are both successes. Nothing here fails a deploy.
 const MEANING = {
   200: 'accepted',
   202: 'accepted, key validation pending',
-  400: 'bad request — malformed payload',
-  403: 'key not valid for this host — check the key file is deployed and readable',
+  400: 'bad request, malformed payload',
+  403: 'key not valid for this host, check the key file is deployed and readable',
   422: 'URLs do not belong to the host, or the key does not match the schema',
-  429: 'too many requests — back off',
+  429: 'too many requests, back off',
 };
 
 const note = MEANING[res.status] || 'unexpected status';

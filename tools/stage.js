@@ -1,12 +1,10 @@
 /*
  * Assemble dist/: what gets uploaded to Azure, and nothing else. build.js
- * writes into the repo root, so the root is both source tree and site, and an
- * unfiltered upload would carry build.js, src/ and tools/ with it.
+ * writes into the repo root, so the root is both source tree and site.
  *
- * A deny list, not an allow list: a new page directory deploys automatically,
- * a new build tool goes in tools/ and is excluded by name.
+ * A deny list, not an allow list: a new page directory deploys automatically.
  *
- * Usage: node tools/stage.js
+ *   node tools/stage.js
  */
 const fs = require('node:fs');
 const path = require('node:path');
@@ -14,7 +12,6 @@ const path = require('node:path');
 const ROOT = __dirname + '/..';
 const DIST = path.join(ROOT, 'dist');
 
-/** Never deployed: source, tooling, dependency and VCS metadata. */
 const DENY = new Set([
   'dist',
   'node_modules',
@@ -34,7 +31,7 @@ const DENY = new Set([
   'README.md',
 ]);
 
-/** Files that must exist in dist/ or the deploy is not worth shipping. */
+/** Missing any of these fails the stage. */
 const REQUIRED = [
   'index.html',
   '404.html',
@@ -45,14 +42,11 @@ const REQUIRED = [
   'site.webmanifest',
   'assets/site.css',
   'assets/site.js',
-  // Nothing links to these, so a missing one is silent until an answer engine
-  // or a security researcher goes looking and finds a 404.
+  // Nothing on the site links to these four, so a missing one is silent: the
+  // BIMI mark is reached from DNS, the rest only by crawlers and Apple.
   'llms.txt',
   '.well-known/security.txt',
-  // The BIMI mark. Only the DNS record points at it, so a missing file shows
-  // up as a mailbox provider quietly dropping the logo from inbox headers.
   'logo.svg',
-  // Apple Pay domain verification. Its absence is invisible until it fails.
   '.well-known/apple-developer-merchantid-domain-association',
 ];
 
@@ -79,21 +73,16 @@ for (const entry of fs.readdirSync(ROOT, { withFileTypes: true })) {
   files++;
 }
 
-/* Point the staged pages at Front Door.
+/* Point the staged pages at Front Door. Only dist/ is rewritten, so
+ * `npm run serve` still runs offline against the repo root.
  *
- * Only dist/ is rewritten. The repo root keeps root-relative /assets/ URLs so
- * `npm run serve` still runs offline against local files, and a diff of the
- * generated pages stays readable.
+ * Assets go to dist/ as well as the CDN: the manifest, favicon and Apple touch
+ * icon are fetched from the site origin and resolve relative to it.
  *
- * Assets are still copied into dist/ as well as uploaded to the CDN: the web
- * manifest, favicon and the Apple touch icon are fetched from the site origin
- * and resolve their icons relative to it.
+ * site.css is left alone. Its font URLs are root-relative, so they resolve
+ * against the stylesheet's own origin and follow it to the CDN.
  *
- * Stylesheets are deliberately left alone. site.css reaches its fonts with
- * root-relative URLs, which resolve against the stylesheet's own origin — so
- * once the CSS is served from the CDN, its fonts come from the CDN too.
- *
- * Set ASSET_CDN='' to stage a build that serves everything from the origin.
+ * ASSET_CDN='' stages a build that serves everything from the origin.
  */
 const CDN = process.env.ASSET_CDN ?? 'https://cdn.vybe.net.in';
 
@@ -108,16 +97,12 @@ function distHtml(dir = DIST) {
 }
 
 if (CDN) {
-  // Only where /assets/ opens an attribute value or a srcset entry, so that an
-  // already-absolute https://vybe.net.in/assets/og-image.png is left intact —
-  // social scrapers want a URL on the canonical domain.
+  // Only where /assets/ opens an attribute or srcset entry, leaving an
+  // already-absolute https://vybe.net.in/assets/og-image.png alone.
   const re = /(["'\s,(])\/assets\//g;
 
-  /* Open the TLS connection to the CDN while the parser is still in <head>,
-     instead of paying a fresh DNS + TCP + TLS round trip at the moment the
-     stylesheet is requested. Two hints, not one: a crossorigin connection is
-     pooled separately from a plain one, and the fonts (CORS, because of the
-     crossorigin attribute on their preloads) cannot reuse the stylesheet's. */
+  /* Two hints, not one: a crossorigin connection is pooled separately from a
+     plain one, so the CORS font preloads cannot reuse the stylesheet's. */
   const preconnect =
     `<link rel="preconnect" href="${CDN}">\n` +
     `<link rel="preconnect" href="${CDN}" crossorigin>\n`;
@@ -135,14 +120,13 @@ if (CDN) {
   console.log(`stage: pointed ${rewritten} pages at ${CDN}`);
 }
 
-// The IndexNow key file must be at the site root or submissions 403. Matched
-// by pattern because it is named for the key it holds.
+// Named for the key it holds, so matched by pattern.
 const hasIndexNowKey = fs.readdirSync(DIST).some((f) => /^[a-f0-9]{8,128}\.txt$/i.test(f));
-if (!hasIndexNowKey) console.warn('stage: no IndexNow key file in dist/ — submissions will 403');
+if (!hasIndexNowKey) console.warn('stage: no IndexNow key file in dist/, submissions will 403');
 
 const missing = REQUIRED.filter((f) => !fs.existsSync(path.join(DIST, f)));
 if (missing.length) {
-  console.error(`stage: missing from dist/ — ${missing.join(', ')}`);
+  console.error(`stage: missing from dist/: ${missing.join(', ')}`);
   console.error('stage: did you run `npm run build` first?');
   process.exit(1);
 }

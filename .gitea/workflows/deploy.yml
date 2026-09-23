@@ -1,21 +1,17 @@
-# =============================================================================
 # Build and deploy vybe.net.in to Azure Static Web Apps on every push to main.
 #
-# Why the SWA CLI instead of Azure/static-web-apps-deploy@v1:
-# that action is a Docker action written against GitHub's API — it wants to
-# post commit statuses and open preview environments per pull request, and on
-# a Gitea runner those calls have nowhere to go. The CLI is plain npm, takes a
-# deployment token, and is the route Azure documents for non-GitHub CI.
+# Uses the SWA CLI rather than Azure/static-web-apps-deploy@v1: that action
+# calls GitHub's API for commit statuses and PR preview environments, which a
+# Gitea runner has nowhere to send.
 #
-# Required repository secret (Settings -> Actions -> Secrets):
+# Required secrets (Settings -> Actions -> Secrets):
 #   AZURE_STATIC_WEB_APPS_API_TOKEN
-# =============================================================================
+#   AZURE_CLIENT_ID / AZURE_CLIENT_SECRET / AZURE_TENANT_ID
 name: Deploy to Azure Static Web Apps
 
 on:
   push:
     branches: [main]
-  # Lets you redeploy the current main from the Actions tab without an empty commit.
   workflow_dispatch:
 
 jobs:
@@ -26,9 +22,7 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v4
         with:
-          # tools/indexnow.mjs diffs .lastmod.json against HEAD to work out
-          # which pages actually changed. A depth-1 clone still has HEAD, but
-          # two commits give it something to fall back on if a build is rerun.
+          # tools/indexnow.mjs diffs .lastmod.json against HEAD~1.
           fetch-depth: 2
 
       - name: Set up Node
@@ -37,8 +31,8 @@ jobs:
           node-version: '22'
 
       - name: Install dependencies
-        # Puppeteer only drives the local screenshot scripts. Without this it
-        # pulls a ~170MB Chromium on every run for a browser CI never opens.
+        # Puppeteer only drives the local screenshot scripts; skip the 170MB
+        # Chromium download CI never opens.
         env:
           PUPPETEER_SKIP_DOWNLOAD: 'true'
         run: npm ci
@@ -47,30 +41,21 @@ jobs:
         run: npm run build
 
       - name: Validate HTML
-        # Deliberately between build and deploy: a malformed page fails the
-        # run rather than reaching production and sitting in Search Console.
+        # Between build and deploy, so a malformed page fails the run rather
+        # than reaching production.
         run: npm run validate
 
       - name: Stage the deploy artifact
-        # Copies the site into dist/, leaving build.js, src/ and tools/ behind.
         run: npm run stage
 
       - name: Upload assets to the CDN origin
         # Before the site deploy, never after: the staged pages reference
-        # cdn.vybe.net.in, so an asset that is not in the container yet is a
-        # 404 on a live page for however long the deploy takes.
+        # cdn.vybe.net.in, so an asset missing from the container is a 404 on a
+        # live page for the length of the deploy.
         #
-        # No CDN purge follows this. Every asset URL carries a ?v=<content
-        # hash> (tools/stamp-assets.js) and the Front Door route caches on the
-        # full query string, so changed content arrives under a new cache key.
-        #
-        # Authenticates as the vybe-cdn-deploy service principal, which holds
-        # Storage Blob Data Contributor on the vybecdn account and nothing
-        # else. An account key or connection string would instead hand CI full
-        # control of the account, including the ability to hand out SAS tokens.
-        #
-        # Required repository secrets:
-        #   AZURE_CLIENT_ID / AZURE_CLIENT_SECRET / AZURE_TENANT_ID
+        # No purge follows. Every asset URL carries a ?v=<content hash> and the
+        # Front Door route caches on the full query string, so changed content
+        # lands under a new cache key.
         env:
           AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
@@ -85,8 +70,7 @@ jobs:
           done
           command -v az >/dev/null || curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
           # --allow-no-subscriptions: the principal is scoped to one storage
-          # account, so it cannot enumerate subscriptions and a plain login
-          # would fail before it ever reached the upload.
+          # account and cannot enumerate subscriptions.
           az login --service-principal \
             --username "$AZURE_CLIENT_ID" \
             --password "$AZURE_CLIENT_SECRET" \
@@ -98,9 +82,8 @@ jobs:
             --source ./dist/assets \
             --overwrite --no-progress \
             --content-cache 'public, max-age=31536000, immutable'
-          # Re-upload the fonts with an explicit type: the CLI guesses content
-          # types from the file extension and has no entry for .woff2, so they
-          # would land as application/octet-stream.
+          # Re-upload the fonts with an explicit type: the CLI has no entry for
+          # .woff2 and they would land as application/octet-stream.
           az storage blob upload-batch \
             --account-name vybecdn --auth-mode login \
             --destination '$web' --destination-path assets \
@@ -126,12 +109,8 @@ jobs:
             --no-use-keychain
 
       - name: Ping IndexNow
-        # After the deploy, never before: the engines fetch the URL as soon as
-        # they are told about it, and pointing them at the old content is worse
-        # than staying quiet. Submits only the pages whose content hash moved.
-        #
-        # continue-on-error because this is a hint, not a gate. The pages are
-        # already live and the sitemap still lists them; a 429 from a search
-        # engine is not a reason to mark a good deploy as failed.
+        # After the deploy: the engines fetch as soon as they are told, and
+        # pointing them at stale content is worse than staying quiet. A hint,
+        # not a gate, so a 429 does not fail a good deploy.
         continue-on-error: true
         run: npm run indexnow

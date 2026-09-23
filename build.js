@@ -16,9 +16,10 @@ const BUILD_DATE = new Date().toISOString().slice(0, 10);
 const ORG = {
   name: 'Vybe Technologies',
   legalName: 'Vybe Technologies',
+  // How people actually type the brand. Google uses these to match a bare
+  // "vybe" query to this entity rather than to an unrelated one.
+  alsoKnownAs: ['Vybe', 'Vybe Tech', 'Vybe Technologies Bengaluru'],
   slogan: 'Smart. Simple. Affordable.',
-  // Sales is the number on the site's calls to action; support has its own
-  // line; the old main number is still answered, as a second office line.
   phone: '+91-99641-77677',
   phoneSupport: '+91-90198-01319',
   phoneOffice: '+91-99641-77877',
@@ -32,15 +33,29 @@ const ORG = {
   region: 'Karnataka',
   postal: '560078',
   country: 'IN',
-  // 24-hour times, because that is the only format schema.org accepts.
+  // schema.org accepts 24-hour times only.
   opens: '09:00',
   closes: '18:30',
   openDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+  // Every profile here must link back to vybe.net.in, or the claim is weak.
+  // The Google Business Profile is the strongest of these for a local brand
+  // query. The share.google link is a redirect; swap it for the canonical
+  // https://www.google.com/maps/place/?q=place_id:<id> form when the place ID
+  // is to hand, so Google is matching an ID rather than following a shortener.
   profiles: [
     'https://www.linkedin.com/company/vybe-technologies',
     'https://www.instagram.com/vybe_technologies/',
+    'https://share.google/htg8JI6VwCntv1U3Y',
   ],
+  founder: { name: 'Ankit Sabu', profile: 'https://www.linkedin.com/in/ankit-sabu-816769273/' },
+  // ISO 8601, which is the only format schema.org reads.
+  foundingDate: '2026-04-27',
+  gstin: '29DGZPC6225F1Z0',
 };
+
+/** Drops keys whose value is empty, so unfilled ORG fields never reach the graph. */
+const defined = (obj) =>
+  Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== '' && v != null && !(Array.isArray(v) && !v.length)));
 
 /* ---------------------------------------------------------------- helpers */
 
@@ -387,7 +402,7 @@ const NAV_GROUPS = [
   {
     id: 'manufacturing',
     label: 'Manufacturing',
-    blurb: 'Cards we make, and hardware we supply. Quoted per order — no prices or stock counts on the site.',
+    blurb: 'Cards we make, and hardware we supply. Quoted per order, with no prices or stock counts on the site.',
     items: [
       { nav: 'manufacturing', href: '/manufacturing/', label: 'All manufacturing &amp; supply', blurb: 'What we make and what we distribute.', icon: 'precision_manufacturing' },
       { nav: 'mfg-rfid', href: '/manufacturing/rfid-cards/', label: 'RFID &amp; NFC cards', blurb: 'MIFARE, DESFire, NTAG and UHF, encoded to your readers.', icon: 'contactless' },
@@ -459,7 +474,7 @@ function navbar(active) {
 
   return `<header class="fixed top-0 w-full z-50 transition-all duration-300 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm" id="navbar">
         <div class="max-w-7xl mx-auto px-6 h-[72px] flex justify-between items-center">
-            <a href="/" class="flex items-center gap-3 group" aria-label="Vybe Technologies — home">
+            <a href="/" class="flex items-center gap-3 group" aria-label="Vybe Technologies home">
                 ${picture({ base: 'vybe-logo', alt: 'Vybe Technologies', cls: 'h-6 object-contain', h: 24, aspect: LOGO_ASPECT, eager: true })}
                 <span class="hidden sm:flex flex-col justify-center border-l border-slate-200 pl-3">
                     <span class="text-[15px] font-bold font-display tracking-tight text-slate-900 leading-none">Technologies</span>
@@ -531,7 +546,7 @@ function footer() {
                     ${picture({ base: 'vybe-logo', alt: 'Vybe Technologies', cls: 'h-6 object-contain filter brightness-0 invert', h: 24, aspect: LOGO_ASPECT })}
                     <span class="text-lg font-bold font-display tracking-tight text-white leading-none">Technologies</span>
                 </div>
-                <p class="text-sm leading-relaxed mb-6">Unified software suites, custom development and secure infrastructure — for campuses and for businesses that need something built to fit.</p>
+                <p class="text-sm leading-relaxed mb-6">Unified software suites, custom development and secure infrastructure, for campuses and for businesses that need something built to fit.</p>
 
                 <ul class="flex items-center gap-3">
                     ${social(
@@ -602,6 +617,7 @@ const organization = {
   '@type': 'Organization',
   '@id': `${SITE}/#organization`,
   name: ORG.name,
+  alternateName: ORG.alsoKnownAs,
   legalName: ORG.legalName,
   url: `${SITE}/`,
   slogan: ORG.slogan,
@@ -609,7 +625,7 @@ const organization = {
     'Vybe Technologies is a Bengaluru software company. Its products include a cloud ERP for schools and colleges and a 100% cashless cafeteria management system, alongside custom software development, cybersecurity and cloud infrastructure for businesses in any sector.',
   // The full lockup, not the bare glyph: it spells the company name.
   logo: { '@type': 'ImageObject', '@id': `${SITE}/#logo`, url: `${SITE}/assets/vybe-lockup.png`, width: 892, height: 118, caption: ORG.name },
-  image: { '@type': 'ImageObject', '@id': `${SITE}/#image`, url: `${SITE}/assets/og-image.png`, width: 1200, height: 630, caption: `${ORG.name} — ${ORG.slogan}` },
+  image: { '@type': 'ImageObject', '@id': `${SITE}/#image`, url: `${SITE}/assets/og-image.png`, width: 1200, height: 630, caption: `${ORG.name} | ${ORG.slogan}` },
   address: {
     '@type': 'PostalAddress',
     streetAddress: ORG.street,
@@ -623,8 +639,22 @@ const organization = {
     { '@type': 'ContactPoint', telephone: ORG.phoneSupport, contactType: 'customer support', email: ORG.support, areaServed: 'IN', availableLanguage: ['en', 'hi', 'kn'] },
   ],
   areaServed: { '@type': 'Country', name: 'India' },
-  // Profiles we control. Each must link back here or the claim is weak.
   sameAs: ORG.profiles,
+  ...defined({
+    foundingDate: ORG.foundingDate,
+    founder: ORG.founder && {
+      '@type': 'Person',
+      '@id': `${SITE}/#founder`,
+      name: ORG.founder.name,
+      jobTitle: 'Founder',
+      worksFor: { '@id': `${SITE}/#organization` },
+      ...defined({ sameAs: ORG.founder.profile ? [ORG.founder.profile] : '' }),
+    },
+    // GSTIN is not a schema.org vocabulary term, so it is stated twice: taxID
+    // is the property Google reads, PropertyValue names the scheme.
+    taxID: ORG.gstin,
+    identifier: ORG.gstin && { '@type': 'PropertyValue', propertyID: 'GSTIN', value: ORG.gstin },
+  }),
   knowsAbout: [
     'Educational ERP', 'Campus management software', 'Cashless cafeteria systems',
     'Kitchen display systems', 'Custom software development', 'Cybersecurity', 'Cloud infrastructure',
@@ -647,6 +677,7 @@ const localBusiness = {
   '@type': 'ProfessionalService',
   '@id': `${SITE}/#office`,
   name: ORG.name,
+  alternateName: ORG.alsoKnownAs,
   parentOrganization: { '@id': `${SITE}/#organization` },
   url: `${SITE}/`,
   telephone: [ORG.phone, ORG.phoneSupport, ORG.phoneOffice],
@@ -673,9 +704,10 @@ const website = {
   '@id': `${SITE}/#website`,
   url: `${SITE}/`,
   name: ORG.name,
+  alternateName: ORG.alsoKnownAs,
   description: ORG.slogan,
   publisher: { '@id': `${SITE}/#organization` },
-  inLanguage: 'en-IN',
+  inLanguage: LOC.tag,
 };
 
 function breadcrumbSchema(url, trail) {
@@ -796,7 +828,7 @@ function beyondSoftwareSection() {
                       '/manufacturing/',
                       'precision_manufacturing',
                       'Manufacturing &amp; supply',
-                      'RFID and NFC cards made, encoded and personalised to your readers, and IT hardware supplied from Dell, HP, Lenovo, Asus, Apple and Logitech. No prices or stock counts here on purpose — both move weekly, so ask and you get a current answer.',
+                      'RFID and NFC cards made, encoded and personalised to your readers, and IT hardware supplied from Dell, HP, Lenovo, Asus, Apple and Logitech. No prices or stock counts here on purpose. Both move weekly, so ask and you get a current answer.',
                       [
                         'RFID and NFC cards, fobs, tags and wristbands',
                         'Desktops, all-in-ones, mini PCs, laptops and monitors',
@@ -895,7 +927,7 @@ const PARTNERS = [
     items: [
       {
         name: 'JS Global Industries',
-        meta: 'Authorised distributor, Logic interactive flat panels — Bengaluru',
+        meta: 'Authorised distributor, Logic interactive flat panels, Bengaluru',
         url: 'https://www.jsglobalindustries.co.in/',
         logo: 'jsglobal',
       },
@@ -1111,15 +1143,15 @@ const DEEP_DIVE = {
     blocks: [
       {
         h: 'The panel, and why it is not a projector',
-        p: 'An interactive flat panel is the anchor of the room, and for nearly every classroom it is the right call over a projector. A projector needs the lights down, which fights the thing you actually want — students able to read and write while looking at the board. It needs a bulb, which is a recurring cost that arrives as a surprise and usually fails mid-lesson. It drifts out of alignment and dims so gradually that nobody notices until it is genuinely bad. A panel has no consumables, is readable in full daylight, and is touch-interactive from the moment it is switched on. The exception is the very large hall where no panel can be read from the back row, and there we will tell you to use a projector rather than sell you a 98-inch panel that still will not work.',
+        p: 'An interactive flat panel is the anchor of the room, and for nearly every classroom it is the right call over a projector. A projector needs the lights down, which fights the thing you actually want: students able to read and write while looking at the board. It needs a bulb, which is a recurring cost that arrives as a surprise and usually fails mid-lesson. It drifts out of alignment and dims so gradually that nobody notices until it is genuinely bad. A panel has no consumables, is readable in full daylight, and is touch-interactive from the moment it is switched on. The exception is the very large hall where no panel can be read from the back row, and there we will tell you to use a projector rather than sell you a 98-inch panel that still will not work.',
       },
       {
         h: 'Sizing, which is about the back row and nothing else',
-        p: 'Panel size is set by the distance to the furthest student, not by the dimensions of the room and definitely not by the budget line. The working rule is that the back row should sit no further from the panel than roughly six times the panel’s height. For a typical 30-to-40-seat classroom that lands on 75 inches; smaller tutorial rooms take 65; wide or deep halls need 86 or 98. This is why we measure rooms before quoting instead of applying one size across a building — a block of classrooms is rarely uniform, and the room that gets the wrong panel is the room that stops being used.',
+        p: 'Panel size is set by the distance to the furthest student, not by the dimensions of the room and definitely not by the budget line. The working rule is that the back row should sit no further from the panel than roughly six times the panel’s height. For a typical 30-to-40-seat classroom that lands on 75 inches; smaller tutorial rooms take 65; wide or deep halls need 86 or 98. This is why we measure rooms before quoting instead of applying one size across a building. A block of classrooms is rarely uniform, and the room that gets the wrong panel is the room that stops being used.',
       },
       {
         h: 'The online class rig, item by item',
-        p: 'Teaching the room and a remote cohort at the same time needs five things, and most rooms that claim to do hybrid are missing at least two. A classroom PC to run the session, so it does not depend on whichever laptop the teacher brought. A camera framed on the teaching area rather than bolted wherever there was a spare bracket. A second chat monitor, which is the component everyone skips and the one teachers notice immediately — without it, reading a remote student’s question means minimising what you are teaching, so in practice remote students stop being answered at all. Lighting, because a camera does not need a bright room, it needs light on the teacher’s face, and a classroom lit from directly above gives you a silhouette. And room audio that picks up students asking questions, not just the person standing at the desk. The panel is the shared surface both audiences are looking at.',
+        p: 'Teaching the room and a remote cohort at the same time needs five things, and most rooms that claim to do hybrid are missing at least two. A classroom PC to run the session, so it does not depend on whichever laptop the teacher brought. A camera framed on the teaching area rather than bolted wherever there was a spare bracket. A second chat monitor, which is the component everyone skips and the one teachers notice immediately. Without it, reading a remote student’s question means minimising what you are teaching, so in practice remote students stop being answered at all. Lighting, because a camera does not need a bright room, it needs light on the teacher’s face, and a classroom lit from directly above gives you a silhouette. And room audio that picks up students asking questions, not just the person standing at the desk. The panel is the shared surface both audiences are looking at.',
       },
       {
         h: 'Power, the part that is always cut first',
@@ -1127,7 +1159,7 @@ const DEEP_DIVE = {
       },
       {
         h: 'Logic interactive flat panels, through an authorised distributor',
-        p: 'The panels we fit are Logic, supplied through JS Global Industries in Bengaluru, who are the authorised distributor for the range and who we work with as a partner and dealer. That matters for two unglamorous reasons. The first is warranty: a panel bought through the authorised channel is replaced without an argument, and one bought from whoever quoted lowest very often is not. The second is proximity — the distributor is across town rather than across the country, so a dead panel in the middle of March is a van and an afternoon rather than a freight consignment and a fortnight. Sizes run from 65 to 98 inches, decided by the depth of the room and the back row&rsquo;s eyesight rather than by the budget line.',
+        p: 'The panels we fit are Logic, supplied through JS Global Industries in Bengaluru, who are the authorised distributor for the range and who we work with as a partner and dealer. That matters for two unglamorous reasons. The first is warranty: a panel bought through the authorised channel is replaced without an argument, and one bought from whoever quoted lowest very often is not. The second is proximity. The distributor is across town rather than across the country, so a dead panel in the middle of March is a van and an afternoon rather than a freight consignment and a fortnight. Sizes run from 65 to 98 inches, decided by the depth of the room and the back row&rsquo;s eyesight rather than by the budget line.',
       },
       {
         h: 'Teaching content is yours to choose',
@@ -1139,7 +1171,7 @@ const DEEP_DIVE = {
       },
       {
         h: 'Handover, and the reason rooms go unused',
-        p: 'The single best predictor of whether a smart classroom is still in daily use a year later is whether the teachers were trained on it properly, by someone patient, on the actual hardware, before they had to use it in front of thirty students. Nobody wants to be visibly incompetent in front of a class, so a teacher who is unsure will quietly avoid the panel and it will sit dark. Installation therefore includes hands-on sessions for the staff who have to teach with it, and after handover there is annual maintenance and support — so a failed panel is a phone call rather than a procurement exercise that takes a term.',
+        p: 'The single best predictor of whether a smart classroom is still in daily use a year later is whether the teachers were trained on it properly, by someone patient, on the actual hardware, before they had to use it in front of thirty students. Nobody wants to be visibly incompetent in front of a class, so a teacher who is unsure will quietly avoid the panel and it will sit dark. Installation therefore includes hands-on sessions for the staff who have to teach with it, and after handover there is annual maintenance and support, so a failed panel is a phone call rather than a procurement exercise that takes a term.',
       },
       {
         h: 'Where this joins the rest of the campus',
@@ -1154,16 +1186,16 @@ const DEEP_DIVE = {
     lede: 'Almost anyone can point a domain at Google Workspace and create a dozen mailboxes. What takes longer, and is what actually goes wrong later, is the part underneath: who can reach what, what happens when somebody leaves, whether your mail is being delivered or quietly spam-foldered, whether a stranger can walk into your online class, and whether your staff can tell a real invoice from a forged one. That whole picture is the job.',
     blocks: [
       {
-        h: 'Google Workspace, Microsoft 365 or Zoho Mail — how to choose',
-        p: 'If your team already lives in Excel, uses Teams, or you have Windows laptops you want centrally managed, Microsoft 365 for Business is usually the shorter path — Entra ID and Intune come with it and you will want both eventually. If your people work mostly in a browser, collaborate heavily on documents at the same time, and nobody is attached to desktop Office, Google Workspace is simpler to run and simpler to explain to staff. Zoho Mail is the one worth taking seriously on cost: it is materially cheaper per user than either, it does the mail part properly, and for an organisation whose real requirement is professional addresses on its own domain rather than a full collaboration suite, it is often the honest recommendation. It is also an Indian company with Indian data centres, which some organisations prefer on data-residency grounds under the DPDP Act. We will tell you which way we would go for your situation and why, including when the answer is that any of the three would do and you should simply take the cheapest.',
+        h: 'Google Workspace, Microsoft 365 or Zoho Mail: how to choose',
+        p: 'If your team already lives in Excel, uses Teams, or you have Windows laptops you want centrally managed, Microsoft 365 for Business is usually the shorter path, since Entra ID and Intune come with it and you will want both eventually. If your people work mostly in a browser, collaborate heavily on documents at the same time, and nobody is attached to desktop Office, Google Workspace is simpler to run and simpler to explain to staff. Zoho Mail is the one worth taking seriously on cost: it is materially cheaper per user than either, it does the mail part properly, and for an organisation whose real requirement is professional addresses on its own domain rather than a full collaboration suite, it is often the honest recommendation. It is also an Indian company with Indian data centres, which some organisations prefer on data-residency grounds under the DPDP Act. We will tell you which way we would go for your situation and why, including when the answer is that any of the three would do and you should simply take the cheapest.',
       },
       {
         h: 'Student email, and why a campus should not run on personal Gmail',
-        p: 'Most institutions arrive at this having quietly standardised on whatever students already had: a personal Gmail address, often created in a hurry, frequently shared with a sibling, occasionally something a prospective employer would rather not see on a CV. The costs are real even when they are invisible. Nobody can tell whether a submission genuinely came from the student who owns it, staff cannot circulate anything sensitive with confidence, there is no way to reach the cohort reliably, and when a student leaves there is no account to close because the institution never owned one. Institution-owned student addresses fix all of that at once, and both Google Workspace for Education and Microsoft 365 Education have tiers that cost qualifying institutions nothing or very little for the core accounts — which usually surprises people, and is the single most common reason this gets postponed for years longer than it needed to be.',
+        p: 'Most institutions arrive at this having quietly standardised on whatever students already had: a personal Gmail address, often created in a hurry, frequently shared with a sibling, occasionally something a prospective employer would rather not see on a CV. The costs are real even when they are invisible. Nobody can tell whether a submission genuinely came from the student who owns it, staff cannot circulate anything sensitive with confidence, there is no way to reach the cohort reliably, and when a student leaves there is no account to close because the institution never owned one. Institution-owned student addresses fix all of that at once, and both Google Workspace for Education and Microsoft 365 Education have tiers that cost qualifying institutions nothing or very little for the core accounts, which usually surprises people, and is the single most common reason this gets postponed for years longer than it needed to be.',
       },
       {
         h: 'Provisioning a whole cohort without typing it in twice',
-        p: 'Creating four hundred accounts by hand is how this becomes a fortnight of somebody’s life. We provision in bulk from the roll you already have — and where the institution runs Vybe ERP, from the student records that are already in it, so the address is created at admission rather than as a separate administrative errand months later. Accounts are organised by year and by department, which is what makes it possible to mail one batch or restrict a resource to one course without maintaining a distribution list by hand. Each academic year the structure rolls forward: incoming students provisioned, existing students moved up, and graduating students moved to whatever the institution’s policy actually is, whether that is an alumni address, a period of read-only access, or a clean suspension. The point of writing that policy down is that it stops being a decision somebody has to make individually, four hundred times.',
+        p: 'Creating four hundred accounts by hand is how this becomes a fortnight of somebody’s life. We provision in bulk from the roll you already have, and where the institution runs Vybe ERP, from the student records that are already in it, so the address is created at admission rather than as a separate administrative errand months later. Accounts are organised by year and by department, which is what makes it possible to mail one batch or restrict a resource to one course without maintaining a distribution list by hand. Each academic year the structure rolls forward: incoming students provisioned, existing students moved up, and graduating students moved to whatever the institution’s policy actually is, whether that is an alumni address, a period of read-only access, or a clean suspension. The point of writing that policy down is that it stops being a decision somebody has to make individually, four hundred times.',
       },
       {
         h: 'Online classes that do not get crashed',
@@ -1171,11 +1203,11 @@ const DEEP_DIVE = {
       },
       {
         h: 'Accountability, which is the part that actually changes behaviour',
-        p: 'The other half of the problem is anonymity. A participant who joined as "Guest" or under an invented name can disrupt a session and simply rejoin under a different one, and there is nothing for the institution to act on afterwards. When every participant is in the room under a named, institution-owned account, that stops. Each join is attributable, the attendance record is a genuine record rather than a list of nicknames, and if somebody does cause a problem the follow-up is a straightforward disciplinary matter instead of an investigation. In practice the deterrent does most of the work — the incidents largely stop once students understand the room knows exactly who they are. We also set up recording and retention in line with whatever the institution has decided about consent and storage, rather than leaving each teacher to improvise it.',
+        p: 'The other half of the problem is anonymity. A participant who joined as "Guest" or under an invented name can disrupt a session and simply rejoin under a different one, and there is nothing for the institution to act on afterwards. When every participant is in the room under a named, institution-owned account, that stops. Each join is attributable, the attendance record is a genuine record rather than a list of nicknames, and if somebody does cause a problem the follow-up is a straightforward disciplinary matter instead of an investigation. In practice the deterrent does most of the work: the incidents largely stop once students understand the room knows exactly who they are. We also set up recording and retention in line with whatever the institution has decided about consent and storage, rather than leaving each teacher to improvise it.',
       },
       {
         h: 'Email on your own domain, set up so it gets delivered',
-        p: 'Mail from a new domain is treated with suspicion by default, and the fix is three DNS records that are widely skipped. SPF states which servers may send as you. DKIM signs each message so it cannot be altered in transit. DMARC ties the two together and tells receiving servers what to do when a message fails — and, crucially, sends you reports on who is attempting to send as your domain. We configure all three and move DMARC to enforcement once the reports are clean, rather than leaving it permanently on the monitoring setting that protects nobody.',
+        p: 'Mail from a new domain is treated with suspicion by default, and the fix is three DNS records that are widely skipped. SPF states which servers may send as you. DKIM signs each message so it cannot be altered in transit. DMARC ties the two together and tells receiving servers what to do when a message fails. Crucially, it also sends you reports on who is attempting to send as your domain. We configure all three and move DMARC to enforcement once the reports are clean, rather than leaving it permanently on the monitoring setting that protects nobody.',
       },
       {
         h: 'Migrating without losing the last six years of mail',
@@ -1183,7 +1215,7 @@ const DEEP_DIVE = {
       },
       {
         h: 'Single sign-on: one identity, everywhere',
-        p: 'Single sign-on means your staff have one account, protected by one strong authentication step, that gets them into Workspace or Microsoft 365 and into the other SaaS tools you pay for — your ERP, your accounting package, your CRM — over SAML or OIDC. The benefit people notice is fewer passwords. The benefit that matters is that access is now centralised: multi-factor authentication is enforced in one place, conditional access rules can require a managed device or block sign-ins from countries you do not operate in, and when somebody leaves, disabling one account closes every door at once instead of leaving a forgotten login live for two years.',
+        p: 'Single sign-on means your staff have one account, protected by one strong authentication step, that gets them into Workspace or Microsoft 365 and into the other SaaS tools you pay for (your ERP, your accounting package, your CRM) over SAML or OIDC. The benefit people notice is fewer passwords. The benefit that matters is that access is now centralised: multi-factor authentication is enforced in one place, conditional access rules can require a managed device or block sign-ins from countries you do not operate in, and when somebody leaves, disabling one account closes every door at once instead of leaving a forgotten login live for two years.',
       },
       {
         h: 'Joiners, leavers and the accounts nobody closed',
@@ -1191,11 +1223,11 @@ const DEEP_DIVE = {
       },
       {
         h: 'Phishing simulation, run against your own staff',
-        p: 'A simulated phishing campaign sends your people a realistic but harmless lure and records who clicks, who submits credentials and who reports it. It is done with the organisation’s authorisation and it is not a trap laid for individuals — the useful output is the pattern, broken down by department and by role, showing where the real exposure sits. Finance and reception are usually the answer, because they are the two functions whose job is to open attachments from strangers. Campaigns are run on a schedule rather than once, because the number that matters is whether the click rate falls over the year, not what it was in January.',
+        p: 'A simulated phishing campaign sends your people a realistic but harmless lure and records who clicks, who submits credentials and who reports it. It is done with the organisation’s authorisation and it is not a trap laid for individuals. The useful output is the pattern, broken down by department and by role, showing where the real exposure sits. Finance and reception are usually the answer, because they are the two functions whose job is to open attachments from strangers. Campaigns are run on a schedule rather than once, because the number that matters is whether the click rate falls over the year, not what it was in January.',
       },
       {
         h: 'Training that is worth an hour of your staff’s time',
-        p: 'Security awareness training fails when it is a compliance video nobody watches. Ours is short, in-person or live remote, and built around the attacks that actually reach Indian businesses: business email compromise, where an attacker impersonates a director and asks for an urgent transfer; invoice fraud, where a genuine supplier’s bank details are silently changed; credential harvesting pages that look exactly like your own login screen. We also cover the part most training skips, which is what to do in the ten minutes after somebody has clicked — because the difference between an incident and a breach is usually how fast it was reported, and staff who expect to be blamed do not report.',
+        p: 'Security awareness training fails when it is a compliance video nobody watches. Ours is short, in-person or live remote, and built around the attacks that actually reach Indian businesses: business email compromise, where an attacker impersonates a director and asks for an urgent transfer; invoice fraud, where a genuine supplier’s bank details are silently changed; credential harvesting pages that look exactly like your own login screen. We also cover the part most training skips, which is what to do in the ten minutes after somebody has clicked, because the difference between an incident and a breach is usually how fast it was reported, and staff who expect to be blamed do not report.',
       },
       {
         h: 'Why this sits next to our security work',
@@ -1211,7 +1243,7 @@ const DEEP_DIVE = {
     blocks: [
       {
         h: 'Private cloud on AWS and Azure',
-        p: 'We design and deploy Virtual Private Clouds on AWS and Microsoft Azure: an isolated network you control, with your own subnets, routing and security groups rather than a shared box with neighbours. The architecture auto-scales, so capacity follows demand up during a traffic spike and back down again afterwards. That is the difference between paying for a peak and paying for a year of peaks. The uptime SLA is 99.99%. We are a registered partner in the AWS Partner Network and a member of the Google Cloud Partner Advantage programme, and we hold an Azure credits grant from Microsoft for Startups — which matters less as a badge than as the reason we can go to the vendor directly when something needs escalating.',
+        p: 'We design and deploy Virtual Private Clouds on AWS and Microsoft Azure: an isolated network you control, with your own subnets, routing and security groups rather than a shared box with neighbours. The architecture auto-scales, so capacity follows demand up during a traffic spike and back down again afterwards. That is the difference between paying for a peak and paying for a year of peaks. The uptime SLA is 99.99%. We are a registered partner in the AWS Partner Network and a member of the Google Cloud Partner Advantage programme, and we hold an Azure credits grant from Microsoft for Startups, which matters less as a badge than as the reason we can go to the vendor directly when something needs escalating.',
       },
       {
         h: 'AWS or Azure, and why it is usually not a close call',
@@ -1321,7 +1353,9 @@ function shell(page) {
     about: { '@id': `${SITE}/#organization` },
     primaryImageOfPage: { '@id': `${SITE}/#image` },
     inLanguage: LOC.tag,
-    datePublished: '2025-01-15',
+    // Tied to ORG.foundingDate: a page cannot predate the company, and the
+    // two sit in the same graph where Google reads them against each other.
+    datePublished: ORG.foundingDate,
     dateModified: page.lastmod || BUILD_DATE,
     ...(page.trail.length > 1 ? { breadcrumb: { '@id': `${url}#breadcrumb` } } : {}),
     // Named third-party organisations on the page. `mentions` claims only
@@ -1372,14 +1406,14 @@ ${page.noindex ? '' : `<link rel="canonical" href="${url}">\n`}<meta name="robot
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Vybe Technologies — Smart. Simple. Affordable.">
+<meta property="og:image:alt" content="Vybe Technologies | Smart. Simple. Affordable.">
 
 <!-- Twitter / X -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${esc(page.ogTitle || page.title)}">
 <meta name="twitter:description" content="${esc(page.description)}">
 <meta name="twitter:image" content="${SITE}/assets/og-image.png">
-<meta name="twitter:image:alt" content="Vybe Technologies — Smart. Simple. Affordable.">
+<meta name="twitter:image:alt" content="Vybe Technologies | Smart. Simple. Affordable.">
 
 <meta name="author" content="${ORG.name}">
 <meta name="publisher" content="${ORG.name}">
@@ -1427,7 +1461,7 @@ const PAGES = [
     file: 'index.html',
     nav: 'home',
     title: 'Vybe Technologies | Campus ERP, Cashless Cafeteria & Cloud',
-    ogTitle: 'Vybe Technologies — Smart. Simple. Affordable.',
+    ogTitle: 'Vybe Technologies | Smart. Simple. Affordable.',
     description:
       'Campus software for schools, colleges and corporate campuses in India: cloud ERP, a 100% cashless cafeteria, custom apps, cybersecurity and cloud servers.',
     trail: [CRUMB_HOME],
@@ -1437,23 +1471,23 @@ const PAGES = [
     faqs: [
       {
         q: 'What does Vybe Technologies do?',
-        a: 'Vybe Technologies is a software company based in Bengaluru. Our flagship products are <strong>Vybe ERP</strong> for school and college administration, <strong>Vybe CMS</strong> for 100% cashless cafeterias, and <strong>Vybe Cloud</strong> for scalable servers and hosting. We set up <strong>smart classrooms</strong> — interactive flat panels, online and hybrid class systems and writing boards — and handle <strong>workspace and email setup</strong>: Google Workspace, Microsoft 365 and Zoho Mail, staff and student accounts, single sign-on and secure online classes. Alongside those, <strong>Vybe IT Solutions</strong> takes on custom software work for businesses of any size or sector — web and mobile apps, business ERPs, retail POS, bespoke SaaS, internal tools — together with cybersecurity and managed IT. If your requirement does not match a product off our shelf, we build it to fit.',
+        a: 'Vybe Technologies is a software company based in Bengaluru. Our flagship products are <strong>Vybe ERP</strong> for school and college administration, <strong>Vybe CMS</strong> for 100% cashless cafeterias, and <strong>Vybe Cloud</strong> for scalable servers and hosting. We set up <strong>smart classrooms</strong> (interactive flat panels, online and hybrid class systems and writing boards) and handle <strong>workspace and email setup</strong>: Google Workspace, Microsoft 365 and Zoho Mail, staff and student accounts, single sign-on and secure online classes. Alongside those, <strong>Vybe IT Solutions</strong> takes on custom software work for businesses of any size or sector: web and mobile apps, business ERPs, retail POS, bespoke SaaS and internal tools, together with cybersecurity and managed IT. If your requirement does not match a product off our shelf, we build it to fit.',
       },
       {
         q: 'Who does Vybe work with?',
-        a: 'The ERP and cafeteria products are built for schools, colleges and corporate campuses — student profiles, fees, payroll, biometric attendance and academics on one side, and a cafeteria system engineered to hold up during peak rush hours on the other. Our custom development, cybersecurity and cloud teams work well beyond education, with businesses in retail, hospitality, healthcare, gaming and professional services.',
+        a: 'The ERP and cafeteria products are built for schools, colleges and corporate campuses: student profiles, fees, payroll, biometric attendance and academics on one side, and a cafeteria system engineered to hold up during peak rush hours on the other. Our custom development, cybersecurity and cloud teams work well beyond education, with businesses in retail, hospitality, healthcare, gaming and professional services.',
       },
       {
         q: 'Where is Vybe Technologies located?',
-        a: `We are based in Bengaluru, Karnataka — ${esc(ORG.street)}, ${ORG.postal}. You can reach sales on ${telLink(ORG.phone)} or <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a>.`,
+        a: `We are based in Bengaluru, Karnataka, at ${esc(ORG.street)}, ${ORG.postal}. You can reach sales on ${telLink(ORG.phone)} or <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a>.`,
       },
       {
         q: 'Can Vybe build software that is specific to our campus?',
-        a: 'Yes. The ERP is fully customisable, and Vybe IT Solutions builds bespoke web and mobile applications — educational portals, business ERPs, retail POS and custom SaaS — to an institution\u2019s exact operational requirements.',
+        a: 'Yes. The ERP is fully customisable, and Vybe IT Solutions builds bespoke web and mobile applications (educational portals, business ERPs, retail POS and custom SaaS) to an institution\u2019s exact operational requirements.',
       },
       {
         q: 'Do you set up smart classrooms?',
-        a: 'Yes — <a href="/smart-classroom/">smart classroom setup</a> end to end: smart interactive flat panels sized to the room, online and hybrid class systems (classroom PC, camera, chat monitor, lighting and audio), UPS-backed power and cabling, and teacher training at handover. The panels are Logic, supplied through <strong>JS Global Industries</strong> in Bengaluru — the authorised distributor for the range, and a partner and dealer we work with for classroom boards as well.',
+        a: 'Yes, <a href="/smart-classroom/">smart classroom setup</a> end to end: smart interactive flat panels sized to the room, online and hybrid class systems (classroom PC, camera, chat monitor, lighting and audio), UPS-backed power and cabling, and teacher training at handover. The panels are Logic, supplied through <strong>JS Global Industries</strong> in Bengaluru, the authorised distributor for the range, and a partner and dealer we work with for classroom boards as well.',
       },
       {
         q: 'Is Vybe an accredited partner of any cloud or hardware vendor?',
@@ -1472,14 +1506,14 @@ const PAGES = [
       itemListElement: [
         { nav: 'erp', name: 'Vybe ERP', url: `${SITE}/erp/`, description: 'Cloud-based Educational Resource Planning suite for schools and colleges.' },
         { nav: 'cms', name: 'Vybe CMS', url: `${SITE}/cms/`, description: '100% cashless cafeteria management system with QR pickup and split payouts.' },
-        { nav: 'classroom', name: 'Smart Classrooms', url: `${SITE}/smart-classroom/`, description: 'Smart classroom setup — Logic interactive flat panels supplied through an authorised distributor, online and hybrid class systems, writing boards and UPS-backed power.' },
+        { nav: 'classroom', name: 'Smart Classrooms', url: `${SITE}/smart-classroom/`, description: 'Smart classroom setup: Logic interactive flat panels supplied through an authorised distributor, online and hybrid class systems, writing boards and UPS-backed power.' },
         { nav: 'workspace', name: 'Workspace & Email', url: `${SITE}/workspace/`, description: 'Google Workspace, Microsoft 365 and Zoho Mail setup, staff and student email, single sign-on, secure online classes and phishing training.' },
         { nav: 'it', name: 'Vybe IT Solutions', url: `${SITE}/it-solutions/`, description: 'Custom app development, penetration testing and managed security operations.' },
         { nav: 'cloud', name: 'Vybe Cloud', url: `${SITE}/cloud/`, description: 'Scalable cloud architecture, game servers and DDoS protection.' },
-        { nav: 'printing', name: 'Printing Services', url: `${SITE}/printing/`, description: 'Commercial printing — business and RFID cards, letterheads, bill books, brochures, flex banners, roll-up standees and signage, printed to your artwork.' },
+        { nav: 'printing', name: 'Printing Services', url: `${SITE}/printing/`, description: 'Commercial printing: business and RFID cards, letterheads, bill books, brochures, flex banners, roll-up standees and signage, printed to your artwork.' },
         { nav: 'registrations', name: 'Business Registrations', url: `${SITE}/registrations/`, description: 'GST, Udyam (MSME) and FSSAI registrations and DPIIT / Startup India recognition, prepared and filed at a flat professional fee with government charges separate, plus non-accredited ISO certification issued by Vybe, consulting on NSDC / Skill India and affiliation applications, and Class 3 digital signature certificates as a registered partner of eMudhra and Capricorn.' },
-        { nav: 'audits', name: 'Compliance Audits', url: `${SITE}/audits/`, description: 'Advisory, non-statutory hygiene, safety and compliance audits — kitchen hygiene to the FSSAI Schedule 4 standard, kitchen layout and pest control records, fire and electrical safety to the National Building Code, canteen and mess hygiene, child safety to the POCSO standard, school transport safety, campus security, a NAAC/NIRF-ready SDG and sustainability audit, POSH Act Internal Committee compliance, software licensing and IT assets, DPDP Act data protection readiness and labour law records. Reports, certificates and badges are issued by Vybe Technologies alone and are not a licence, rating, accreditation or No Objection Certificate.' },
-        { nav: 'manufacturing', name: 'Manufacturing & Supply', url: `${SITE}/manufacturing/`, description: 'Manufacture of RFID and NFC cards, fobs, tags and wristbands at 125 kHz, 13.56 MHz and UHF — MIFARE Classic, MIFARE DESFire, NTAG and EM4100 — personalised and encoded to your access control, attendance and cafeteria systems, and distribution of IT hardware from Dell, HP, Lenovo, Asus, Apple, Logitech and Alienware, including desktops, all-in-one PCs, mini PCs, laptops, monitors, keyboards, mice, headsets, conferencing equipment and power adapters. Industrial IoT installations covering UHF asset and inventory tracking, temperature and humidity monitoring of cold rooms and server rooms, energy metering per panel or department, and edge gateways integrated with dashboards and Vybe ERP. Supplied against purchase orders and tenders with manufacturer warranty and GST invoicing. Pricing, stock availability and warranty terms are quoted per enquiry rather than listed.' },
+        { nav: 'audits', name: 'Compliance Audits', url: `${SITE}/audits/`, description: 'Advisory, non-statutory hygiene, safety and compliance audits: kitchen hygiene to the FSSAI Schedule 4 standard, kitchen layout and pest control records, fire and electrical safety to the National Building Code, canteen and mess hygiene, child safety to the POCSO standard, school transport safety, campus security, a NAAC/NIRF-ready SDG and sustainability audit, POSH Act Internal Committee compliance, software licensing and IT assets, DPDP Act data protection readiness and labour law records. Reports, certificates and badges are issued by Vybe Technologies alone and are not a licence, rating, accreditation or No Objection Certificate.' },
+        { nav: 'manufacturing', name: 'Manufacturing & Supply', url: `${SITE}/manufacturing/`, description: 'Manufacture of RFID and NFC cards, fobs, tags and wristbands at 125 kHz, 13.56 MHz and UHF (MIFARE Classic, MIFARE DESFire, NTAG and EM4100), personalised and encoded to your access control, attendance and cafeteria systems, and distribution of IT hardware from Dell, HP, Lenovo, Asus, Apple, Logitech and Alienware, including desktops, all-in-one PCs, mini PCs, laptops, monitors, keyboards, mice, headsets, conferencing equipment and power adapters. Industrial IoT installations covering UHF asset and inventory tracking, temperature and humidity monitoring of cold rooms and server rooms, energy metering per panel or department, and edge gateways integrated with dashboards and Vybe ERP. Supplied against purchase orders and tenders with manufacturer warranty and GST invoicing. Pricing, stock availability and warranty terms are quoted per enquiry rather than listed.' },
       ].filter((s) => published(s.nav)).map((s, i) => ({
         '@type': 'ListItem',
         position: i + 1,
@@ -1493,14 +1527,14 @@ const PAGES = [
     file: 'erp/index.html',
     nav: 'erp',
     title: 'Vybe ERP | School & College Management Software (Cloud)',
-    ogTitle: 'Vybe ERP — Campus administration in one dashboard',
+    ogTitle: 'Vybe ERP: campus administration in one dashboard',
     description:
       'A customisable cloud ERP for schools and colleges: parent and staff portals, online fee collection, payroll, biometric attendance, timetables and report cards.',
     trail: [CRUMB_HOME, { name: 'Vybe ERP', url: '/erp/' }],
     priority: '0.9',
     view: erp,
     faqs: [
-      { q: 'What is Vybe ERP?', a: 'Vybe ERP is a completely customisable, cloud-based Educational Resource Planning suite. It replaces fragmented administrative tasks — admissions, fees, attendance, academics — with one centralised, secure dashboard for schools and colleges.' },
+      { q: 'What is Vybe ERP?', a: 'Vybe ERP is a completely customisable, cloud-based Educational Resource Planning suite. It replaces fragmented administrative tasks (admissions, fees, attendance, academics) with one centralised, secure dashboard for schools and colleges.' },
       { q: 'Does Vybe ERP support biometric attendance?', a: 'Yes. The ERP integrates directly with campus biometric scanners so attendance is captured automatically, with no manual registers or spreadsheet reconciliation.' },
       { q: 'Can parents and students log in separately?', a: 'Yes. Students, parents and staff each get a dedicated portal login, so parents can track academics, attendance and fee status without going through the office.' },
       { q: 'How are fees collected?', a: 'Vybe ERP handles online fee collection with instant receipt generation, and keeps payroll logs for staff in the same system.' },
@@ -1538,7 +1572,7 @@ const PAGES = [
     file: 'cms/index.html',
     nav: 'cms',
     title: 'Vybe CMS | 100% Cashless Smart Cafeteria System for Campuses',
-    ogTitle: 'Vybe CMS — The cafeteria line ends here',
+    ogTitle: 'Vybe CMS: the cafeteria line ends here',
     description:
       'A 100% cashless cafeteria platform for campuses: mobile ordering, QR-code pickup, a kitchen display system, automated vendor payouts and live admin analytics.',
     trail: [CRUMB_HOME, { name: 'Vybe CMS', url: '/cms/' }],
@@ -1547,12 +1581,12 @@ const PAGES = [
     view: cms,
     faqs: [
       { q: 'What is Vybe CMS?', a: 'Vybe CMS is a comprehensive SaaS platform for institutional cafeterias. It eliminates campus food queues, automates vendor payouts and gives the institution real-time analytics across every stall.' },
-      { q: 'How do students collect their food?', a: 'Students order from the app and are given an auto-generated QR code. The vendor scans it at the Service Terminal, which marks the order complete instantly — no verbal confirmation and no queue.' },
+      { q: 'How do students collect their food?', a: 'Students order from the app and are given an auto-generated QR code. The vendor scans it at the Service Terminal, which marks the order complete instantly, with no verbal confirmation and no queue.' },
       { q: 'How do vendors get paid?', a: 'Payouts are automated and powered by PhonePe. Funds are split at checkout, routing the food cost directly to the vendor\u2019s bank account. Students can also pay from the zero-fee closed-loop Vybe Wallet.' },
       { q: 'Can students order ahead of a break?', a: 'Yes. Students can place an order from class and schedule it for \u2018Break 1\u2019 or \u2018Break 2\u2019, which lets kitchens prep intelligently instead of absorbing one large rush.' },
-      { q: 'Do students need to install an app from the app store?', a: 'No. Vybe CMS is built as a PWA, so it installs to any iOS or Android home screen straight from the browser — no app store approval required.' },
+      { q: 'Do students need to install an app from the app store?', a: 'No. Vybe CMS is built as a PWA, so it installs to any iOS or Android home screen straight from the browser, with no app store approval required.' },
       { q: 'What does the kitchen see?', a: 'The Kitchen Display System (KDS) is a dedicated interface that separates immediate orders from scheduled break orders, with live order-prep tracking. Vendors can also mark items out of stock instantly or upload entire menus as JSON.' },
-      { q: 'Is Vybe CMS being used anywhere today?', a: 'Yes — it is implemented at Christ Academy Institute for Advanced Studies (CAIAS).' },
+      { q: 'Is Vybe CMS being used anywhere today?', a: 'Yes. It is implemented at Christ Academy Institute for Advanced Studies (CAIAS).' },
     ],
     schema: (url) => ({
       '@type': 'SoftwareApplication',
@@ -1586,7 +1620,7 @@ const PAGES = [
     file: 'smart-classroom/index.html',
     nav: 'classroom',
     title: 'Smart Classroom Setup | Interactive Flat Panels | Vybe',
-    ogTitle: 'Smart Classrooms — panels, cameras, power and content',
+    ogTitle: 'Smart Classrooms: panels, cameras, power and content',
     description:
       'Smart classroom setup for schools and colleges: interactive flat panels, online class systems with camera and lighting, UPS-backed power and cabling.',
     trail: [CRUMB_HOME, { name: 'Smart Classrooms', url: '/smart-classroom/' }],
@@ -1597,7 +1631,7 @@ const PAGES = [
     faqs: [
       {
         q: 'What is included in a smart classroom setup?',
-        a: 'A complete room rather than a list of parts: the interactive flat panel supplied and mounted, a classroom PC, camera, audio and lighting where the room is used for online or hybrid teaching, UPS backup and surge protection, dedicated power points and concealed cabling, content and LMS licensing, and teacher training at handover. Specifications are set per room — a 40-seat lecture hall and a 20-seat tutorial room do not take the same panel.',
+        a: 'A complete room rather than a list of parts: the interactive flat panel supplied and mounted, a classroom PC, camera, audio and lighting where the room is used for online or hybrid teaching, UPS backup and surge protection, dedicated power points and concealed cabling, content and LMS licensing, and teacher training at handover. Specifications are set per room. A 40-seat lecture hall and a 20-seat tutorial room do not take the same panel.',
       },
       {
         q: 'Should we buy an interactive flat panel or a projector?',
@@ -1625,7 +1659,7 @@ const PAGES = [
       },
       {
         q: 'Do you supply writing boards as well as panels?',
-        a: 'Yes. JS Global Industries, the same partner our panels come through, manufacture classroom display and writing boards in Bengaluru. Most rooms want both — a panel for delivery and a writing surface beside it for working through a problem — and specifying them together means the wall is laid out once rather than retrofitted.',
+        a: 'Yes. JS Global Industries, the same partner our panels come through, manufacture classroom display and writing boards in Bengaluru. Most rooms want both: a panel for delivery and a writing surface beside it for working through a problem, and specifying them together means the wall is laid out once rather than retrofitted.',
       },
       {
         q: 'Do you train our teachers, and what happens after installation?',
@@ -1633,7 +1667,7 @@ const PAGES = [
       },
       {
         q: 'Can smart classrooms integrate with Vybe ERP?',
-        a: `Yes. Where the institution runs <a class="text-brand font-bold" href="/erp/">Vybe ERP</a>, the classroom sits inside the same system — timetables, attendance and academics — rather than being a parallel setup with its own logins. Student accounts set up through our <a class="text-brand font-bold" href="/workspace/">workspace and email</a> service are what let online classes admit your own students automatically and keep every participant identifiable.`,
+        a: `Yes. Where the institution runs <a class="text-brand font-bold" href="/erp/">Vybe ERP</a>, the classroom sits inside the same system (timetables, attendance and academics) rather than being a parallel setup with its own logins. Student accounts set up through our <a class="text-brand font-bold" href="/workspace/">workspace and email</a> service are what let online classes admit your own students automatically and keep every participant identifiable.`,
       },
     ],
     schema: (url) => [
@@ -1679,7 +1713,7 @@ const PAGES = [
     file: 'workspace/index.html',
     nav: 'workspace',
     title: 'Google Workspace & Student Email Setup | Microsoft 365',
-    ogTitle: 'Workspace & Email — set up properly, secured properly',
+    ogTitle: 'Workspace & Email: set up properly, secured properly',
     description:
       'Google Workspace, Microsoft 365 and Zoho Mail setup: staff and student email on your own domain, single sign-on, secure online classes and phishing training.',
     trail: [CRUMB_HOME, { name: 'Workspace & Email', url: '/workspace/' }],
@@ -1690,11 +1724,11 @@ const PAGES = [
     faqs: [
       {
         q: 'Should we use Google Workspace, Microsoft 365 or Zoho Mail?',
-        a: 'Microsoft 365 for Business usually wins if your team already relies on desktop Office and Teams, or if you have Windows laptops to manage centrally — Entra ID and Intune come with it. Google Workspace is usually simpler if your people work mainly in a browser and collaborate live on documents. Zoho Mail is the value option and a genuinely good one: noticeably cheaper per user, Indian-owned with Indian data centres if data residency matters to you, and the right answer when what you actually need is professional email on your own domain rather than a full collaboration suite. We will recommend one for your specific setup and explain why.',
+        a: 'Microsoft 365 for Business usually wins if your team already relies on desktop Office and Teams, or if you have Windows laptops to manage centrally, since Entra ID and Intune come with it. Google Workspace is usually simpler if your people work mainly in a browser and collaborate live on documents. Zoho Mail is the value option and a genuinely good one: noticeably cheaper per user, Indian-owned with Indian data centres if data residency matters to you, and the right answer when what you actually need is professional email on your own domain rather than a full collaboration suite. We will recommend one for your specific setup and explain why.',
       },
       {
         q: 'Do you set up Zoho Mail?',
-        a: 'Yes. Zoho Mail is one of the three suites we deploy, and we handle it the same way as the others — domain verification, DNS, mailbox creation, migration of your existing mail, and SPF, DKIM and DMARC configured properly. It is often what we recommend to smaller teams and cost-sensitive institutions, since the per-user cost is well below Google Workspace or Microsoft 365 for what is, for many organisations, the same practical outcome.',
+        a: 'Yes. Zoho Mail is one of the three suites we deploy, and we handle it the same way as the others: domain verification, DNS, mailbox creation, migration of your existing mail, and SPF, DKIM and DMARC configured properly. It is often what we recommend to smaller teams and cost-sensitive institutions, since the per-user cost is well below Google Workspace or Microsoft 365 for what is, for many organisations, the same practical outcome.',
       },
       {
         q: 'Can you migrate our existing email without losing anything?',
@@ -1702,7 +1736,7 @@ const PAGES = [
       },
       {
         q: 'Can you set up email accounts for students, not just staff?',
-        a: 'Yes, and it is a large part of what we do. Every student gets an institution-owned address on your domain, provisioned in bulk from your existing roll — or created automatically at admission where the institution runs Vybe ERP — and organised by year and department so you can mail a single batch without maintaining lists by hand. Each academic year the structure rolls forward, with graduating students moved to whatever your policy says: an alumni address, read-only access, or suspension. Both Google Workspace for Education and Microsoft 365 Education have tiers that cost qualifying institutions nothing or very little for the core student accounts.',
+        a: 'Yes, and it is a large part of what we do. Every student gets an institution-owned address on your domain, provisioned in bulk from your existing roll, or created automatically at admission where the institution runs Vybe ERP, and organised by year and department so you can mail a single batch without maintaining lists by hand. Each academic year the structure rolls forward, with graduating students moved to whatever your policy says: an alumni address, read-only access, or suspension. Both Google Workspace for Education and Microsoft 365 Education have tiers that cost qualifying institutions nothing or very little for the core student accounts.',
       },
       {
         q: 'How do you stop strangers joining our online classes?',
@@ -1710,11 +1744,11 @@ const PAGES = [
       },
       {
         q: 'What if a student disrupts an online class?',
-        a: 'Because every participant joins under a named, institution-owned account rather than as an anonymous guest, disruption is attributable. Nobody can misbehave under an invented name and rejoin under another one, the attendance record is a real record, and the follow-up is an ordinary disciplinary matter rather than an investigation. In practice most of the benefit is deterrence — the incidents largely stop once students know the room can identify everyone in it.',
+        a: 'Because every participant joins under a named, institution-owned account rather than as an anonymous guest, disruption is attributable. Nobody can misbehave under an invented name and rejoin under another one, the attendance record is a real record, and the follow-up is an ordinary disciplinary matter rather than an investigation. In practice most of the benefit is deterrence. The incidents largely stop once students know the room can identify everyone in it.',
       },
       {
         q: 'What is SPF, DKIM and DMARC, and do we need all three?',
-        a: 'They are the three DNS records that decide whether your mail reaches the inbox and whether anyone else can send mail pretending to be you. SPF lists which servers may send as your domain, DKIM cryptographically signs each message, and DMARC tells receiving servers what to do when a message fails either check — and reports attempted impersonation back to you. Yes, you need all three, and DMARC needs to be moved to enforcement rather than left on monitoring.',
+        a: 'They are the three DNS records that decide whether your mail reaches the inbox and whether anyone else can send mail pretending to be you. SPF lists which servers may send as your domain, DKIM cryptographically signs each message, and DMARC tells receiving servers what to do when a message fails either check, and reports attempted impersonation back to you. Yes, you need all three, and DMARC needs to be moved to enforcement rather than left on monitoring.',
       },
       {
         q: 'What does single sign-on actually give us?',
@@ -1722,7 +1756,7 @@ const PAGES = [
       },
       {
         q: 'What is a phishing simulation and is it safe to run on our staff?',
-        a: 'It is an authorised, harmless test: we send your employees a realistic phishing lure and record who clicks, who submits credentials and who reports it. Nothing is installed and no real credentials are captured. It is run with the organisation’s consent and reported as departmental patterns rather than as a list of individuals to punish — the point is to find where training is needed, and staff who expect to be blamed stop reporting real incidents.',
+        a: 'It is an authorised, harmless test: we send your employees a realistic phishing lure and record who clicks, who submits credentials and who reports it. Nothing is installed and no real credentials are captured. It is run with the organisation’s consent and reported as departmental patterns rather than as a list of individuals to punish. The point is to find where training is needed, and staff who expect to be blamed stop reporting real incidents.',
       },
       {
         q: 'What does the staff security training cover?',
@@ -1776,16 +1810,16 @@ const PAGES = [
     file: 'it-solutions/index.html',
     nav: 'it',
     title: 'Custom App Development & Cybersecurity | Vybe IT Solutions',
-    ogTitle: 'Vybe IT Solutions — Custom software and cybersecurity',
+    ogTitle: 'Vybe IT Solutions: custom software and cybersecurity',
     description:
-      'Bespoke web and mobile apps — portals, business ERPs, retail POS and SaaS — secured with penetration testing, DPDP Act compliance and managed SecOps.',
+      'Bespoke web and mobile apps (portals, business ERPs, retail POS and SaaS) secured with penetration testing, DPDP Act compliance and managed SecOps.',
     trail: [CRUMB_HOME, { name: 'IT & Cyber', url: '/it-solutions/' }],
     priority: '0.8',
     dark: true,
     bodyClass: 'text-white dark-section selection:bg-brand/10 selection:text-brand flex flex-col min-h-screen relative z-0',
     view: it,
     faqs: [
-      { q: 'What kind of applications does Vybe build?', a: 'Fast, responsive and scalable web and mobile applications built to an organisation\u2019s exact operational requirements using modern tech stacks — educational portals, business ERPs, retail POS systems and custom SaaS products.' },
+      { q: 'What kind of applications does Vybe build?', a: 'Fast, responsive and scalable web and mobile applications built to an organisation\u2019s exact operational requirements using modern tech stacks: educational portals, business ERPs, retail POS systems and custom SaaS products.' },
       { q: 'What security services do you offer?', a: 'Penetration testing and application security (ethical hacking, exploit identification and deep vulnerability testing), plus Managed SecOps: 24/7 proactive monitoring, incident response and server hardening.' },
       { q: 'Can you help us meet ISO 27001 or the DPDP Act?', a: 'Yes. We provide guidance and implementation for ISO 27001 and India\u2019s Digital Personal Data Protection (DPDP) Act standards.' },
       { q: 'How do we get a quote for a custom build?', a: `Send your software requirements to <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a> and we will scope the project and come back with a quote.` },
@@ -1797,7 +1831,7 @@ const PAGES = [
         name: 'Custom Application Development',
         url,
         serviceType: 'Software development',
-        description: 'Bespoke, scalable web and mobile applications — educational portals, business ERPs, retail POS and custom SaaS.',
+        description: 'Bespoke, scalable web and mobile applications: educational portals, business ERPs, retail POS and custom SaaS.',
         provider: { '@id': `${SITE}/#organization` },
         areaServed: { '@type': 'Country', name: 'India' },
       },
@@ -1819,7 +1853,7 @@ const PAGES = [
     file: 'cloud/index.html',
     nav: 'cloud',
     title: 'Vybe Cloud | Cloud Servers, Game Hosting & DDoS Protection',
-    ogTitle: 'Vybe Cloud — Enterprise-grade infrastructure',
+    ogTitle: 'Vybe Cloud: enterprise-grade infrastructure',
     description:
       'Enterprise infrastructure: auto-scaling private clouds on AWS and Azure with a 99.99% uptime SLA, bare-metal game servers and active DDoS traffic scrubbing.',
     trail: [CRUMB_HOME, { name: 'Vybe Cloud', url: '/cloud/' }],
@@ -2000,12 +2034,12 @@ function contactCard({ icon, label, blurb, email, phone, phoneLabel }) {
 
 const contactFaqs = [
   {
-    q: 'Who should we contact — sales, support or legal?',
+    q: 'Who should we contact: sales, support or legal?',
     a: `Sales, on <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a>, for anything you do not have yet: a quote, a demo, a new campus, extra modules or hardware. Support, on <a class="text-brand font-bold" href="mailto:${ORG.support}">${ORG.support}</a>, for something already running that is not behaving. Legal, on <a class="text-brand font-bold" href="mailto:${ORG.legal}">${ORG.legal}</a>, for contracts, data protection and privacy requests, security disclosures and invoicing disputes. If you pick the wrong one we will pass it across rather than send you back.`,
   },
   {
     q: 'What if my enquiry is not resolved?',
-    a: `Start with sales, support or legal, whichever fits — they own the work and settle almost everything directly. If the matter is still unresolved after that, if you are not satisfied with how it was handled, or in a serious matter, you may bring it to our Grievance Officer at <a class="text-brand font-bold" href="mailto:${ORG.grievance}">${ORG.grievance}</a>, who also receives privacy and data protection grievances. Please attach the original correspondence and the date it was sent.`,
+    a: `Start with sales, support or legal, whichever fits. They own the work and settle almost everything directly. If the matter is still unresolved after that, if you are not satisfied with how it was handled, or in a serious matter, you may bring it to our Grievance Officer at <a class="text-brand font-bold" href="mailto:${ORG.grievance}">${ORG.grievance}</a>, who also receives privacy and data protection grievances. Please attach the original correspondence and the date it was sent.`,
   },
   {
     q: 'What should we include in a first enquiry?',
@@ -2013,7 +2047,7 @@ const contactFaqs = [
   },
   {
     q: 'Where are you located, and can we visit?',
-    a: `Our registered office is at ${esc(ORG.street)}, ${esc(ORG.locality)}, ${esc(ORG.region)} ${ORG.postal}. You are welcome to come and see the products running — call ahead on ${telLink(ORG.phone)} so somebody who can answer your questions is in the office.`,
+    a: `Our registered office is at ${esc(ORG.street)}, ${esc(ORG.locality)}, ${esc(ORG.region)} ${ORG.postal}. You are welcome to come and see the products running. Call ahead on ${telLink(ORG.phone)} so somebody who can answer your questions is in the office.`,
   },
   {
     q: 'Do you work with institutions outside Bengaluru?',
@@ -2033,7 +2067,7 @@ ${breadcrumbs([CRUMB_HOME, { name: 'Contact Us', url: '/contact/' }], false)}
             <div class="max-w-6xl mx-auto relative z-10">
                 <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-3">Contact Us</p>
                 <h1 class="text-5xl md:text-7xl font-black font-display tracking-tighter text-slate-900">Talk to us.</h1>
-                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">Tell us what you are trying to run, and we will tell you plainly whether we are the right fit for it. No call centre and no ticket queue — the numbers below reach the people who build and support the software.</p>
+                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">Tell us what you are trying to run, and we will tell you plainly whether we are the right fit for it. No call centre and no ticket queue. The numbers below reach the people who build and support the software.</p>
 
                 <ul class="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                     ${contactCard({
@@ -2064,7 +2098,7 @@ ${breadcrumbs([CRUMB_HOME, { name: 'Contact Us', url: '/contact/' }], false)}
                     <span class="material-symbols-outlined text-brand text-[28px] shrink-0" aria-hidden="true">flag</span>
                     <div>
                         <h3 class="text-base font-bold font-display tracking-tight text-slate-900">Grievance Officer</h3>
-                        <p class="mt-2 text-sm text-slate-600 leading-relaxed max-w-3xl">Please raise your enquiry with sales, support or legal first — they own the work and settle the large majority of matters directly. If it remains unresolved after that, if you are not satisfied with how it was handled, or in a serious matter, you may bring it to our Grievance Officer at <a href="mailto:${ORG.grievance}" class="font-bold text-brand hover:underline">${ORG.grievance}</a>. Please attach the original correspondence and the date it was sent, so the matter can be taken up from where it stands rather than started again.</p>
+                        <p class="mt-2 text-sm text-slate-600 leading-relaxed max-w-3xl">Please raise your enquiry with sales, support or legal first. They own the work and settle the large majority of matters directly. If it remains unresolved after that, if you are not satisfied with how it was handled, or in a serious matter, you may bring it to our Grievance Officer at <a href="mailto:${ORG.grievance}" class="font-bold text-brand hover:underline">${ORG.grievance}</a>. Please attach the original correspondence and the date it was sent, so the matter can be taken up from where it stands rather than started again.</p>
                     </div>
                 </div>
             </div>
@@ -3592,7 +3626,7 @@ ${relatedSection('registrations', { dark: false })}
  *   1. Every audit is a *Vybe* audit. `name` carries the prefix, always. The
  *      standard it is read against is a separate field, `standard`, rendered
  *      as a description of the yardstick and never as a badge of approval.
- *      "Vybe Hygiene & Food Safety Audit — FSSAI Schedule 4 standard" is a
+ *      "Vybe Hygiene & Food Safety Audit: FSSAI Schedule 4 standard" is a
  *      true sentence; "FSSAI audit" is not one, and nothing here says it.
  *
  *   2. The certificate and badge are ours and nobody else's. We are not
@@ -3621,7 +3655,7 @@ const AUDIT_GROUPS = [
     h1: 'Kitchen audits, before the inspection.',
     lede:
       'Restaurants, cloud kitchens, bakeries, caterers and contract canteens, walked through against Schedule 4 of the FSSAI regulations. You get a written report with photographs, findings graded by what actually matters, a fix list you can work down, and a Vybe certificate and badge where it passes. It is not an FSSAI inspection and the certificate is ours, not FSSAI’s.',
-    metaTitle: 'Kitchen Hygiene Audit — FSSAI Schedule 4 Standard | Vybe',
+    metaTitle: 'Kitchen Hygiene Audit: FSSAI Schedule 4 Standard | Vybe',
     metaDescription:
       'Hygiene and food safety audit to the FSSAI Schedule 4 standard, in Bengaluru. Report, graded fix list, Vybe certificate and badge. Not an FSSAI inspection.',
     audits: [
@@ -3643,7 +3677,7 @@ const AUDIT_GROUPS = [
           'Records and traceability: supplier bills, batch and expiry, and the register nobody has filled in since March',
         ],
         basis:
-          'Schedule 4 of the Food Safety and Standards (Licensing and Registration of Food Businesses) Regulations, 2011 — the Part that applies to you depends on whether you are a petty operator, a restaurant or a manufacturer.',
+          'Schedule 4 of the Food Safety and Standards (Licensing and Registration of Food Businesses) Regulations, 2011. The Part that applies to you depends on whether you are a petty operator, a restaurant or a manufacturer.',
         notStatutory:
           'This is a Vybe audit conducted to the Schedule 4 standard. It is not an FSSAI inspection, and it is not a third-party audit by an FSSAI-recognised auditing agency under the Food Safety and Standards (Food Safety Auditing) Regulations, 2018. <strong>We are not affiliated to or recognised by FSSAI</strong>, the certificate we issue is ours alone, and none of this changes your licence, your inspection history or your hygiene rating.',
       },
@@ -3683,7 +3717,7 @@ const AUDIT_GROUPS = [
           'Bait stations, fly-catchers and glue boards: mapped, numbered, serviced, or three of them missing',
           'Chemicals used, their labels, and whether they are approved for use in a food area',
           'Evidence of follow-up: a finding raised in one visit and closed in the next, or raised every visit for a year',
-          'Proofing of entry points — gaps under doors, unscreened windows, service penetrations, drain covers',
+          'Proofing of entry points: gaps under doors, unscreened windows, service penetrations, drain covers',
           'The exact documents an auditor or an inspector asks to see, and whether you could produce them today',
         ],
         basis:
@@ -3699,7 +3733,7 @@ const AUDIT_GROUPS = [
       },
       {
         h: 'What we actually do on site',
-        p: 'We walk the whole line, from where deliveries land to where waste leaves, in service hours rather than after a deep clean, because a kitchen that has been scrubbed for a visitor tells you nothing. Fridges get opened and temperatures read. Records get asked for — supplier bills, water test reports, medical fitness certificates, the pest control file, the cleaning schedule — and the answer "it is with the accountant" is itself a finding. We talk to the people actually handling food, not only to the manager, because the gap between the written procedure and the practised one is most of what an audit is for.',
+        p: 'We walk the whole line, from where deliveries land to where waste leaves, in service hours rather than after a deep clean, because a kitchen that has been scrubbed for a visitor tells you nothing. Fridges get opened and temperatures read. Records get asked for: supplier bills, water test reports, medical fitness certificates, the pest control file, the cleaning schedule. The answer "it is with the accountant" is itself a finding. We talk to the people actually handling food, not only to the manager, because the gap between the written procedure and the practised one is most of what an audit is for.',
       },
       {
         h: 'What the report looks like',
@@ -3707,7 +3741,7 @@ const AUDIT_GROUPS = [
       },
       {
         h: 'Where our opinion stops',
-        p: 'We read a kitchen against a published standard and we tell you what we see. We do not test food, we do not test water — we look at whether you have had it tested and by whom — and we do not certify anything to anybody else’s standard but our own. Where a finding needs a licensed professional, an electrical contractor, a food technologist, a structural engineer, we say so and we say to bring one in. The report and the certificate are documents from us, for you and for whoever you choose to show them to, and they carry no standing with any regulator.',
+        p: 'We read a kitchen against a published standard and we tell you what we see. We do not test food, we do not test water. We look at whether you have had it tested and by whom, and we do not certify anything to anybody else’s standard but our own. Where a finding needs a licensed professional, an electrical contractor, a food technologist, a structural engineer, we say so and we say to bring one in. The report and the certificate are documents from us, for you and for whoever you choose to show them to, and they carry no standing with any regulator.',
       },
     ],
     faqs: [
@@ -3721,7 +3755,7 @@ const AUDIT_GROUPS = [
       },
       {
         q: 'Will the audit shut the kitchen for a day?',
-        a: 'No. We walk a working kitchen during working hours, which is the whole point — a kitchen cleaned for a visitor is not the kitchen an inspector sees. A typical single-outlet audit is two to four hours on site, most of which is us staying out of the way. The records review usually takes longer than the walk.',
+        a: 'No. We walk a working kitchen during working hours, which is the whole point. A kitchen cleaned for a visitor is not the kitchen an inspector sees. A typical single-outlet audit is two to four hours on site, most of which is us staying out of the way. The records review usually takes longer than the walk.',
       },
       {
         q: 'What does it cost?',
@@ -3731,7 +3765,7 @@ const AUDIT_GROUPS = [
       },
       {
         q: 'Do you fix what you find?',
-        a: 'Some of it. Signage, records, schedules, the display material Schedule 4 asks for and the training register are things we can put right as part of the work. Anything that needs a contractor — a new exhaust, a floor regraded, a wall tiled — we describe precisely enough that you can get it quoted, and we do not take a cut from whoever quotes it. We also do not require you to use us for the fixes to get the re-check.',
+        a: 'Some of it. Signage, records, schedules, the display material Schedule 4 asks for and the training register are things we can put right as part of the work. Anything that needs a contractor (a new exhaust, a floor regraded, a wall tiled) we describe precisely enough that you can get it quoted, and we do not take a cut from whoever quotes it. We also do not require you to use us for the fixes to get the re-check.',
       },
       {
         q: 'Can you audit a cloud kitchen or a home-based food business?',
@@ -3768,15 +3802,15 @@ const AUDIT_GROUPS = [
           'Hose reels, wet risers, pumps, tanks and detection, and whether the system has been tested rather than installed',
           'Alarm audibility in every block, including the ones added later, and manual call point placement',
           'Emergency lighting, exit signage and the assembly point nobody has actually walked to',
-          'Evacuation drill records, dates, timings and who was counted — this is the single most common gap on a campus',
+          'Evacuation drill records, dates, timings and who was counted. This is the single most common gap on a campus',
           'Electrical: load against sanctioned, DB and panel condition, earthing, visible wiring, extension boards, lab supplies',
           'Generator, transformer and panel rooms, and what is being stored in them',
           'Kitchen, lab, library and store rooms, which carry a different fire load from a classroom',
         ],
         basis:
-          'The National Building Code of India 2016, Part 4 (Fire and Life Safety), which sets the requirements for educational occupancies and is the basis on which a fire NOC is granted. Buildings above the occupancy and height thresholds in Part 4 — commonly cited as 500 or more occupants for an educational building — are the ones where a fire clearance is insisted upon.',
+          'The National Building Code of India 2016, Part 4 (Fire and Life Safety), which sets the requirements for educational occupancies and is the basis on which a fire NOC is granted. Buildings above the occupancy and height thresholds in Part 4, commonly cited as 500 or more occupants for an educational building, are the ones where a fire clearance is insisted upon.',
         notStatutory:
-          'A Vybe audit to the NBC standard: preparation for, not a substitute for, the statutory process. <strong>We are not the fire department and we are not affiliated to it.</strong> We do not conduct the inspection that leads to a No Objection Certificate and we cannot issue one — in Karnataka that is the Fire and Emergency Services Department. Our certificate is not an NOC and must never be shown as one. What the audit does is find what they would find, while there is still time to fix it.',
+          'A Vybe audit to the NBC standard: preparation for, not a substitute for, the statutory process. <strong>We are not the fire department and we are not affiliated to it.</strong> We do not conduct the inspection that leads to a No Objection Certificate and we cannot issue one. In Karnataka that is the Fire and Emergency Services Department. Our certificate is not an NOC and must never be shown as one. What the audit does is find what they would find, while there is still time to fix it.',
       },
       {
         id: 'canteen-hygiene',
@@ -3820,7 +3854,7 @@ const AUDIT_GROUPS = [
         basis:
           'The Protection of Children from Sexual Offences Act, 2012, particularly the mandatory reporting obligation in section 19, the Juvenile Justice (Care and Protection of Children) Act, 2015, and the school safety guidelines issued by CBSE and by state authorities.',
         notStatutory:
-          'A Vybe review of your arrangements against the POCSO standard. It is not a legal opinion, not an investigation of any incident or allegation, and it does not discharge any obligation the law places on you. <strong>No certificate from us makes a campus safe or compliant</strong> — it records what we found on a date. Where something we find looks like it needs a lawyer or a report to the authorities, we will say so in plain words on the day and we will not sit on it.',
+          'A Vybe review of your arrangements against the POCSO standard. It is not a legal opinion, not an investigation of any incident or allegation, and it does not discharge any obligation the law places on you. <strong>No certificate from us makes a campus safe or compliant</strong>. It records what we found on a date. Where something we find looks like it needs a lawyer or a report to the authorities, we will say so in plain words on the day and we will not sit on it.',
       },
       {
         id: 'transport-safety',
@@ -3867,7 +3901,7 @@ const AUDIT_GROUPS = [
         basis:
           'Campus safety guidance from CBSE and state education departments, read alongside ordinary physical security practice. Where the finding touches fire or transport, it is cross-referenced to those audits rather than repeated.',
         notStatutory:
-          'A Vybe advisory audit. Not a police or regulatory inspection, and not a penetration test of your IT systems — if that is what you want, it sits under <a class="text-brand font-bold" href="/it-solutions/">IT and cyber</a> rather than here.',
+          'A Vybe advisory audit. Not a police or regulatory inspection, and not a penetration test of your IT systems. If that is what you want, it sits under <a class="text-brand font-bold" href="/it-solutions/">IT and cyber</a> rather than here.',
       },
       {
         id: 'sdg-sustainability',
@@ -3877,11 +3911,11 @@ const AUDIT_GROUPS = [
         tagline:
           'The green audit, evidenced the way NAAC and NIRF ask for it: energy, waste, water and curriculum, each tied to the Goal it answers to.',
         covers: [
-          'Energy consumption and efficiency: block-by-block load, connected against sanctioned, lighting and HVAC retrofits, solar generation against what it was sized for, and the meters nobody reads — SDG 7 and SDG 13',
-          'Waste management and recycling: segregation at source, the wet, dry, e-waste and sanitary streams, who collects each and under what authorisation, composting, and what actually happens after the gate — SDG 11 and SDG 12',
-          'Water conservation: consumption per head, rainwater harvesting structures and whether they are connected to anything, the STP and its log, treated water reuse, leaks and borewell dependence — SDG 6',
+          'Energy consumption and efficiency: block-by-block load, connected against sanctioned, lighting and HVAC retrofits, solar generation against what it was sized for, and the meters nobody reads (SDG 7 and SDG 13)',
+          'Waste management and recycling: segregation at source, the wet, dry, e-waste and sanitary streams, who collects each and under what authorisation, composting, and what actually happens after the gate (SDG 11 and SDG 12)',
+          'Water conservation: consumption per head, rainwater harvesting structures and whether they are connected to anything, the STP and its log, treated water reuse, leaks and borewell dependence (SDG 6)',
           'Campus sustainability practice: single-use plastic across the canteen, events and the stationery store, green cover and tree census, biodiversity register, procurement, and emissions from the fleet',
-          'Curriculum and pedagogy: where sustainability actually appears in teaching, projects, eco-club activity and student research, which is the part NAAC asks about and the part a generic green audit skips — SDG 4',
+          'Curriculum and pedagogy: where sustainability actually appears in teaching, projects, eco-club activity and student research, which is the part NAAC asks about and the part a generic green audit skips (SDG 4)',
           'Governance: the environment policy, the committee behind it, the budget line, and whether last year’s actions were ever closed',
           'The SDG map itself: every finding tied to the specific Goal and target it answers to, so it can be quoted rather than paraphrased',
           'The evidence file assembled in one place, rather than reconstructed the week before a submission is due',
@@ -3903,11 +3937,11 @@ const AUDIT_GROUPS = [
       },
       {
         h: 'The child safety audit is the uncomfortable one',
-        p: 'It has to be. Police verification is where it usually starts and it is usually incomplete — teaching staff are verified, the housekeeping contractor’s people are not, and the van driver is somebody’s cousin. Then there is the policy, which exists as a PDF nobody has read, and mandatory reporting under section 19 of POCSO, which a surprising number of staff do not know binds them personally. We ask these questions of the people who would actually receive a disclosure from a child, because asking the principal tells you what the school intends rather than what it does. Where we find something serious, you will hear it from us immediately and in plain words, not in a report three days later.',
+        p: 'It has to be. Police verification is where it usually starts and it is usually incomplete. Teaching staff are verified, the housekeeping contractor’s people are not, and the van driver is somebody’s cousin. Then there is the policy, which exists as a PDF nobody has read, and mandatory reporting under section 19 of POCSO, which a surprising number of staff do not know binds them personally. We ask these questions of the people who would actually receive a disclosure from a child, because asking the principal tells you what the school intends rather than what it does. Where we find something serious, you will hear it from us immediately and in plain words, not in a report three days later.',
       },
       {
         h: 'Why the SDG audit is not a generic green audit',
-        p: 'Because a generic green audit produces a folder about waste bins, and an accreditation team asks a different question. NAAC wants sustainability evidenced across governance, practice and, critically, curriculum — what students are actually taught and what they actually do — with a policy, a committee, a budget line and closed actions behind it. NIRF wants numbers you can defend. So the audit is built to produce that: energy, waste and water measured rather than described, every finding mapped to the specific Sustainable Development Goal and target it answers to, and the evidence assembled in one file instead of reconstructed the week before a submission. Institutions that already have a green audit report usually find the gap is not the environment work, it is that none of it is written down in a form anybody can score.',
+        p: 'Because a generic green audit produces a folder about waste bins, and an accreditation team asks a different question. NAAC wants sustainability evidenced across governance, practice and, critically, curriculum: what students are actually taught and what they actually do, with a policy, a committee, a budget line and closed actions behind it. NIRF wants numbers you can defend. So the audit is built to produce that: energy, waste and water measured rather than described, every finding mapped to the specific Sustainable Development Goal and target it answers to, and the evidence assembled in one file instead of reconstructed the week before a submission. Institutions that already have a green audit report usually find the gap is not the environment work, it is that none of it is written down in a form anybody can score.',
       },
       {
         h: 'What you get, and what it is worth',
@@ -3917,11 +3951,11 @@ const AUDIT_GROUPS = [
     faqs: [
       {
         q: 'Does the fire safety audit get us a fire NOC?',
-        a: 'No, and be careful of anybody who says theirs does. A No Objection Certificate is issued by the state fire services department after its own inspection — in Karnataka, the Karnataka State Fire and Emergency Services. <strong>We are not the fire department, we are not affiliated to it, and we cannot issue or arrange a clearance.</strong> The Vybe Fire Safety Certificate records that we audited you to the NBC standard and what we found; it is not an NOC and must not be presented as one. What the audit does is find the things that would hold a clearance up, while there is still time and budget to fix them.',
+        a: 'No, and be careful of anybody who says theirs does. A No Objection Certificate is issued by the state fire services department after its own inspection. In Karnataka that is the Karnataka State Fire and Emergency Services. <strong>We are not the fire department, we are not affiliated to it, and we cannot issue or arrange a clearance.</strong> The Vybe Fire Safety Certificate records that we audited you to the NBC standard and what we found; it is not an NOC and must not be presented as one. What the audit does is find the things that would hold a clearance up, while there is still time and budget to fix them.',
       },
       {
         q: 'Is the SDG audit recognised by NAAC or NIRF?',
-        a: 'No. <strong>We have no affiliation with NAAC, NIRF, the UGC or any accrediting body, and nothing we issue carries marks or standing with them.</strong> "NAAC/NIRF-ready" describes how the audit is built — measured, evidenced and mapped to specific Sustainable Development Goals, in the structure those frameworks ask questions in — so that your team is not assembling it from scratch at submission time. The assessment, the score and the accreditation remain entirely theirs to give.',
+        a: 'No. <strong>We have no affiliation with NAAC, NIRF, the UGC or any accrediting body, and nothing we issue carries marks or standing with them.</strong> "NAAC/NIRF-ready" describes how the audit is built: measured, evidenced and mapped to specific Sustainable Development Goals, in the structure those frameworks ask questions in, so that your team is not assembling it from scratch at submission time. The assessment, the score and the accreditation remain entirely theirs to give.',
       },
       {
         q: 'Which buildings actually need a fire clearance?',
@@ -3933,7 +3967,7 @@ const AUDIT_GROUPS = [
       },
       {
         q: 'Do you need to speak to our staff and see our records?',
-        a: 'Yes, and an audit that does not is not worth buying. We ask for staff police verification records, drill logs, the AMC and service records for fire equipment, vehicle papers, the canteen contract and the contractor’s FSSAI licence, the child protection policy, and for the SDG audit twelve months of electricity and water bills and your waste vendor’s authorisation. We speak to the people who would actually be involved — the gate, the drivers, the mess staff, class teachers — rather than only to the management, because the difference between the two answers is most of what the audit finds.',
+        a: 'Yes, and an audit that does not is not worth buying. We ask for staff police verification records, drill logs, the AMC and service records for fire equipment, vehicle papers, the canteen contract and the contractor’s FSSAI licence, the child protection policy, and for the SDG audit twelve months of electricity and water bills and your waste vendor’s authorisation. We speak to the people who would actually be involved (the gate, the drivers, the mess staff, class teachers) rather than only to the management, because the difference between the two answers is most of what the audit finds.',
       },
       {
         q: 'Will you tell us what you find, or just write it down?',
@@ -3958,7 +3992,7 @@ const AUDIT_GROUPS = [
     tagline: 'POSH, software licensing, DPDP, labour law and the office fire basics.',
     h1: 'Workplace compliance, checked before it is checked.',
     lede:
-      'The five things an office is quietly out of compliance with and does not find out about until a complaint, a vendor audit, a notice or an inspection. POSH is the one with a penalty attached and a hard trigger — ten employees — so it is where most of these start.',
+      'The five things an office is quietly out of compliance with and does not find out about until a complaint, a vendor audit, a notice or an inspection. POSH is the one with a penalty attached and a hard trigger at ten employees, so it is where most of these start.',
     metaTitle: 'POSH, DPDP, Labour Law & Software Licence Audits | Vybe',
     metaDescription:
       'Workplace audits in Bengaluru: POSH Act and Internal Committee, DPDP data protection, software licensing, labour law and office fire safety.',
@@ -3969,7 +4003,7 @@ const AUDIT_GROUPS = [
         name: 'Vybe POSH Compliance Audit',
         standard: 'POSH Act 2013 standard',
         tagline:
-          'Internal Committee, policy, training and the annual report — mandatory at ten employees, with a penalty behind it.',
+          'Internal Committee, policy, training and the annual report, mandatory at ten employees, with a penalty behind it.',
         covers: [
           'Whether an Internal Committee exists at all, and whether one exists at every office with ten or more employees rather than only at head office',
           'Its composition: a Presiding Officer who is a woman employed at a senior level, at least half the members women, and an external member from an NGO or with experience of issues relating to sexual harassment',
@@ -4024,7 +4058,7 @@ const AUDIT_GROUPS = [
           'Notice and consent at the point of collection, in the form the Act requires, rather than a line in a footer',
           'Where you are relying on a legitimate use rather than consent, and whether that reliance holds',
           'Retention and deletion: how long you keep things, and whether anything is ever actually deleted',
-          'Processors and vendors — payroll, CRM, cloud, analytics, that WhatsApp group — and what your contracts with them say',
+          'Processors and vendors, from payroll and CRM to cloud, analytics and that WhatsApp group, and what your contracts with them say',
           'A data principal’s rights: access, correction, erasure, nomination and grievance, and whether anybody at your end would answer',
           'Breach readiness: who is told, by whom, in what time, and whether the Board would be notified',
           'Children’s data and verifiable parental consent, which is a hard requirement and a live problem for anyone running a school or an ed-tech product',
@@ -4033,7 +4067,7 @@ const AUDIT_GROUPS = [
         ],
         basis: 'The Digital Personal Data Protection Act, 2023 and the Rules made under it.',
         notStatutory:
-          'A Vybe gap assessment to the DPDP standard. It is not the independent Data Auditor engagement that a Significant Data Fiduciary must arrange under the Act, <strong>we are not appointed or recognised by the Data Protection Board</strong>, and it is not a legal opinion. Neither the audit nor the certificate makes you compliant — they tell you where you are not.',
+          'A Vybe gap assessment to the DPDP standard. It is not the independent Data Auditor engagement that a Significant Data Fiduciary must arrange under the Act, <strong>we are not appointed or recognised by the Data Protection Board</strong>, and it is not a legal opinion. Neither the audit nor the certificate makes you compliant. They tell you where you are not.',
       },
       {
         id: 'labour-law',
@@ -4067,7 +4101,7 @@ const AUDIT_GROUPS = [
         standard: 'NBC 2016 Part 4 standard',
         tagline: 'The same fire and electrical basics as a campus, scaled to a floor plate.',
         covers: [
-          'Exit routes and whether they are clear, which is where an office fails almost every time — cartons in the corridor, a fire door wedged, a second exit that opens into a locked lobby',
+          'Exit routes and whether they are clear, which is where an office fails almost every time: cartons in the corridor, a fire door wedged, a second exit that opens into a locked lobby',
           'Extinguisher type against the risk, placement, pressure and refill dates, and whether anybody on the floor has used one',
           'Detection and alarm, its audibility in meeting rooms and washrooms, and manual call points',
           'Emergency lighting, exit signage and the route to the assembly point',
@@ -4087,7 +4121,7 @@ const AUDIT_GROUPS = [
     sections: [
       {
         h: 'POSH is the one with a deadline already passed',
-        p: 'Every other audit here is prudent. POSH is overdue. The obligation to constitute an Internal Committee applies to every employer with ten or more employees, it applied from 2013, and it applies at each office separately rather than once for the company. The penalty for not having one is up to ₹50,000, and for a repeat it doubles and brings the possibility of the licence or registration the business trades under being cancelled. The part that catches people is not the committee, though — it is the rest of it: the external member who has to come from outside, the display of the committee’s constitution at a conspicuous place, the annual report to the District Officer, and the awareness sessions. We have yet to walk into an office that had all five and could show the records.',
+        p: 'Every other audit here is prudent. POSH is overdue. The obligation to constitute an Internal Committee applies to every employer with ten or more employees, it applied from 2013, and it applies at each office separately rather than once for the company. The penalty for not having one is up to ₹50,000, and for a repeat it doubles and brings the possibility of the licence or registration the business trades under being cancelled. The part that catches people is not the committee, though. It is the rest of it: the external member who has to come from outside, the display of the committee’s constitution at a conspicuous place, the annual report to the District Officer, and the awareness sessions. We have yet to walk into an office that had all five and could show the records.',
       },
       {
         h: 'The software audit usually pays for itself',
@@ -4095,7 +4129,7 @@ const AUDIT_GROUPS = [
       },
       {
         h: 'DPDP is a gap assessment, not a certificate of compliance',
-        p: 'Nobody can make you DPDP compliant in a week, and anybody offering to should be shown the door. What is achievable is knowing exactly where you stand: what personal data you hold, whose it is, what you told them when you took it, who you have since given it to, how long you keep it, and what would happen if somebody asked for it back or if it leaked. Most organisations cannot answer more than two of those. The audit produces the answers and a prioritised list, and the first items on that list are usually unglamorous — a retention rule, a vendor contract clause, a grievance address that reaches a person. The certificate at the end says we audited you against the Act on a date. It does not say you are compliant, because that is not ours to say.',
+        p: 'Nobody can make you DPDP compliant in a week, and anybody offering to should be shown the door. What is achievable is knowing exactly where you stand: what personal data you hold, whose it is, what you told them when you took it, who you have since given it to, how long you keep it, and what would happen if somebody asked for it back or if it leaked. Most organisations cannot answer more than two of those. The audit produces the answers and a prioritised list, and the first items on that list are usually unglamorous: a retention rule, a vendor contract clause, a grievance address that reaches a person. The certificate at the end says we audited you against the Act on a date. It does not say you are compliant, because that is not ours to say.',
       },
       {
         h: 'What you get, and what our opinion is worth',
@@ -4109,7 +4143,7 @@ const AUDIT_GROUPS = [
       },
       {
         q: 'Does this audit make us POSH compliant?',
-        a: 'No. It tells you precisely where you are not, and it can produce the missing pieces — a policy that says what the Act requires, the display notice, the committee constitution, the annual report format, the awareness session. <strong>What it cannot do is serve on your Internal Committee, conduct an inquiry, or file anything on your behalf as though we were you.</strong> The external member of your IC has to come from outside the organisation and must not be us reviewing our own arrangement. The certificate records that we audited you against the Act; it is not a finding of compliance by any authority.',
+        a: 'No. It tells you precisely where you are not, and it can produce the missing pieces: a policy that says what the Act requires, the display notice, the committee constitution, the annual report format, the awareness session. <strong>What it cannot do is serve on your Internal Committee, conduct an inquiry, or file anything on your behalf as though we were you.</strong> The external member of your IC has to come from outside the organisation and must not be us reviewing our own arrangement. The certificate records that we audited you against the Act; it is not a finding of compliance by any authority.',
       },
       {
         q: 'Is the software licence audit reported to anyone?',
@@ -4117,7 +4151,7 @@ const AUDIT_GROUPS = [
       },
       {
         q: 'Is the DPDP audit legal advice?',
-        a: 'No. It is a technical and procedural gap assessment against the Act and Rules, written by people who read them carefully, and it will tell you where your practice and the text do not line up. Where the answer turns on a question of law — whether a legitimate use applies to you, how a contract should be drafted, whether you are a Significant Data Fiduciary — we will tell you that it is a lawyer’s question rather than answer it ourselves.',
+        a: 'No. It is a technical and procedural gap assessment against the Act and Rules, written by people who read them carefully, and it will tell you where your practice and the text do not line up. Where the answer turns on a question of law, whether that is a legitimate use applying to you, how a contract should be drafted or whether you are a Significant Data Fiduciary, we will tell you that it is a lawyer’s question rather than answer it ourselves.',
       },
       {
         q: 'Can you do these remotely?',
@@ -4149,7 +4183,7 @@ function auditNotice({ dark = false } = {}) {
   return noticePanel(
     'Vybe audits, Vybe certificates. Read this first.',
     `<p>We read your premises, your records and your arrangements against the standard that applies to them, write down what we find, and where the audit passes we issue a certificate and a badge. <strong>Every audit here is a Vybe audit and every certificate is issued by Vybe Technologies.</strong></p>
-                        <p>Where an audit names a standard — FSSAI Schedule 4, the National Building Code, POCSO, the POSH Act, the DPDP Act, the UN SDGs — that names the yardstick we read you against. It is not a claim of approval, affiliation or recognition by whoever wrote it. <strong>We are not accredited by, affiliated to, appointed by or recognised by FSSAI, the Fire and Emergency Services, any Pollution Control Board, NAAC, NIRF, the Labour Department, the Data Protection Board or any other authority or certification body.</strong></p>
+                        <p>Where an audit names a standard, whether that is FSSAI Schedule 4, the National Building Code, POCSO, the POSH Act, the DPDP Act or the UN SDGs, that names the yardstick we read you against. It is not a claim of approval, affiliation or recognition by whoever wrote it. <strong>We are not accredited by, affiliated to, appointed by or recognised by FSSAI, the Fire and Emergency Services, any Pollution Control Board, NAAC, NIRF, the Labour Department, the Data Protection Board or any other authority or certification body.</strong></p>
                         <p>So our certificate is not a licence, an NOC, a hygiene rating, an accreditation or a finding of legal compliance, it carries no authority’s mark, and it must not be displayed or described as though it did. It is verifiable on our own portal and nowhere else. If somebody is asking your organisation for an official certificate, ours is not it, and we will tell you which body issues the one they want rather than sell you ours instead.</p>`,
     { dark }
   );
@@ -4217,7 +4251,7 @@ function certificateSection() {
             <div class="max-w-6xl mx-auto">
                 <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-2">Report, certificate, badge</p>
                 <h2 id="audit-certificate-heading" class="text-3xl md:text-4xl font-black font-display tracking-tight text-slate-900">What you walk away with.</h2>
-                <p class="mt-5 text-lg leading-relaxed text-slate-600 max-w-3xl">Every audit produces a report. Where it closes at or above our threshold it also produces a certificate and a badge — both issued by us, and both described below in the plainest words we can find, so that nobody displays one thinking it is something it is not.</p>
+                <p class="mt-5 text-lg leading-relaxed text-slate-600 max-w-3xl">Every audit produces a report. Where it closes at or above our threshold it also produces a certificate and a badge, both issued by us, and both described below in the plainest words we can find, so that nobody displays one thinking it is something it is not.</p>
 
                 <div class="mt-12 grid gap-5 md:grid-cols-3">
                     ${point(
@@ -4243,7 +4277,7 @@ function certificateSection() {
                       `<p>They are issued by <strong>Vybe Technologies</strong> and by nobody else. <strong>We are not accredited by, affiliated to, appointed by, empanelled with or recognised by</strong> FSSAI, the Karnataka State Fire and Emergency Services or any fire authority, any State Pollution Control Board, NAAC, NIRF, the UGC, the Labour Department, the Data Protection Board of India, the BSA, any software vendor, NABCB, any member of the International Accreditation Forum, or any other regulator, accreditation body or certification body.</p>
                         <p>So the certificate is <strong>not</strong> an FSSAI licence, approval or hygiene rating; <strong>not</strong> a fire No Objection Certificate; <strong>not</strong> a pollution control consent; <strong>not</strong> a NAAC or NIRF accreditation, score or endorsement; <strong>not</strong> a vehicle fitness certificate; <strong>not</strong> a vendor’s licensing clearance; and <strong>not</strong> a finding by any authority that your organisation is legally compliant. It carries no government, regulatory or accreditation mark, and it must not be presented, described or displayed as though it does.</p>
                         <p>What it does say is exactly this: that Vybe Technologies audited a named site against a named standard on a named date, and that it met the threshold we publish for that audit. That is a real and checkable statement, and it is the only one being made.</p>
-                        <p>It is verifiable in one place: our own portal. Anyone can check the number and see who holds it, for which audit, against which standard, for what scope and until when. If a customer, a parent body, a tender, a regulator or an accreditation team requires an <em>official</em> or <em>accredited</em> certificate, ours is not it — ask them what they need before you buy one from us or from anybody, and we will tell you which body issues it.</p>`
+                        <p>It is verifiable in one place: our own portal. Anyone can check the number and see who holds it, for which audit, against which standard, for what scope and until when. If a customer, a parent body, a tender, a regulator or an accreditation team requires an <em>official</em> or <em>accredited</em> certificate, ours is not it. Ask them what they need before you buy one from us or from anybody, and we will tell you which body issues it.</p>`
                     )}
                 </div>
             </div>
@@ -4270,7 +4304,7 @@ const AUDIT_STEPS = [
   {
     icon: 'workspace_premium',
     h: 'Re-check, then certificate',
-    p: 'Work down the list and we come back to confirm in writing what has closed. Pass our threshold and the Vybe certificate and badge are issued, valid a year. Fall short and we say so — a certificate nobody can fail is worth nothing.',
+    p: 'Work down the list and we come back to confirm in writing what has closed. Pass our threshold and the Vybe certificate and badge are issued, valid a year. Fall short and we say so. A certificate nobody can fail is worth nothing.',
   },
 ];
 
@@ -4298,7 +4332,7 @@ function auditStepsSection({ heading, lede }) {
 const auditFaqs = [
   {
     q: 'Are these official audits?',
-    a: 'No, and that is the first thing we say rather than the last. <strong>Every audit here is a Vybe audit and none of them is a statutory or regulatory audit.</strong> We are not the fire department, not an FSSAI-recognised auditing agency under the Food Safety Auditing Regulations, 2018, not a Labour Department inspector, not an appointed Data Auditor under the DPDP Act, and not connected to NAAC or NIRF. When an audit names a standard, that names what we read you against — it is not a claim that whoever wrote the standard has approved us or you.',
+    a: 'No, and that is the first thing we say rather than the last. <strong>Every audit here is a Vybe audit and none of them is a statutory or regulatory audit.</strong> We are not the fire department, not an FSSAI-recognised auditing agency under the Food Safety Auditing Regulations, 2018, not a Labour Department inspector, not an appointed Data Auditor under the DPDP Act, and not connected to NAAC or NIRF. When an audit names a standard, that names what we read you against. It is not a claim that whoever wrote the standard has approved us or you.',
   },
   {
     q: 'Then what is the point of an unofficial audit?',
@@ -4328,23 +4362,23 @@ const auditFaqs = [
   },
   {
     q: 'Do you fix what you find?',
-    a: 'The paperwork, yes: policies, registers, schedules, display notices, the documentation an application or an inspection asks for, and the training records behind them. That can be included in the scope. Anything needing a contractor — an exhaust replaced, a floor regraded, a distribution board rewired, a camera moved — we describe precisely enough for you to get it quoted, and we take nothing from whoever quotes it. You are not required to use us for the fixes to get the re-check or the certificate.',
+    a: 'The paperwork, yes: policies, registers, schedules, display notices, the documentation an application or an inspection asks for, and the training records behind them. That can be included in the scope. Anything needing a contractor (an exhaust replaced, a floor regraded, a distribution board rewired, a camera moved) we describe precisely enough for you to get it quoted, and we take nothing from whoever quotes it. You are not required to use us for the fixes to get the re-check or the certificate.',
   },
   {
     q: 'Who carries out the audit?',
-    a: 'Our own team, working to a written checklist per audit so that two visits to the same place produce comparable reports. Where a finding needs a licensed professional to resolve or to sign off — a chartered electrical safety inspector, a structural engineer, a food technologist, a lawyer, an external Internal Committee member — we say so in the report and we say to bring one in. We would rather mark the boundary of our competence than blur it.',
+    a: 'Our own team, working to a written checklist per audit so that two visits to the same place produce comparable reports. Where a finding needs a licensed professional to resolve or to sign off, whether that is a chartered electrical safety inspector, a structural engineer, a food technologist, a lawyer or an external Internal Committee member, we say so in the report and we say to bring one in. We would rather mark the boundary of our competence than blur it.',
   },
   {
     q: 'Is what you find confidential?',
-    a: 'Yes. The report is yours. Nothing goes to any regulator, vendor, industry body or third party from us, and nothing is used as a reference without your written agreement. The one exception is the certificate, which exists to be shown and is checkable by anybody you give the number to. The one thing we will not do is stay quiet about an immediate danger to a person, or about something that looks like it triggers a mandatory reporting obligation — a POCSO disclosure in particular. In that situation you will hear it from us on the day, in plain words, along with what the law expects of you.',
+    a: 'Yes. The report is yours. Nothing goes to any regulator, vendor, industry body or third party from us, and nothing is used as a reference without your written agreement. The one exception is the certificate, which exists to be shown and is checkable by anybody you give the number to. The one thing we will not do is stay quiet about an immediate danger to a person, or about something that looks like it triggers a mandatory reporting obligation, a POCSO disclosure in particular. In that situation you will hear it from us on the day, in plain words, along with what the law expects of you.',
   },
   {
     q: 'Do you audit outside Bengaluru?',
-    a: 'Bengaluru and the surrounding districts are the normal working area and there is no travel charge inside it. Further afield is possible, with travel quoted separately and openly in the scope. For the document-led audits — POSH, software licensing, DPDP, labour law — a good part of the work is records, systems and conversations, so distance matters less. The site-based ones cannot be done remotely and we will not pretend they can.',
+    a: 'Bengaluru and the surrounding districts are the normal working area and there is no travel charge inside it. Further afield is possible, with travel quoted separately and openly in the scope. For the document-led audits (POSH, software licensing, DPDP and labour law) a good part of the work is records, systems and conversations, so distance matters less. The site-based ones cannot be done remotely and we will not pretend they can.',
   },
   {
     q: 'We already had an audit. Why another one?',
-    a: 'If it was recent, thorough and you have worked through it, you may not need one. Send us the report and we will tell you plainly whether a second opinion is worth your money — sometimes the answer is that a re-check against the existing list is all you need, and that is a much smaller piece of work. What is usually worth revisiting is anything older than a year, anything from before a building, a block, a kitchen or a fleet changed, and anything covering only one of the areas you are now being asked about.',
+    a: 'If it was recent, thorough and you have worked through it, you may not need one. Send us the report and we will tell you plainly whether a second opinion is worth your money. Sometimes the answer is that a re-check against the existing list is all you need, and that is a much smaller piece of work. What is usually worth revisiting is anything older than a year, anything from before a building, a block, a kitchen or a fleet changed, and anything covering only one of the areas you are now being asked about.',
   },
 ];
 
@@ -4617,11 +4651,11 @@ const DIST_CATEGORIES = [
     blurb:
       'Slim, SFF and full tower builds from Core i3 up to Core Ultra 9 and Ryzen 7, on Windows 11 Home or Pro, FreeDOS or Ubuntu.',
     lines: [
-      'Dell Slim ECS1250 — Core i3, i5 and i7 14th gen, 8–16 GB, 512 GB NVMe',
-      'HP Pro 280 G9 and Pro Tower 280 G9 — Core i3 13th gen to i5-13500, up to 1 TB NVMe',
-      'HP ProDesk 2 G1a — Ryzen 5 8500G and Ryzen 7 8700G on the AMD PRO 665 chipset',
-      'Lenovo ThinkCentre neo 50t and M70t Gen 5/6 — up to Core Ultra 7 265 with vPro',
-      'Alienware Aurora ACT1250 — Core Ultra 9 285K, Z890, for workstation and gaming loads',
+      'Dell Slim ECS1250: Core i3, i5 and i7 14th gen, 8–16 GB, 512 GB NVMe',
+      'HP Pro 280 G9 and Pro Tower 280 G9: Core i3 13th gen to i5-13500, up to 1 TB NVMe',
+      'HP ProDesk 2 G1a: Ryzen 5 8500G and Ryzen 7 8700G on the AMD PRO 665 chipset',
+      'Lenovo ThinkCentre neo 50t and M70t Gen 5/6: up to Core Ultra 7 265 with vPro',
+      'Alienware Aurora ACT1250: Core Ultra 9 285K, Z890, for workstation and gaming loads',
     ],
   },
   {
@@ -4633,8 +4667,8 @@ const DIST_CATEGORIES = [
     blurb:
       'One cable, no tower and nothing on the floor. What front desks, labs and admin rooms usually want once they have seen one.',
     lines: [
-      'HP 27-cr1000i — 27" Full HD, Core Ultra 5 125U, 16 GB, 1 TB SSD',
-      'HP ProOne 440 G9 — the 23.8" business all-in-one, wall and arm mountable',
+      'HP 27-cr1000i: 27" Full HD, Core Ultra 5 125U, 16 GB, 1 TB SSD',
+      'HP ProOne 440 G9: the 23.8" business all-in-one, wall and arm mountable',
       'Keyboard and mouse included on most SKUs; check the config before you assume it',
     ],
   },
@@ -4647,9 +4681,9 @@ const DIST_CATEGORIES = [
     blurb:
       'A litre of machine that VESA-mounts behind the display. The right answer for digital signage, kiosks, labs and any desk short of room.',
     lines: [
-      'HP Pro Mini 400 G9 — Core i5, 16 GB, 512 GB, mounts behind the monitor',
-      'Lenovo ThinkCentre neo 50q Gen 5 and Gen 6 Tiny — Core i3-1315U up to Core Ultra 7 Series 2',
-      'Lenovo ThinkCentre neo 50s Gen 5 — small form factor where a tiny will not take the cards',
+      'HP Pro Mini 400 G9: Core i5, 16 GB, 512 GB, mounts behind the monitor',
+      'Lenovo ThinkCentre neo 50q Gen 5 and Gen 6 Tiny: Core i3-1315U up to Core Ultra 7 Series 2',
+      'Lenovo ThinkCentre neo 50s Gen 5: small form factor where a tiny will not take the cards',
     ],
   },
   {
@@ -4661,10 +4695,10 @@ const DIST_CATEGORIES = [
     blurb:
       'Business notebooks, student machines and creative laptops, including Apple. Bulk configurations are quoted per order.',
     lines: [
-      'Apple MacBook Pro 16" — M5 Pro, 24 GB, 1 TB, 120 Hz, English (India) keyboard',
+      'Apple MacBook Pro 16": M5 Pro, 24 GB, 1 TB, 120 Hz, English (India) keyboard',
       'Asus Vivobook X1504MA and the rest of the education range',
       'Dell, HP and Lenovo commercial notebooks with on-site warranty options',
-      'Imaging, asset tagging and enrolment can be done before delivery — ask',
+      'Imaging, asset tagging and enrolment can be done before delivery, just ask',
     ],
   },
   {
@@ -4767,7 +4801,7 @@ const mfgFaqs = [
   },
   {
     q: 'What warranty do these carry?',
-    a: 'Manufacturer warranty, and it varies by product and SKU rather than by us — typically one to three years on desktops and notebooks, with on-site and extended options available on the commercial ranges from Dell, HP and Lenovo. Refurbished units carry a shorter warranty, stated per unit before you buy. Ask about a specific model and we will tell you the term, what it covers and what an upgrade to on-site costs.',
+    a: 'Manufacturer warranty, and it varies by product and SKU rather than by us, and is typically one to three years on desktops and notebooks, with on-site and extended options available on the commercial ranges from Dell, HP and Lenovo. Refurbished units carry a shorter warranty, stated per unit before you buy. Ask about a specific model and we will tell you the term, what it covers and what an upgrade to on-site costs.',
   },
   {
     q: 'Can you supply against a purchase order or a tender?',
@@ -4779,7 +4813,7 @@ const mfgFaqs = [
   },
   {
     q: 'Do you take old equipment away?',
-    a: 'We can, and for an office or a campus refresh we usually do. Buy-back on anything with life left in it, responsible disposal through an authorised e-waste handler for anything that does not, and a certificate of disposal for your records — which matters if you are ever audited on it. Say so at quote stage and it comes off the price of the new kit.',
+    a: 'We can, and for an office or a campus refresh we usually do. Buy-back on anything with life left in it, responsible disposal through an authorised e-waste handler for anything that does not, and a certificate of disposal for your records, which matters if you are ever audited on it. Say so at quote stage and it comes off the price of the new kit.',
   },
   {
     q: 'Is the hardware you supply genuine?',
@@ -4787,7 +4821,7 @@ const mfgFaqs = [
   },
   {
     q: 'What is the smallest order you will take?',
-    a: 'For hardware there is no formal minimum, though for a single mouse you are better off at a shop. Where we are worth talking to is anything from a handful of machines upward, or a standing arrangement where you come back each time you need something. RFID cards have a practical minimum that depends on the chip and the finish — ask, and if the run is too small to make sense we will tell you rather than take it.',
+    a: 'For hardware there is no formal minimum, though for a single mouse you are better off at a shop. Where we are worth talking to is anything from a handful of machines upward, or a standing arrangement where you come back each time you need something. RFID cards have a practical minimum that depends on the chip and the finish, so ask, and if the run is too small to make sense we will tell you rather than take it.',
   },
 ];
 
@@ -4813,7 +4847,7 @@ ${breadcrumbs([CRUMB_HOME, { name: 'Manufacturing', url: '/manufacturing/' }], f
                     ${noticePanel(
                       'No prices and no stock counts on this site, on purpose',
                       `<p>Hardware pricing and availability move weekly, and card pricing moves with the chip, the finish and the run length. A number published here would be wrong by the time you read it, and being wrong in your favour is as unhelpful as being wrong the other way.</p>
-                        <p>So ask. Tell us the model or the specification and the quantity and you get a current figure, the real lead time, and the warranty term that actually applies — usually the same day. If something is a four-week wait, we will say four weeks rather than let you find out after the purchase order.</p>`
+                        <p>So ask. Tell us the model or the specification and the quantity and you get a current figure, the real lead time, and the warranty term that actually applies, usually the same day. If something is a four-week wait, we will say four weeks rather than let you find out after the purchase order.</p>`
                     )}
                 </div>
 
@@ -4849,7 +4883,7 @@ ${proseSections({
   sections: [
     {
       h: 'Why we are not a storefront',
-      p: 'Because the things that decide whether a purchase is a good one — the configuration, the warranty term, whether it will be imaged before it arrives, what happens to the machines it replaces — are exactly the things a cart cannot ask you about. Most of the orders we take change shape between the first message and the quotation, usually because we asked what the machines are actually for and the answer pointed somewhere cheaper. That conversation is worth more to both sides than a checkout button.',
+      p: 'Because the things that decide whether a purchase is a good one (the configuration, the warranty term, whether it will be imaged before it arrives, what happens to the machines it replaces) are exactly the things a cart cannot ask you about. Most of the orders we take change shape between the first message and the quotation, usually because we asked what the machines are actually for and the answer pointed somewhere cheaper. That conversation is worth more to both sides than a checkout button.',
     },
     {
       h: 'Where we are worth talking to, and where we are not',
@@ -4926,7 +4960,7 @@ ${relatedSection('manufacturing', { dark: false })}
         name: 'Vybe manufacturing and IT hardware supply',
         serviceType: 'RFID card manufacturing, IoT installations and IT hardware distribution',
         description:
-          'Manufacture of RFID and NFC cards, fobs, tags and wristbands with chip selection, encoding and personalisation, and distribution of IT hardware — desktops, all-in-one PCs, mini PCs, laptops, monitors, keyboards, mice, headsets, conferencing equipment, power adapters and spares — from Dell, HP, Lenovo, Asus, Apple and Logitech, to businesses, schools and colleges in Bengaluru. Industrial IoT installations covering UHF asset and inventory tracking, temperature and humidity monitoring, energy metering, and edge gateways integrated with dashboards and Vybe ERP. Supplied against purchase orders and tenders, with manufacturer warranty, GST invoicing, optional imaging and asset tagging, and buy-back or authorised e-waste disposal. Pricing, stock availability and warranty terms are quoted per enquiry rather than listed.',
+          'Manufacture of RFID and NFC cards, fobs, tags and wristbands with chip selection, encoding and personalisation, and distribution of IT hardware: desktops, all-in-one PCs, mini PCs, laptops, monitors, keyboards, mice, headsets, conferencing equipment, power adapters and spares from Dell, HP, Lenovo, Asus, Apple and Logitech, to businesses, schools and colleges in Bengaluru. Industrial IoT installations covering UHF asset and inventory tracking, temperature and humidity monitoring, energy metering, and edge gateways integrated with dashboards and Vybe ERP. Supplied against purchase orders and tenders, with manufacturer warranty, GST invoicing, optional imaging and asset tagging, and buy-back or authorised e-waste disposal. Pricing, stock availability and warranty terms are quoted per enquiry rather than listed.',
         provider: { '@id': `${SITE}/#organization` },
         areaServed: { '@type': 'City', name: 'Bengaluru' },
         url: u,
@@ -4954,9 +4988,9 @@ const RFID_SPECS = [
     icon: 'contactless',
     h: 'Frequency, chosen for the job',
     items: [
-      '125 kHz low frequency — EM4100, EM4200, T5577. Cheap, read-only, fine for a simple door',
-      '13.56 MHz high frequency — MIFARE Classic 1K and 4K, MIFARE DESFire EV1, EV2 and EV3, NTAG213, NTAG215, NTAG216',
-      '860–960 MHz UHF — for vehicle tags, gate reads and anything that has to work at a distance',
+      '125 kHz low frequency: EM4100, EM4200, T5577. Cheap, read-only, fine for a simple door',
+      '13.56 MHz high frequency: MIFARE Classic 1K and 4K, MIFARE DESFire EV1, EV2 and EV3, NTAG213, NTAG215, NTAG216',
+      '860–960 MHz UHF: for vehicle tags, gate reads and anything that has to work at a distance',
       'Dual-frequency cards where a campus is halfway through replacing its readers, which is most of them',
     ],
   },
@@ -4987,7 +5021,7 @@ const RFID_SPECS = [
     h: 'Encoding',
     items: [
       'Encoded to your system before delivery, so cards arrive working rather than blank',
-      'Sector and application keys set to yours, not left on the factory default — which is how most card systems are actually broken into',
+      'Sector and application keys set to yours, not left on the factory default, which is how most card systems are actually broken into',
       'Access control formats: Wiegand 26 and 34, and the custom formats panels expect',
       'NDEF encoding for NFC cards that have to open a URL or a payment flow on a phone',
       'Card data supplied back as a file your system can import, matched to the printed numbers',
@@ -4998,11 +5032,11 @@ const RFID_SPECS = [
 const rfidFaqs = [
   {
     q: 'How is this different from the cards under Printing?',
-    a: 'It is the same physical card, approached from opposite ends. <a class="text-brand font-bold" href="/printing/cards/">Card printing</a> is about the artwork, the finish and short runs — visiting cards, plain ID cards, a hundred passes for an event. This page is about what happens once a chip is involved: which chip, at which frequency, encoded to which system, with which keys, matched to the readers you already own. If your card has to open a door, mark attendance or pay for lunch, you are on the right page. If it just has to look good, the printing page is the cheaper one.',
+    a: 'It is the same physical card, approached from opposite ends. <a class="text-brand font-bold" href="/printing/cards/">Card printing</a> is about the artwork, the finish and short runs: visiting cards, plain ID cards, a hundred passes for an event. This page is about what happens once a chip is involved: which chip, at which frequency, encoded to which system, with which keys, matched to the readers you already own. If your card has to open a door, mark attendance or pay for lunch, you are on the right page. If it just has to look good, the printing page is the cheaper one.',
   },
   {
     q: 'Will these work with the readers we already have?',
-    a: 'That is the first thing to settle and it is why we ask for the reader model before quoting. A 125 kHz reader will never read a 13.56 MHz card, and a MIFARE Classic reader will not read DESFire unless it was set up for it. Tell us what is on your doors and turnstiles — a photograph of the unit is usually enough — and we will tell you which chip you need. Where a campus is mid-migration between two systems, a dual-frequency card buys you the time to finish.',
+    a: 'That is the first thing to settle and it is why we ask for the reader model before quoting. A 125 kHz reader will never read a 13.56 MHz card, and a MIFARE Classic reader will not read DESFire unless it was set up for it. Tell us what is on your doors and turnstiles, and a photograph of the unit is usually enough, and we will tell you which chip you need. Where a campus is mid-migration between two systems, a dual-frequency card buys you the time to finish.',
   },
   {
     q: 'Do you encode them, or do we?',
@@ -5018,11 +5052,11 @@ const rfidFaqs = [
   },
   {
     q: 'How long do they take?',
-    a: 'Plain encoded cards from stock are quick. Fully personalised cards — photo, name, number, encoded and verified — depend on how fast the data and the photographs reach us, and that is almost always the slow part rather than the printing. Send a clean spreadsheet and named photograph files and you will have a realistic date; send four hundred photographs called IMG_0423.jpg and it will take longer, for reasons nobody can fix at our end.',
+    a: 'Plain encoded cards from stock are quick. Fully personalised cards, with photo, name, number, encoded and verified, depend on how fast the data and the photographs reach us, and that is almost always the slow part rather than the printing. Send a clean spreadsheet and named photograph files and you will have a realistic date; send four hundred photographs called IMG_0423.jpg and it will take longer, for reasons nobody can fix at our end.',
   },
   {
     q: 'What does it cost?',
-    a: `Quoted, because the chip choice moves the per-card price more than anything else does — an EM4100 fob and a DESFire EV3 card are not in the same bracket. Quantity, finish, whether it is personalised and whether we encode it do the rest. Tell us the chip or the reader, the quantity and what has to go on the face of the card at <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a> and a figure comes back.`,
+    a: `Quoted, because the chip choice moves the per-card price more than anything else does. An EM4100 fob and a DESFire EV3 card are not in the same bracket. Quantity, finish, whether it is personalised and whether we encode it do the rest. Tell us the chip or the reader, the quantity and what has to go on the face of the card at <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a> and a figure comes back.`,
   },
 ];
 
@@ -5089,7 +5123,7 @@ ${proseSections({
   sections: [
     {
       h: 'Which chip, and why it matters more than the price',
-      p: 'An EM4100 card at 125 kHz is cheap, read-only and carries a number anybody with a fifteen-hundred-rupee cloner can copy in seconds. That is genuinely fine for a store room. It is not fine for a payroll gate, a hostel door or a cafeteria wallet. MIFARE DESFire EV2 and EV3 are a different class of thing — mutual authentication, encrypted communication, and no meaningful cloning risk in practice. The honest advice usually lands between the two: put the good chip where the money or the safety is, and do not pay for it on the visitor pass.',
+      p: 'An EM4100 card at 125 kHz is cheap, read-only and carries a number anybody with a fifteen-hundred-rupee cloner can copy in seconds. That is genuinely fine for a store room. It is not fine for a payroll gate, a hostel door or a cafeteria wallet. MIFARE DESFire EV2 and EV3 are a different class of thing: mutual authentication, encrypted communication, and no meaningful cloning risk in practice. The honest advice usually lands between the two: put the good chip where the money or the safety is, and do not pay for it on the visitor pass.',
     },
     {
       h: 'The default keys problem',
@@ -5219,7 +5253,7 @@ const IOT_SPECS = [
       'Alerts by WhatsApp, email or SMS the moment a reading leaves the band you set',
       'History retained, so an auditor can be shown the last twelve months instead of this morning',
       'Battery sensors where running a cable is not practical, mains-powered where it is',
-      'Placement chosen against what you are actually protecting — the reading at the door is not the reading in the middle of the room',
+      'Placement chosen against what you are actually protecting: the reading at the door is not the reading in the middle of the room',
     ],
   },
   {
@@ -5249,7 +5283,7 @@ const IOT_SPECS = [
 const iotFaqs = [
   {
     q: 'Where does a project like this actually start?',
-    a: 'With a question rather than a sensor. "Which cold room went out of range last month", "what are we still running at two in the morning", "where did that trolley go" — each of those implies a different sensor in a different place, and answering one properly is worth more than instrumenting the whole building and reading none of it. Tell us the decision you want to make and we will work backwards to the smallest installation that answers it.',
+    a: 'With a question rather than a sensor. "Which cold room went out of range last month", "what are we still running at two in the morning", "where did that trolley go". Each of those implies a different sensor in a different place, and answering one properly is worth more than instrumenting the whole building and reading none of it. Tell us the decision you want to make and we will work backwards to the smallest installation that answers it.',
   },
   {
     q: 'Can this use the RFID tags you already make?',
@@ -5265,7 +5299,7 @@ const iotFaqs = [
   },
   {
     q: 'Who owns the data?',
-    a: 'You do, and you can export all of it at any time in a format that is useful rather than deliberately awkward. We will tell you plainly where it is stored before anything is installed. If your policy requires it to stay on your own hardware, that is a reasonable policy and the gateway can be configured to keep it there — it changes the quote and it is better raised at the start than discovered at handover.',
+    a: 'You do, and you can export all of it at any time in a format that is useful rather than deliberately awkward. We will tell you plainly where it is stored before anything is installed. If your policy requires it to stay on your own hardware, that is a reasonable policy and the gateway can be configured to keep it there, but it changes the quote and it is better raised at the start than discovered at handover.',
   },
   {
     q: 'What happens when a sensor fails?',
@@ -5308,7 +5342,7 @@ ${breadcrumbs(
                     ${noticePanel(
                       'Tell us the question before you tell us the sensor',
                       `<p>The usual way an IoT project goes wrong is not technical. It is that everything gets instrumented, a dashboard appears with forty tiles on it, and within a month nobody opens it because no single tile was tied to a decision anybody actually makes.</p>
-                        <p>So the first conversation is about what you want to stop guessing at — which room went out of range, what is drawing power overnight, where the trolley went. One question answered properly is worth more than a building full of sensors, and it is usually a much smaller quote than you expect.</p>`
+                        <p>So the first conversation is about what you want to stop guessing at: which room went out of range, what is drawing power overnight, where the trolley went. One question answered properly is worth more than a building full of sensors, and it is usually a much smaller quote than you expect.</p>`
                     )}
                 </div>
 
@@ -5411,7 +5445,7 @@ ${relatedSection('manufacturing', { dark: false })}
       title: 'IoT Solutions for Manufacturing in Bengaluru | Vybe',
       ogTitle: 'IoT: asset tracking, environment and energy monitoring',
       description:
-        'IoT for manufacturing in Bengaluru — UHF asset tracking, temperature, humidity and energy monitoring, gateways and ERP integration. Contact us for a survey.',
+        'IoT for manufacturing in Bengaluru: UHF asset tracking, temperature, humidity and energy monitoring, gateways and ERP integration. Contact us for a survey.',
       lastmod,
       trail: [
         CRUMB_HOME,
@@ -5424,7 +5458,7 @@ ${relatedSection('manufacturing', { dark: false })}
         '@type': 'Service',
         '@id': `${u}#service`,
         name: 'IoT solutions for manufacturing',
-        serviceType: 'Industrial IoT — asset tracking, environmental and energy monitoring',
+        serviceType: 'Industrial IoT: asset tracking, environmental and energy monitoring',
         description:
           'Design, supply and installation of IoT systems for manufacturing and distribution sites in Bengaluru. UHF RFID asset and inventory tracking using fixed gateway readers, handheld readers and on-metal tags manufactured in house; continuous temperature and humidity monitoring of cold rooms, stores and server rooms with threshold alerting and retained history; energy metering per panel, line or department using clamp-on current transformers, including solar and generator contribution. Edge gateways with local buffering over Wi-Fi, Ethernet, LoRaWAN or 4G, Modbus and MQTT integration, dashboards with CSV export and integration into Vybe ERP. Scope, sensor count and lead time are quoted per site survey rather than listed.',
         provider: { '@id': `${SITE}/#organization` },
@@ -5440,7 +5474,7 @@ ${relatedSection('manufacturing', { dark: false })}
 
 /**
  * One card per category. The image is a manufacturer render used as a
- * representative shot of the category, not a photograph of stock we hold —
+ * representative shot of the category, not a photograph of stock we hold,
  * which is why the card says "contact for stock" rather than showing a count.
  */
 function distCard(c) {
@@ -5479,7 +5513,7 @@ function distCard(c) {
 const distFaqs = [
   {
     q: 'Where are the prices?',
-    a: 'Not on the page, and that is deliberate rather than coy. Hardware pricing moves with the distributor rate, the configuration, the quantity and the warranty term, and a figure printed here would be wrong within the week. Send us the model or the specification and the quantity and you will have a current, firm figure — usually the same day, and valid for long enough to get it approved.',
+    a: 'Not on the page, and that is deliberate rather than coy. Hardware pricing moves with the distributor rate, the configuration, the quantity and the warranty term, and a figure printed here would be wrong within the week. Send us the model or the specification and the quantity and you will have a current, firm figure, usually the same day, and valid for long enough to get it approved.',
   },
   {
     q: 'Do you have it in stock?',
@@ -5487,15 +5521,15 @@ const distFaqs = [
   },
   {
     q: 'What warranty comes with it?',
-    a: 'The manufacturer’s, and the term varies by product and by SKU — usually one to three years on desktops and notebooks, with on-site and extended cover available across the Dell, HP and Lenovo commercial ranges. Refurbished units carry their own shorter warranty, stated per unit on the quotation. Ask about a specific model and we will tell you the term, what it actually covers, and what upgrading to on-site would cost.',
+    a: 'The manufacturer’s, and the term varies by product and by SKU, usually one to three years on desktops and notebooks, with on-site and extended cover available across the Dell, HP and Lenovo commercial ranges. Refurbished units carry their own shorter warranty, stated per unit on the quotation. Ask about a specific model and we will tell you the term, what it actually covers, and what upgrading to on-site would cost.',
   },
   {
     q: 'Can I get a configuration that is not listed here?',
-    a: 'Almost certainly. The lines on this page are what moves regularly, not the extent of what we can source. More memory, a bigger or second drive, a discrete graphics card, a different operating system, a specific keyboard layout, a particular warranty term — all of it is configurable, and on the commercial ranges a build-to-order usually beats buying a stock machine and upgrading it afterwards. Tell us the workload rather than the part numbers and we will come back with the specification.',
+    a: 'Almost certainly. The lines on this page are what moves regularly, not the extent of what we can source. More memory, a bigger or second drive, a discrete graphics card, a different operating system, a specific keyboard layout, a particular warranty term: all of it is configurable, and on the commercial ranges a build-to-order usually beats buying a stock machine and upgrading it afterwards. Tell us the workload rather than the part numbers and we will come back with the specification.',
   },
   {
     q: 'Do you supply refurbished machines?',
-    a: 'Yes, and we label them plainly as refurbished on the quotation and the invoice. Refurbished Dell OptiPlex small form factor units and HP ProDesk 400 G4 and G5 Minis are the ones that move most — genuinely sensible for a lab, a reception desk, a signage player or anywhere the workload is light and the budget is real. They carry a shorter warranty, stated per unit, and we will tell you honestly when spending a little more on new is the better decision.',
+    a: 'Yes, and we label them plainly as refurbished on the quotation and the invoice. Refurbished Dell OptiPlex small form factor units and HP ProDesk 400 G4 and G5 Minis are the ones that move most, and are genuinely sensible for a lab, a reception desk, a signage player or anywhere the workload is light and the budget is real. They carry a shorter warranty, stated per unit, and we will tell you honestly when spending a little more on new is the better decision.',
   },
   {
     q: 'Will you image and asset-tag them before delivery?',
@@ -5503,7 +5537,7 @@ const distFaqs = [
   },
   {
     q: 'Do you deliver outside Bengaluru?',
-    a: 'Yes, across Karnataka and beyond it for orders of a reasonable size, with freight quoted openly in the scope rather than buried in the unit price. Installation and imaging outside the city depend on the size of the order — for a full campus it is straightforward, for four machines it rarely justifies the travel and we will say so.',
+    a: 'Yes, across Karnataka and beyond it for orders of a reasonable size, with freight quoted openly in the scope rather than buried in the unit price. Installation and imaging outside the city depend on the size of the order. For a full campus it is straightforward, for four machines it rarely justifies the travel and we will say so.',
   },
   {
     q: 'Can you quote for a tender or a GeM comparison?',
@@ -5541,8 +5575,8 @@ ${breadcrumbs(
                 <div class="mt-12">
                     ${noticePanel(
                       'No prices, no stock counts. Ask and you get both.',
-                      `<p>Everything below is what we supply regularly. What is not below is a price or a stock figure, because both move weekly and a stale number helps nobody — least of all you, when you have already taken it to your finance team.</p>
-                        <p>Tell us the model or the specification and the quantity, and you get a current figure, the real lead time, the configuration options and the warranty term that applies. <strong>Product images are manufacturers’ own renders shown to illustrate each category — not photographs of stock in hand, and all brand names and marks belong to their owners.</strong></p>`
+                      `<p>Everything below is what we supply regularly. What is not below is a price or a stock figure, because both move weekly and a stale number helps nobody, least of all you, when you have already taken it to your finance team.</p>
+                        <p>Tell us the model or the specification and the quantity, and you get a current figure, the real lead time, the configuration options and the warranty term that applies. <strong>Product images are manufacturers’ own renders shown to illustrate each category, not photographs of stock in hand, and all brand names and marks belong to their owners.</strong></p>`
                     )}
                 </div>
 
@@ -5561,7 +5595,7 @@ ${breadcrumbs(
                 </ul>
 
                 <div class="mt-8">
-                    ${noticePanel('Refurbished, where it genuinely makes sense', `<p>We also supply refurbished business machines — Dell OptiPlex small form factor units, HP ProDesk 400 G4 and G5 Minis and similar. For a lab, a reception desk, a signage player or a back-office role where the workload is light, they are a sensible use of a real budget.</p>
+                    ${noticePanel('Refurbished, where it genuinely makes sense', `<p>We also supply refurbished business machines: Dell OptiPlex small form factor units, HP ProDesk 400 G4 and G5 Minis and similar. For a lab, a reception desk, a signage player or a back-office role where the workload is light, they are a sensible use of a real budget.</p>
                         <p>They are labelled refurbished on the quotation and on the invoice, never quietly mixed in with new, and they carry their own shorter warranty which is stated per unit before you agree to anything. Where spending a little more on new is the better decision, we will say so.</p>`)}
                 </div>
 
@@ -5583,7 +5617,7 @@ ${proseSections({
   sections: [
     {
       h: 'Specify against the workload, not the spec sheet',
-      p: 'The most common way to waste money on a fleet is to buy one configuration for everybody. A reception desk, a computer lab, an accounts team running heavy spreadsheets and a designer are four different machines, and buying the designer’s specification for all of them costs several times what buying the reception desk’s would. Tell us what the machines are actually for, floor by floor if need be, and the quotation will come back split accordingly — which more often than not is how the total comes down rather than up.',
+      p: 'The most common way to waste money on a fleet is to buy one configuration for everybody. A reception desk, a computer lab, an accounts team running heavy spreadsheets and a designer are four different machines, and buying the designer’s specification for all of them costs several times what buying the reception desk’s would. Tell us what the machines are actually for, floor by floor if need be, and the quotation will come back split accordingly, which more often than not is how the total comes down rather than up.',
     },
     {
       h: 'Memory and storage are where the real decisions are',
@@ -5595,7 +5629,7 @@ ${proseSections({
     },
     {
       h: 'What happens to the old machines',
-      p: 'They should not go in a cupboard, which is where most of them go. Anything with life left in it has a buy-back value that comes straight off the cost of the new kit, and anything that does not needs to go to an authorised e-waste handler — not to the scrap dealer at the gate, who will take the payment and the liability stays with you. We handle both, and for anything carrying data we can wipe drives to a documented standard and give you a certificate of destruction and disposal for your records. That is the piece that matters if you are ever audited on it, and it is the piece almost everybody forgets to ask for.',
+      p: 'They should not go in a cupboard, which is where most of them go. Anything with life left in it has a buy-back value that comes straight off the cost of the new kit, and anything that does not needs to go to an authorised e-waste handler, not to the scrap dealer at the gate, who will take the payment and the liability stays with you. We handle both, and for anything carrying data we can wipe drives to a documented standard and give you a certificate of destruction and disposal for your records. That is the piece that matters if you are ever audited on it, and it is the piece almost everybody forgets to ask for.',
     },
   ],
 })}
@@ -5756,11 +5790,11 @@ function sitemapImages(url) {
   const img = (loc, caption) =>
     `\n    <image:image><image:loc>${loc}</image:loc><image:caption>${esc(caption)}</image:caption></image:image>`;
 
-  let out = img(`${SITE}/assets/og-image.png`, `${ORG.name} — ${ORG.slogan}`);
+  let out = img(`${SITE}/assets/og-image.png`, `${ORG.name} | ${ORG.slogan}`);
   if (url === '/') {
     out += img(`${SITE}/assets/vybe-lockup.png`, `${ORG.name} logo`);
     for (const g of PARTNERS) {
-      for (const i of g.items) out += img(`${SITE}/assets/partners/${i.logo}.png`, `${i.name} — ${g.label}`);
+      for (const i of g.items) out += img(`${SITE}/assets/partners/${i.logo}.png`, `${i.name}, ${g.label}`);
     }
   }
   return out;
@@ -5821,11 +5855,11 @@ ${PRODUCTS.filter((p) => published(p.nav))
 ## Contact
 
 - [Contact Us](${SITE}/contact/): Phone, email, registered office and opening hours.
-- Sales: ${ORG.sales} / ${ORG.phone} — quotes, demos, new deployments, hardware, printing and registrations.
-- Support: ${ORG.support} / ${ORG.phoneSupport} — existing Vybe deployments.
-- Second office line: ${ORG.phoneOffice} — reaches the same office.
-- Legal and compliance: ${ORG.legal} — contracts, privacy and data protection requests, security disclosures.
-- Grievance Officer: ${ORG.grievance} — last resort only, after sales, support or legal have not resolved the matter. Route enquiries to the three addresses above first.
+- Sales: ${ORG.sales} / ${ORG.phone} for quotes, demos, new deployments, hardware, printing and registrations.
+- Support: ${ORG.support} / ${ORG.phoneSupport} for existing Vybe deployments.
+- Second office line: ${ORG.phoneOffice}, which reaches the same office.
+- Legal and compliance: ${ORG.legal} for contracts, privacy and data protection requests, security disclosures.
+- Grievance Officer: ${ORG.grievance}, last resort only, after sales, support or legal have not resolved the matter. Route enquiries to the three addresses above first.
 
 ## Policies
 

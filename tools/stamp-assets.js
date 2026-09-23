@@ -1,11 +1,10 @@
 /*
- * Cache-busting stamp. staticwebapp.config.json serves /assets/* with
- * `max-age=31536000, immutable`, but the filenames never change — so a phone
- * that visited last month keeps last month's site.css and icon font for a
- * year. New icons then render as their literal ligature text ("school",
- * "receipt_long") and new layout rules never arrive. Appending a content hash
- * to each URL gives every changed asset a new cache key, which is what makes
- * `immutable` safe in the first place.
+ * Cache-busting stamp. /assets/* is served `max-age=31536000, immutable` but
+ * the filenames never change, so a returning visitor would keep last month's
+ * site.css and icon font for a year: new icons render as their literal
+ * ligature text and new layout rules never arrive. A content hash on each URL
+ * gives every changed asset a new cache key, which is what makes `immutable`
+ * safe in the first place.
  *
  * Runs last, after Tailwind has written the final assets/site.css:
  *
@@ -17,8 +16,7 @@ const crypto = require('node:crypto');
 
 const ROOT = path.join(__dirname, '..');
 
-/* Assets whose URLs get stamped. Fonts are listed first because their hashes
-   are baked into site.css, which then changes site.css's own hash. */
+// Fonts first: their hashes are baked into site.css, which moves its own hash.
 const FONTS = ['assets/fonts/inter-var.woff2', 'assets/fonts/plus-jakarta-sans-var.woff2', 'assets/fonts/material-symbols-subset.woff2'];
 const CSS = 'assets/site.css';
 const JS = 'assets/site.js';
@@ -45,19 +43,17 @@ function htmlFiles(dir = ROOT) {
 }
 
 /* 1. Stamp the font URLs inside the stylesheet, so the @font-face src and the
-      <link rel=preload> in the HTML end up byte-identical — otherwise the
-      browser treats the preload as a miss and downloads each font twice. */
+      <link rel=preload> end up byte-identical. Otherwise the browser treats
+      the preload as a miss and downloads each font twice. */
 const fontHashes = Object.fromEntries(FONTS.map((f) => [f, hashOf(f)]));
 const cssPath = path.join(ROOT, CSS);
 let css = fs.readFileSync(cssPath, 'utf8');
 for (const [rel, h] of Object.entries(fontHashes)) css = stamp(css, rel, h);
 fs.writeFileSync(cssPath, css);
 
-/* 2. Now that site.css is final, hash every file under assets/. Images are
-      stamped as well as code: once they are served from Front Door with a
-      one-year immutable lifetime, a replaced product photo that kept its URL
-      would sit in the edge cache until the year ran out. Stamping every
-      asset is what lets the deploy skip a CDN purge entirely. */
+/* 2. Now that site.css is final, hash every file under assets/. Images too: a
+      replaced photo that kept its URL would sit in the edge cache for a year.
+      Stamping everything is what lets the deploy skip a CDN purge. */
 const assetFiles = (dir) =>
   fs.readdirSync(path.join(ROOT, dir), { withFileTypes: true }).flatMap((e) =>
     e.isDirectory() ? assetFiles(`${dir}/${e.name}`) : [`${dir}/${e.name}`]

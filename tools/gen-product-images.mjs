@@ -1,24 +1,19 @@
 /*
- * Category images for the distribution catalogue.
+ * Category images for the distribution catalogue. Manufacturer renders, used
+ * as a channel partner normally uses them: one representative shot per
+ * category, not a photograph of stock we hold. To pull a brand's artwork,
+ * delete the original from src/products/ and drop the entry from
+ * CATEGORY_IMAGES in build.js; the card falls back to its icon on its own.
  *
- * These are manufacturer product renders, used the way a channel partner
- * normally uses them: one representative shot per category, not a photograph
- * of specific stock we hold. They are the vendors' artwork and their
- * trademarks remain theirs. If a brand asks for one to come down, delete the
- * original from src/products/, drop the entry from CATEGORY_IMAGES in
- * build.js, and the card falls back to its Material Symbols icon on its own.
+ * Reads src/products/ (never deployed) and writes the <base>.webp plus
+ * <base>.opt.png pair that picture() expects into assets/products/.
  *
- * Originals live in src/products/ and are never deployed; this writes the
- * optimised pair the `picture()` helper expects — <base>.webp plus
- * <base>.opt.png — into assets/products/.
+ * Sources are white-background renders at wildly different pixel sizes, so
+ * each is trimmed to its own ink and composed onto one shared square canvas.
+ * A 4000px tower and a 500px charger then sit at the same optical weight with
+ * no per-image classes, which the CSP would forbid anyway.
  *
- * Every source is a white-background render at wildly different pixel sizes,
- * so each is trimmed to its own ink and then composed onto one shared square
- * canvas. That way a 4000px tower and a 500px charger sit at the same optical
- * weight in the grid, and the page needs no per-image classes — which it
- * could not have anyway, because the CSP forbids inline styles.
- *
- * Usage: node tools/gen-product-images.mjs   (npm run products)
+ *   node tools/gen-product-images.mjs   (npm run products)
  */
 import sharp from 'sharp';
 import fs from 'node:fs';
@@ -45,11 +40,8 @@ for (const name of NAMES) {
     continue;
   }
 
-  /*
-   * `trim` on the white background rather than on alpha: several of these
-   * renders carry a flattened white field with no transparency at all, so
-   * trimming alpha would be a no-op and the subject would float.
-   */
+  // Trim on white rather than alpha: several renders are flattened with no
+  // transparency, so an alpha trim is a no-op and the subject floats.
   const trimmed = await sharp(file)
     .flatten({ background: '#ffffff' })
     .trim({ background: '#ffffff', threshold: 12 })

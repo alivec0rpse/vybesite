@@ -1,14 +1,14 @@
 /*
- * Normalise the client and partner marks for the logo row on the home page.
- * Every mark is the brand's own reversed artwork, which is why the section is
- * dark. No recolouring beyond what is noted for JS Global below.
+ * Normalise the client and partner marks for the logo row. Each is the brand's
+ * own reversed artwork, which is why the section is dark. No recolouring
+ * beyond the JS Global knockout below.
  *
  * A 6:1 wordmark and a 1:1 crest look nothing alike at the same pixel height,
- * so each mark is composed onto one shared 3:1 canvas and scaled by its own
- * shape. The page can then render the row at a single size with no per-logo
- * classes, which matters because the CSP forbids inline styles.
+ * so each is composed onto one shared 3:1 canvas and scaled by its own shape.
+ * The row then renders at a single size with no per-logo classes, which the
+ * CSP would forbid anyway.
  *
- * Usage: node tools/gen-partner-logos.mjs   (npm run logos)
+ *   node tools/gen-partner-logos.mjs   (npm run logos)
  */
 import sharp from 'sharp';
 import fs from 'node:fs';
@@ -28,8 +28,8 @@ fs.mkdirSync(OUT, { recursive: true });
 
 /**
  * JS Global publish their mark only as gold-on-black JPEG with contact details
- * set underneath. `crop` removes those, then each pixel's brightness becomes
- * its alpha so the black falls away. Colour is renormalised against that
+ * underneath. `crop` removes those, then each pixel's brightness becomes its
+ * alpha so the black falls away, with colour renormalised against that
  * brightness so the gold keeps its hue where the alpha is partial.
  */
 async function knockOutBlack(file, crop) {
@@ -50,9 +50,8 @@ async function knockOutBlack(file, crop) {
 const MARKS = [
   { name: 'caias', file: 'caias.webp' },
   { name: 'vendx', file: 'vendx.png' },
-  // Held back with the Trusted Partner group in build.js until the MoU is
-  // signed. Left unbuilt, not just unreferenced: a file under assets/ is a
-  // public URL whether anything links to it or not.
+  // Held back until the MoU is signed. Unbuilt rather than merely unreferenced:
+  // a file under assets/ is a public URL whether anything links to it or not.
   // { name: 'milkymist', file: 'milkymist.png' },
   { name: 'jsglobal', file: 'jsglobal.jpg', crop: { left: 60, top: 40, width: 730, height: 610 } },
 ];

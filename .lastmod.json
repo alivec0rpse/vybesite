@@ -1,18 +1,18 @@
 {
   "/": {
-    "hash": "e6b863191597c976",
+    "hash": "5c898c83a62c39f5",
     "date": "2026-09-23"
   },
   "/erp/": {
-    "hash": "3f1b41b230e54381",
+    "hash": "eeeae6db8b94ecd6",
     "date": "2026-09-23"
   },
   "/cms/": {
-    "hash": "62d43fb5adcce6dd",
+    "hash": "d77c387434e447a2",
     "date": "2026-09-23"
   },
   "/it-solutions/": {
-    "hash": "c0da2cb0d4bfe6af",
+    "hash": "8fd8cb2b1b22c027",
     "date": "2026-09-23"
   },
   "/cloud/": {
@@ -36,16 +36,16 @@
     "date": "2026-09-21"
   },
   "/workspace/": {
-    "hash": "0c6f13f74fdcfd31",
+    "hash": "62d4dd7c410e5567",
     "date": "2026-09-23"
   },
   "/smart-classroom/": {
-    "hash": "879cd979fcffa0de",
+    "hash": "3c124cc2d8095f3f",
     "date": "2026-09-23"
   },
   "/contact/": {
-    "hash": "c87d4f30251b7b76",
-    "date": "2026-09-21"
+    "hash": "f01de5bdda74f926",
+    "date": "2026-09-23"
   },
   "/printing/": {
     "hash": "404f1bdb05ec6565",
@@ -96,35 +96,35 @@
     "date": "2026-09-23"
   },
   "/audits/": {
-    "hash": "7c5637aa570a4f66",
+    "hash": "db3f2ceaae3344ca",
     "date": "2026-09-23"
   },
   "/audits/kitchen-food-safety/": {
-    "hash": "eaa1f82a8385598e",
+    "hash": "5a0bc38cb84a29fb",
     "date": "2026-09-23"
   },
   "/audits/schools-institutions/": {
-    "hash": "3e5411c18ef74e5f",
+    "hash": "9d690a92ba987122",
     "date": "2026-09-23"
   },
   "/audits/workplace-compliance/": {
-    "hash": "98716586b331f838",
+    "hash": "11af6f260fb1537b",
     "date": "2026-09-23"
   },
   "/manufacturing/": {
-    "hash": "8597b07d565ec6bf",
+    "hash": "ff3d9e67544fb7a1",
     "date": "2026-09-23"
   },
   "/manufacturing/rfid-cards/": {
-    "hash": "27d6a22d4d22c274",
+    "hash": "e8f4a20a3e123d0c",
     "date": "2026-09-23"
   },
   "/manufacturing/distribution/": {
-    "hash": "e3012a56886716dc",
+    "hash": "3f7241e5b64f638e",
     "date": "2026-09-23"
   },
   "/manufacturing/iot/": {
-    "hash": "d79123add721866f",
+    "hash": "73544668d5ae4649",
     "date": "2026-09-23"
   }
 }

@@ -1,19 +1,16 @@
 /*
- * logo.svg — the BIMI mark, served from the site root.
+ * logo.svg, the BIMI mark served from the site root.
  *
- * BIMI does not accept ordinary SVG. The profile is SVG Tiny Portable/Secure
- * (SVG 1.2 Tiny with `baseProfile="tiny-ps"`): square viewBox, a <title>, no
- * width/height on the root, no script, no raster <image>, no external
- * references, nothing animated, and under 32KB. So the mark has to be real
- * vector geometry, and src/logos/vybe-logo.png is a bitmap — potrace turns it
- * into one path, which is then baked into the icon's coordinate space so the
- * output carries no transform for a validator to argue with.
+ * BIMI needs SVG Tiny Portable/Secure (SVG 1.2 Tiny, `baseProfile="tiny-ps"`):
+ * square viewBox, a <title>, no width/height on the root, no script, no raster
+ * <image>, no external references, nothing animated, under 32KB. The source is
+ * a bitmap, so potrace turns it into one path, baked into the icon coordinate
+ * space so the output carries no transform for a validator to argue with.
  *
- * Geometry matches assets/icon-maskable-512.png: mailbox providers (Gmail
- * especially) crop the BIMI avatar to a circle, so the wordmark sits inside
- * the same 80% safe zone the Android maskable icon uses.
+ * Geometry matches assets/icon-maskable-512.png: Gmail crops the BIMI avatar
+ * to a circle, so the wordmark sits in the same 80% safe zone.
  *
- * Usage: node tools/gen-bimi.mjs
+ *   node tools/gen-bimi.mjs
  */
 import sharp from 'sharp';
 import fs from 'node:fs';
@@ -29,9 +26,8 @@ const PAD = 0.155; // as in gen-images.mjs, the circle-safe padding
 const BRAND = '#e31837';
 const TITLE = 'Vybe Technologies';
 
-/* 1. Trim the transparent margin so the mark centres true, then flatten to the
- *    black-on-white bitmap potrace wants. The mark is white-on-transparent, so
- *    its shape lives in the alpha channel and nowhere else. */
+/* 1. Trim, then flatten to the black-on-white bitmap potrace wants. The mark
+ *    is white-on-transparent, so its shape lives only in the alpha channel. */
 const trimmed = await sharp(S + 'vybe-logo.png').trim().toBuffer();
 const { width, height } = await sharp(trimmed).metadata();
 const bitmap = await sharp(trimmed)

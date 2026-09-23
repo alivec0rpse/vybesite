@@ -149,11 +149,6 @@
     }
   ],
 
-  "navigationFallback": {
-    "rewrite": "/404.html",
-    "exclude": ["/assets/*", "/.well-known/*", "/*.xml", "/*.txt", "/*.ico", "/*.webmanifest", "/*.png", "/*.webp", "/*.svg"]
-  },
-
   "responseOverrides": {
     "404": { "rewrite": "/404.html", "statusCode": 404 }
   },
