@@ -5411,7 +5411,7 @@ ${relatedSection('manufacturing', { dark: false })}
       title: 'IoT Solutions for Manufacturing in Bengaluru | Vybe',
       ogTitle: 'IoT: asset tracking, environment and energy monitoring',
       description:
-        'IoT for manufacturing in Bengaluru — UHF asset and inventory tracking, temperature, humidity and energy monitoring, gateways and ERP integration. Contact us for a site survey.',
+        'IoT for manufacturing in Bengaluru — UHF asset tracking, temperature, humidity and energy monitoring, gateways and ERP integration. Contact us for a survey.',
       lastmod,
       trail: [
         CRUMB_HOME,
