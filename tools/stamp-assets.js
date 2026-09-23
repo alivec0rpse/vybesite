@@ -53,8 +53,17 @@ let css = fs.readFileSync(cssPath, 'utf8');
 for (const [rel, h] of Object.entries(fontHashes)) css = stamp(css, rel, h);
 fs.writeFileSync(cssPath, css);
 
-/* 2. Now that site.css is final, hash it and site.js. */
-const assetHashes = { ...fontHashes, [CSS]: hashOf(CSS), [JS]: hashOf(JS) };
+/* 2. Now that site.css is final, hash every file under assets/. Images are
+      stamped as well as code: once they are served from Front Door with a
+      one-year immutable lifetime, a replaced product photo that kept its URL
+      would sit in the edge cache until the year ran out. Stamping every
+      asset is what lets the deploy skip a CDN purge entirely. */
+const assetFiles = (dir) =>
+  fs.readdirSync(path.join(ROOT, dir), { withFileTypes: true }).flatMap((e) =>
+    e.isDirectory() ? assetFiles(`${dir}/${e.name}`) : [`${dir}/${e.name}`]
+  );
+
+const assetHashes = Object.fromEntries(assetFiles('assets').map((rel) => [rel, hashOf(rel)]));
 
 /* 3. Rewrite every reference in the emitted pages. */
 let pages = 0;
@@ -68,5 +77,5 @@ for (const file of htmlFiles()) {
   }
 }
 
-console.log(`stamped ${pages} pages:`);
+console.log(`stamped ${pages} pages against ${Object.keys(assetHashes).length} assets:`);
 for (const [rel, h] of Object.entries(assetHashes)) console.log(`  /${rel}?v=${h}`);

@@ -392,6 +392,7 @@ const NAV_GROUPS = [
       { nav: 'manufacturing', href: '/manufacturing/', label: 'All manufacturing &amp; supply', blurb: 'What we make and what we distribute.', icon: 'precision_manufacturing' },
       { nav: 'mfg-rfid', href: '/manufacturing/rfid-cards/', label: 'RFID &amp; NFC cards', blurb: 'MIFARE, DESFire, NTAG and UHF, encoded to your readers.', icon: 'contactless' },
       { nav: 'mfg-distribution', href: '/manufacturing/distribution/', label: 'IT hardware distribution', blurb: 'Dell, HP, Lenovo, Asus, Apple and Logitech.', icon: 'local_shipping' },
+      { nav: 'mfg-iot', href: '/manufacturing/iot/', label: 'IoT solutions', blurb: 'Asset tracking, temperature, humidity and energy monitoring.', icon: 'sensors' },
       { href: '/manufacturing/distribution/#laptops', label: 'Laptops &amp; desktops', blurb: 'Contact us for stock, configuration and warranty.', icon: 'laptop_windows' },
     ],
   },
@@ -716,7 +717,7 @@ const PRODUCTS = [
   { nav: 'printing', href: '/printing/', name: 'Printing', blurb: 'Everything from business cards to banners, standees and RFID cards.', icon: 'print' },
   { nav: 'registrations', href: '/registrations/', name: 'Business Registrations', blurb: 'GST, Udyam (MSME), FSSAI and Startup India recognition, from ₹199, plus ISO, NSDC consulting and digital signatures.', icon: 'receipt_long' },
   { nav: 'audits', href: '/audits/', name: 'Compliance Audits', blurb: 'Hygiene, fire, child safety, SDG, POSH and data protection audits for kitchens, campuses and offices. Report, certificate and badge.', icon: 'fact_check' },
-  { nav: 'manufacturing', href: '/manufacturing/', name: 'Manufacturing & Supply', blurb: 'RFID and NFC cards made and encoded to your system, plus Dell, HP, Lenovo, Asus and Apple hardware. Contact us for stock and pricing.', icon: 'precision_manufacturing' },
+  { nav: 'manufacturing', href: '/manufacturing/', name: 'Manufacturing & Supply', blurb: 'RFID and NFC cards made and encoded to your system, IoT asset and energy monitoring, plus Dell, HP, Lenovo, Asus and Apple hardware. Contact us for stock and pricing.', icon: 'precision_manufacturing' },
 ];
 
 /**
@@ -1478,7 +1479,7 @@ const PAGES = [
         { nav: 'printing', name: 'Printing Services', url: `${SITE}/printing/`, description: 'Commercial printing — business and RFID cards, letterheads, bill books, brochures, flex banners, roll-up standees and signage, printed to your artwork.' },
         { nav: 'registrations', name: 'Business Registrations', url: `${SITE}/registrations/`, description: 'GST, Udyam (MSME) and FSSAI registrations and DPIIT / Startup India recognition, prepared and filed at a flat professional fee with government charges separate, plus non-accredited ISO certification issued by Vybe, consulting on NSDC / Skill India and affiliation applications, and Class 3 digital signature certificates as a registered partner of eMudhra and Capricorn.' },
         { nav: 'audits', name: 'Compliance Audits', url: `${SITE}/audits/`, description: 'Advisory, non-statutory hygiene, safety and compliance audits — kitchen hygiene to the FSSAI Schedule 4 standard, kitchen layout and pest control records, fire and electrical safety to the National Building Code, canteen and mess hygiene, child safety to the POCSO standard, school transport safety, campus security, a NAAC/NIRF-ready SDG and sustainability audit, POSH Act Internal Committee compliance, software licensing and IT assets, DPDP Act data protection readiness and labour law records. Reports, certificates and badges are issued by Vybe Technologies alone and are not a licence, rating, accreditation or No Objection Certificate.' },
-        { nav: 'manufacturing', name: 'Manufacturing & Supply', url: `${SITE}/manufacturing/`, description: 'Manufacture of RFID and NFC cards, fobs, tags and wristbands at 125 kHz, 13.56 MHz and UHF — MIFARE Classic, MIFARE DESFire, NTAG and EM4100 — personalised and encoded to your access control, attendance and cafeteria systems, and distribution of IT hardware from Dell, HP, Lenovo, Asus, Apple, Logitech and Alienware, including desktops, all-in-one PCs, mini PCs, laptops, monitors, keyboards, mice, headsets, conferencing equipment and power adapters. Supplied against purchase orders and tenders with manufacturer warranty and GST invoicing. Pricing, stock availability and warranty terms are quoted per enquiry rather than listed.' },
+        { nav: 'manufacturing', name: 'Manufacturing & Supply', url: `${SITE}/manufacturing/`, description: 'Manufacture of RFID and NFC cards, fobs, tags and wristbands at 125 kHz, 13.56 MHz and UHF — MIFARE Classic, MIFARE DESFire, NTAG and EM4100 — personalised and encoded to your access control, attendance and cafeteria systems, and distribution of IT hardware from Dell, HP, Lenovo, Asus, Apple, Logitech and Alienware, including desktops, all-in-one PCs, mini PCs, laptops, monitors, keyboards, mice, headsets, conferencing equipment and power adapters. Industrial IoT installations covering UHF asset and inventory tracking, temperature and humidity monitoring of cold rooms and server rooms, energy metering per panel or department, and edge gateways integrated with dashboards and Vybe ERP. Supplied against purchase orders and tenders with manufacturer warranty and GST invoicing. Pricing, stock availability and warranty terms are quoted per enquiry rather than listed.' },
       ].filter((s) => published(s.nav)).map((s, i) => ({
         '@type': 'ListItem',
         position: i + 1,
@@ -4746,6 +4747,13 @@ const MFG_LINES = [
     blurb:
       'Desktops, all-in-ones, mini PCs, laptops, displays and peripherals from Dell, HP, Lenovo, Asus, Apple and Logitech.',
   },
+  {
+    href: '/manufacturing/iot/',
+    icon: 'sensors',
+    name: 'IoT solutions',
+    blurb:
+      'Asset and inventory tracking, temperature, humidity and energy monitoring, with gateways and dashboards that tie into your ERP.',
+  },
 ];
 
 const mfgFaqs = [
@@ -4791,7 +4799,7 @@ ${breadcrumbs([CRUMB_HOME, { name: 'Manufacturing', url: '/manufacturing/' }], f
             <div class="max-w-6xl mx-auto relative z-10">
                 <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-3">Manufacturing &amp; Supply</p>
                 <h1 class="text-5xl md:text-7xl font-black font-display tracking-tighter text-slate-900">What we make, and what we supply.</h1>
-                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">RFID and NFC cards manufactured, encoded and personalised to your system. Desktops, laptops, displays and peripherals distributed from Dell, HP, Lenovo, Asus, Apple and Logitech. Both are quoted against what you need rather than listed off a shelf.</p>
+                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">RFID and NFC cards manufactured, encoded and personalised to your system. Desktops, laptops, displays and peripherals distributed from Dell, HP, Lenovo, Asus, Apple and Logitech. IoT that tracks what you own and monitors what it costs to run. All of it quoted against what you need rather than listed off a shelf.</p>
 
                 ${ctaRow({
                   waText: MFG_ENQUIRY,
@@ -4907,7 +4915,7 @@ ${relatedSection('manufacturing', { dark: false })}
       title: 'Manufacturing & IT Hardware Supply in Bengaluru | Vybe',
       ogTitle: 'Vybe manufacturing and supply: RFID cards and IT hardware',
       description:
-        'RFID and NFC cards made and encoded, plus Dell, HP, Lenovo and Apple hardware distribution in Bengaluru. Contact us for stock, pricing and warranty.',
+        'RFID and NFC cards made and encoded, IoT asset and energy monitoring, plus Dell, HP and Lenovo hardware in Bengaluru. Contact us for stock and pricing.',
       lastmod,
       trail: [CRUMB_HOME, { name: 'Manufacturing', url }],
       faqs: mfgFaqs,
@@ -4916,9 +4924,9 @@ ${relatedSection('manufacturing', { dark: false })}
         '@type': 'Service',
         '@id': `${u}#service`,
         name: 'Vybe manufacturing and IT hardware supply',
-        serviceType: 'RFID card manufacturing and IT hardware distribution',
+        serviceType: 'RFID card manufacturing, IoT installations and IT hardware distribution',
         description:
-          'Manufacture of RFID and NFC cards, fobs, tags and wristbands with chip selection, encoding and personalisation, and distribution of IT hardware — desktops, all-in-one PCs, mini PCs, laptops, monitors, keyboards, mice, headsets, conferencing equipment, power adapters and spares — from Dell, HP, Lenovo, Asus, Apple and Logitech, to businesses, schools and colleges in Bengaluru. Supplied against purchase orders and tenders, with manufacturer warranty, GST invoicing, optional imaging and asset tagging, and buy-back or authorised e-waste disposal. Pricing, stock availability and warranty terms are quoted per enquiry rather than listed.',
+          'Manufacture of RFID and NFC cards, fobs, tags and wristbands with chip selection, encoding and personalisation, and distribution of IT hardware — desktops, all-in-one PCs, mini PCs, laptops, monitors, keyboards, mice, headsets, conferencing equipment, power adapters and spares — from Dell, HP, Lenovo, Asus, Apple and Logitech, to businesses, schools and colleges in Bengaluru. Industrial IoT installations covering UHF asset and inventory tracking, temperature and humidity monitoring, energy metering, and edge gateways integrated with dashboards and Vybe ERP. Supplied against purchase orders and tenders, with manufacturer warranty, GST invoicing, optional imaging and asset tagging, and buy-back or authorised e-waste disposal. Pricing, stock availability and warranty terms are quoted per enquiry rather than listed.',
         provider: { '@id': `${SITE}/#organization` },
         areaServed: { '@type': 'City', name: 'Bengaluru' },
         url: u,
@@ -5115,6 +5123,12 @@ ${siblingSection({
       blurb: 'Desktops, laptops, displays and peripherals from Dell, HP, Lenovo, Asus and Apple.',
     },
     {
+      href: '/manufacturing/iot/',
+      icon: 'sensors',
+      name: 'IoT solutions',
+      blurb: 'Asset tracking that reads the same tags, plus temperature and energy monitoring.',
+    },
+    {
       href: '/printing/cards/',
       icon: 'badge',
       name: 'Card printing',
@@ -5174,6 +5188,245 @@ ${relatedSection('manufacturing', { dark: false })}
         serviceType: 'RFID and NFC card manufacturing, personalisation and encoding',
         description:
           'Manufacture of RFID and NFC cards, key fobs, wristbands and asset tags in Bengaluru, at 125 kHz (EM4100, EM4200, T5577), 13.56 MHz (MIFARE Classic 1K and 4K, MIFARE DESFire EV1, EV2 and EV3, NTAG213, NTAG215, NTAG216) and UHF, including dual-frequency cards. Photo identity personalisation, sequential numbering, barcode and QR, magnetic stripe and signature panel, and encoding to Wiegand and custom access control formats with customer-set sector keys. Integrates with Vybe ERP attendance and Vybe CMS cashless cafeteria. Pricing, minimum run and lead time are quoted per enquiry.',
+        provider: { '@id': `${SITE}/#organization` },
+        areaServed: { '@type': 'City', name: 'Bengaluru' },
+        url: u,
+        isRelatedTo: { '@id': `${SITE}/manufacturing/#service` },
+      }),
+    },
+  });
+}
+
+/* -------------------------------------------------------- manufacturing, IoT */
+
+const IOT_SPECS = [
+  {
+    icon: 'inventory_2',
+    h: 'Asset and inventory tracking',
+    items: [
+      'UHF tags read at gates and doorways, so a movement is logged without anybody stopping to scan',
+      'Handheld readers for stock counts that take an afternoon rather than a weekend',
+      'On-metal and ruggedised tags, for tools, trolleys and anything where the surface fights the antenna',
+      'Tags made on the same line as the cards, so the tag and the reader are specified together rather than separately',
+      'Movement tied to a person and a time, not just to a location',
+    ],
+  },
+  {
+    icon: 'thermostat',
+    h: 'Temperature and humidity',
+    items: [
+      'Cold rooms, stores and server rooms logged continuously rather than checked on a clipboard',
+      'Alerts by WhatsApp, email or SMS the moment a reading leaves the band you set',
+      'History retained, so an auditor can be shown the last twelve months instead of this morning',
+      'Battery sensors where running a cable is not practical, mains-powered where it is',
+      'Placement chosen against what you are actually protecting — the reading at the door is not the reading in the middle of the room',
+    ],
+  },
+  {
+    icon: 'bolt',
+    h: 'Energy metering',
+    items: [
+      'Clamp-on CT meters per panel, line or department, fitted without rewiring',
+      'Consumption over time, so the bill becomes a set of numbers you can act on',
+      'Load patterns that show what is still running out of hours and should not be',
+      'Solar and generator contribution tracked alongside grid draw where both are present',
+      'Per-department figures where the cost has to be allocated internally',
+    ],
+  },
+  {
+    icon: 'hub',
+    h: 'Gateways and integration',
+    items: [
+      'Edge gateways that keep logging when the internet drops and backfill when it returns',
+      'Wi-Fi, Ethernet, LoRaWAN or 4G chosen against the building rather than the brochure',
+      'Modbus and MQTT where the equipment already speaks them',
+      'Dashboards that can be read at a glance, with CSV export for whoever wants the raw numbers',
+      'Readings into Vybe ERP where you already run it, rather than a second system to log into',
+    ],
+  },
+];
+
+const iotFaqs = [
+  {
+    q: 'Where does a project like this actually start?',
+    a: 'With a question rather than a sensor. "Which cold room went out of range last month", "what are we still running at two in the morning", "where did that trolley go" — each of those implies a different sensor in a different place, and answering one properly is worth more than instrumenting the whole building and reading none of it. Tell us the decision you want to make and we will work backwards to the smallest installation that answers it.',
+  },
+  {
+    q: 'Can this use the RFID tags you already make?',
+    a: `Yes, and it is the main reason this sits under manufacturing rather than under IT. The tags and cards are made and encoded here, so the tag, the reader and the numbering are specified together instead of being bought from three places and reconciled afterwards. If you already run cards from us for doors or attendance, asset tracking can reuse the same numbering rather than starting a second scheme. The chip side of that is covered on <a class="text-brand font-bold" href="/manufacturing/rfid-cards/">RFID and NFC card manufacturing</a>.`,
+  },
+  {
+    q: 'What happens when the internet at the site goes down?',
+    a: 'The gateway keeps logging locally and backfills when the link returns, so you get a gap in the dashboard rather than a hole in the record. This matters more than it sounds: the sites that most need monitoring are often the ones with the least reliable connectivity, and a system that silently stops recording during an outage is worse than no system, because you only discover it when somebody asks for the very period that is missing.',
+  },
+  {
+    q: 'Does it feed into Vybe ERP?',
+    a: `Where you run it, yes. Readings and asset movements can land in <a class="text-brand font-bold" href="/erp/">Vybe ERP</a> so there is one place to look rather than another login and another password. Where you run something else, we can export to it or simply hand you CSV and an API and let your team do the joining. What we try to avoid is leaving you with a dashboard nobody opens because it lives somewhere separate from the system people already have open all day.`,
+  },
+  {
+    q: 'Who owns the data?',
+    a: 'You do, and you can export all of it at any time in a format that is useful rather than deliberately awkward. We will tell you plainly where it is stored before anything is installed. If your policy requires it to stay on your own hardware, that is a reasonable policy and the gateway can be configured to keep it there — it changes the quote and it is better raised at the start than discovered at handover.',
+  },
+  {
+    q: 'What happens when a sensor fails?',
+    a: 'It is treated as an event rather than as silence. A sensor that stops reporting raises the same kind of alert as one reporting a bad number, because the failure mode that actually hurts is a dead sensor sitting unnoticed for six weeks while everybody assumes the cold room is fine. Batteries are reported before they die rather than after. Spares are quoted with the installation so a replacement is a swap rather than a procurement exercise.',
+  },
+  {
+    q: 'What does it cost?',
+    a: `Quoted, and the site drives it more than the sensor count does. A single cold room is a small job; six buildings with poor connectivity and an energy meter on every panel is not. The survey is where the real number comes from, because cable runs, mounting and how far the gateway sits from the sensors move the price more than the hardware list does. Tell us the site and the question you want answered at <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a> and a figure comes back.`,
+  },
+];
+
+const iotBody = `<div class="w-full bg-surface-main">
+${breadcrumbs(
+  [CRUMB_HOME, { name: 'Manufacturing', url: '/manufacturing/' }, { name: 'IoT solutions', url: '/manufacturing/iot/' }],
+  false
+)}
+
+        <section class="px-6 pt-12 pb-20 md:pb-28 relative overflow-hidden">
+            <div class="absolute inset-0 bg-grid-faint" aria-hidden="true"></div>
+            <div class="max-w-6xl mx-auto relative z-10">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-3">Manufacturing</p>
+                <h1 class="text-5xl md:text-7xl font-black font-display tracking-tighter text-slate-900">IoT that answers a question you already have.</h1>
+                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">Asset and inventory tracking on the tags we make ourselves. Temperature, humidity and energy logged continuously, with alerts when a reading leaves the band. Gateways that keep working when the internet does not, and readings that land where you already look.</p>
+
+                <p class="mt-8 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <span class="text-5xl font-black font-display tracking-tight text-slate-900">On quote</span>
+                    <span class="text-sm font-bold text-slate-500">the site drives the price more than the sensor count does</span>
+                </p>
+                <p class="mt-1 text-xs font-bold uppercase tracking-[0.15em] text-brand">Contact us for a site survey, sensor count, connectivity and lead time</p>
+
+                ${ctaRow({
+                  waText: 'Hi Vybe, I would like to talk about an IoT installation.',
+                  waLabel: 'WhatsApp us',
+                  email: ORG.sales,
+                  subject: 'IoT solutions enquiry',
+                  emailLabel: `Email ${ORG.sales}`,
+                })}
+
+                <div class="mt-12">
+                    ${noticePanel(
+                      'Tell us the question before you tell us the sensor',
+                      `<p>The usual way an IoT project goes wrong is not technical. It is that everything gets instrumented, a dashboard appears with forty tiles on it, and within a month nobody opens it because no single tile was tied to a decision anybody actually makes.</p>
+                        <p>So the first conversation is about what you want to stop guessing at — which room went out of range, what is drawing power overnight, where the trolley went. One question answered properly is worth more than a building full of sensors, and it is usually a much smaller quote than you expect.</p>`
+                    )}
+                </div>
+
+                <div class="mt-14 grid gap-5 md:grid-cols-2">
+                    ${IOT_SPECS.map(
+                      (s) => `<div class="flex flex-col rounded-2xl border border-slate-200 bg-white p-8">
+                        <span class="material-symbols-outlined text-brand text-[28px]" aria-hidden="true">${s.icon}</span>
+                        <h2 class="mt-4 text-xl font-bold font-display tracking-tight text-slate-900">${esc(s.h)}</h2>
+                        <ul class="mt-5 grid gap-2 text-sm text-slate-600">
+                            ${s.items
+                              .map(
+                                (i) => `<li class="flex items-start gap-2">
+                                <span class="material-symbols-outlined text-brand text-[18px] shrink-0 mt-0.5" aria-hidden="true">check_circle</span>
+                                <span>${esc(i)}</span>
+                            </li>`
+                              )
+                              .join('\n                            ')}
+                        </ul>
+                    </div>`
+                    ).join('\n                    ')}
+                </div>
+            </div>
+        </section>
+
+${proseSections({
+  id: 'iot-detail',
+  eyebrow: 'In detail',
+  heading: 'A reading is only useful if somebody trusts it.',
+  sections: [
+    {
+      h: 'Placement decides the number',
+      p: 'A temperature sensor mounted next to the door of a cold room will read the corridor every time somebody opens it, and the record will show excursions that never happened to the stock. One buried at the back behind a pallet will read nothing but the pallet. Neither is a sensor fault and no amount of software fixes either. Where the sensor goes is a judgement about what you are protecting, made on site with the doors open and the shelves loaded, and it is the part of the job that earns its money.',
+    },
+    {
+      h: 'Alerts that people still read in month six',
+      p: 'An alert that fires twice a day gets muted within a fortnight, and the one that mattered goes with it. So the bands are set against what the stock or the equipment can actually tolerate rather than against a round number, with a delay so a door held open for thirty seconds does not page anybody, and an escalation so an unacknowledged alert at two in the morning reaches a second person. Tuning this after a few weeks of real data is part of the installation, not an extra.',
+    },
+    {
+      h: 'Connectivity is where these projects actually fail',
+      p: 'The sensors are rarely the problem. The problem is the cold store at the back of the building where Wi-Fi does not reach, the 4G that works on a phone at head height and not on a gateway in a plant room, and the site where somebody unplugs the router every night. That is what the survey is looking for. Sometimes the answer is LoRaWAN because it walks through walls the Wi-Fi will not; sometimes it is a cable, because a cable is boring and works.',
+    },
+    {
+      h: 'One place to look',
+      p: 'Every system added to a business brings a login, and a login nobody uses is a system that is not doing anything. Where you already run Vybe ERP, readings and asset movements can appear there alongside everything else, so checking them is part of a routine somebody already has rather than a separate habit they have to build. Where they have to live in their own dashboard, we would rather put five tiles on it that get read than forty that do not.',
+    },
+  ],
+})}
+
+${siblingSection({
+  eyebrow: 'Related',
+  heading: 'What usually goes with an IoT installation.',
+  items: [
+    {
+      href: '/manufacturing/',
+      icon: 'precision_manufacturing',
+      name: 'All manufacturing & supply',
+      blurb: 'What we make and what we distribute, in one place.',
+    },
+    {
+      href: '/manufacturing/rfid-cards/',
+      icon: 'contactless',
+      name: 'RFID & NFC cards',
+      blurb: 'The tags and cards the tracking side reads, made and encoded here.',
+    },
+    {
+      href: '/manufacturing/distribution/',
+      icon: 'local_shipping',
+      name: 'IT hardware distribution',
+      blurb: 'The displays, mini PCs and networking the dashboards run on.',
+    },
+    {
+      href: '/erp/',
+      icon: 'dashboard_customize',
+      name: 'Vybe ERP',
+      blurb: 'Where the readings can land, instead of a separate login.',
+    },
+    {
+      href: '/it-solutions/',
+      icon: 'code_blocks',
+      name: 'IT & cyber',
+      blurb: 'The networking, cabling and security the gateways depend on.',
+    },
+  ],
+})}
+
+${faqSection(iotFaqs, { dark: false })}
+${relatedSection('manufacturing', { dark: false })}
+</div>`;
+
+{
+  const url = '/manufacturing/iot/';
+  const lastmod = lastmodFor(url, iotBody);
+  DOCS.push({
+    file: 'manufacturing/iot/index.html',
+    priority: '0.7',
+    changefreq: 'monthly',
+    page: {
+      url,
+      nav: 'mfg-iot',
+      title: 'IoT Solutions for Manufacturing in Bengaluru | Vybe',
+      ogTitle: 'IoT: asset tracking, environment and energy monitoring',
+      description:
+        'IoT for manufacturing in Bengaluru — UHF asset and inventory tracking, temperature, humidity and energy monitoring, gateways and ERP integration. Contact us for a site survey.',
+      lastmod,
+      trail: [
+        CRUMB_HOME,
+        { name: 'Manufacturing', url: '/manufacturing/' },
+        { name: 'IoT solutions', url },
+      ],
+      faqs: iotFaqs,
+      body: iotBody,
+      schema: (u) => ({
+        '@type': 'Service',
+        '@id': `${u}#service`,
+        name: 'IoT solutions for manufacturing',
+        serviceType: 'Industrial IoT — asset tracking, environmental and energy monitoring',
+        description:
+          'Design, supply and installation of IoT systems for manufacturing and distribution sites in Bengaluru. UHF RFID asset and inventory tracking using fixed gateway readers, handheld readers and on-metal tags manufactured in house; continuous temperature and humidity monitoring of cold rooms, stores and server rooms with threshold alerting and retained history; energy metering per panel, line or department using clamp-on current transformers, including solar and generator contribution. Edge gateways with local buffering over Wi-Fi, Ethernet, LoRaWAN or 4G, Modbus and MQTT integration, dashboards with CSV export and integration into Vybe ERP. Scope, sensor count and lead time are quoted per site survey rather than listed.',
         provider: { '@id': `${SITE}/#organization` },
         areaServed: { '@type': 'City', name: 'Bengaluru' },
         url: u,

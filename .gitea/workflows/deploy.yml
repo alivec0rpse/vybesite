@@ -55,6 +55,61 @@ jobs:
         # Copies the site into dist/, leaving build.js, src/ and tools/ behind.
         run: npm run stage
 
+      - name: Upload assets to the CDN origin
+        # Before the site deploy, never after: the staged pages reference
+        # cdn.vybe.net.in, so an asset that is not in the container yet is a
+        # 404 on a live page for however long the deploy takes.
+        #
+        # No CDN purge follows this. Every asset URL carries a ?v=<content
+        # hash> (tools/stamp-assets.js) and the Front Door route caches on the
+        # full query string, so changed content arrives under a new cache key.
+        #
+        # Authenticates as the vybe-cdn-deploy service principal, which holds
+        # Storage Blob Data Contributor on the vybecdn account and nothing
+        # else. An account key or connection string would instead hand CI full
+        # control of the account, including the ability to hand out SAS tokens.
+        #
+        # Required repository secrets:
+        #   AZURE_CLIENT_ID / AZURE_CLIENT_SECRET / AZURE_TENANT_ID
+        env:
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        run: |
+          for v in AZURE_CLIENT_ID AZURE_CLIENT_SECRET AZURE_TENANT_ID; do
+            if [ -z "$(eval echo \$$v)" ]; then
+              echo "$v is not set."
+              echo "Add it under Settings -> Actions -> Secrets in this repository."
+              exit 1
+            fi
+          done
+          command -v az >/dev/null || curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+          # --allow-no-subscriptions: the principal is scoped to one storage
+          # account, so it cannot enumerate subscriptions and a plain login
+          # would fail before it ever reached the upload.
+          az login --service-principal \
+            --username "$AZURE_CLIENT_ID" \
+            --password "$AZURE_CLIENT_SECRET" \
+            --tenant "$AZURE_TENANT_ID" \
+            --allow-no-subscriptions --output none
+          az storage blob upload-batch \
+            --account-name vybecdn --auth-mode login \
+            --destination '$web' --destination-path assets \
+            --source ./dist/assets \
+            --overwrite --no-progress \
+            --content-cache 'public, max-age=31536000, immutable'
+          # Re-upload the fonts with an explicit type: the CLI guesses content
+          # types from the file extension and has no entry for .woff2, so they
+          # would land as application/octet-stream.
+          az storage blob upload-batch \
+            --account-name vybecdn --auth-mode login \
+            --destination '$web' --destination-path assets \
+            --source ./dist/assets \
+            --pattern '**/*.woff2' \
+            --overwrite --no-progress \
+            --content-type 'font/woff2' \
+            --content-cache 'public, max-age=31536000, immutable'
+
       - name: Deploy to Azure
         env:
           SWA_CLI_DEPLOYMENT_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
