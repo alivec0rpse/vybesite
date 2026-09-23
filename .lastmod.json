@@ -1,19 +1,19 @@
 {
   "/": {
-    "hash": "e6cc824284395a81",
-    "date": "2026-09-22"
+    "hash": "e6b863191597c976",
+    "date": "2026-09-23"
   },
   "/erp/": {
-    "hash": "4f37379461237ab1",
-    "date": "2026-09-22"
+    "hash": "b35ca15960621d77",
+    "date": "2026-09-23"
   },
   "/cms/": {
-    "hash": "fd460a7b62c05a59",
-    "date": "2026-09-22"
+    "hash": "ecd9e3ad61c865b1",
+    "date": "2026-09-23"
   },
   "/it-solutions/": {
-    "hash": "6fd344e2dbbf3917",
-    "date": "2026-09-22"
+    "hash": "0b5e5af73d68464b",
+    "date": "2026-09-23"
   },
   "/cloud/": {
     "hash": "1b19066f41872902",
@@ -24,8 +24,8 @@
     "date": "2026-09-21"
   },
   "/terms/": {
-    "hash": "ed0016ae6fdebb66",
-    "date": "2026-09-21"
+    "hash": "f2f81965fc780672",
+    "date": "2026-09-23"
   },
   "/refund-policy/": {
     "hash": "937e522dc9a8e478",
@@ -36,79 +36,91 @@
     "date": "2026-09-21"
   },
   "/workspace/": {
-    "hash": "c6d9dc6d0729b874",
-    "date": "2026-09-22"
+    "hash": "f786f780b702e7f0",
+    "date": "2026-09-23"
   },
   "/smart-classroom/": {
-    "hash": "6d4c1f5c7d6309fc",
-    "date": "2026-09-22"
+    "hash": "54d0f8af61f3225d",
+    "date": "2026-09-23"
   },
   "/contact/": {
     "hash": "c87d4f30251b7b76",
     "date": "2026-09-21"
   },
   "/printing/": {
-    "hash": "4647d63d011172df",
-    "date": "2026-09-22"
+    "hash": "bb57377e8089ad02",
+    "date": "2026-09-23"
   },
   "/registrations/": {
-    "hash": "f918cae7bb4624cc",
-    "date": "2026-09-22"
+    "hash": "160e6cf2c51f95f8",
+    "date": "2026-09-23"
   },
   "/printing/stationery/": {
-    "hash": "8fd2d6f0bdc2b42e",
-    "date": "2026-09-22"
+    "hash": "24bf02b1853dc87e",
+    "date": "2026-09-23"
   },
   "/printing/cards/": {
-    "hash": "7c3211c292cad456",
-    "date": "2026-09-22"
+    "hash": "e42cfae29904c238",
+    "date": "2026-09-23"
   },
   "/printing/banners-standees/": {
-    "hash": "b31a13f3c283532d",
-    "date": "2026-09-22"
+    "hash": "e2c585ef0df6bd6e",
+    "date": "2026-09-23"
   },
   "/registrations/gst/": {
-    "hash": "dc42c5ec9669610d",
-    "date": "2026-09-22"
+    "hash": "a91195d95d35abed",
+    "date": "2026-09-23"
   },
   "/registrations/msme/": {
-    "hash": "f7b03a5ec2ac0fdc",
-    "date": "2026-09-22"
+    "hash": "98a33b241091dde0",
+    "date": "2026-09-23"
   },
   "/registrations/fssai/": {
-    "hash": "1af88f4a3277a78b",
-    "date": "2026-09-22"
+    "hash": "419ca79aa1e710fc",
+    "date": "2026-09-23"
   },
   "/registrations/startup-india/": {
-    "hash": "c8582b00452e02dd",
-    "date": "2026-09-22"
+    "hash": "a0a6ccb87f9a28d5",
+    "date": "2026-09-23"
   },
   "/registrations/iso-certification/": {
-    "hash": "b6796564f89d0cd3",
-    "date": "2026-09-22"
+    "hash": "5f3913fc7bbe0691",
+    "date": "2026-09-23"
   },
   "/registrations/nsdc-skill-india/": {
-    "hash": "ade08e0f3bf8ea49",
-    "date": "2026-09-22"
+    "hash": "e69cf035f61e5e78",
+    "date": "2026-09-23"
   },
   "/registrations/digital-signature-certificate/": {
-    "hash": "c74c45b817a42a02",
-    "date": "2026-09-22"
+    "hash": "2af4d630f63c6712",
+    "date": "2026-09-23"
   },
   "/audits/": {
-    "hash": "b0b0edbb0d20f850",
-    "date": "2026-09-22"
+    "hash": "50f7e53686afefdb",
+    "date": "2026-09-23"
   },
   "/audits/kitchen-food-safety/": {
-    "hash": "a70e03c0566e9559",
-    "date": "2026-09-22"
+    "hash": "cd6a24b167ac1bda",
+    "date": "2026-09-23"
   },
   "/audits/schools-institutions/": {
-    "hash": "21550473ee5d43da",
-    "date": "2026-09-22"
+    "hash": "c590488e8e277aad",
+    "date": "2026-09-23"
   },
   "/audits/workplace-compliance/": {
-    "hash": "29d01fc67f6f6507",
-    "date": "2026-09-22"
+    "hash": "58d36702db9b9df2",
+    "date": "2026-09-23"
+  },
+  "/manufacturing/": {
+    "hash": "5ed72f51a67a6727",
+    "date": "2026-09-23"
+  },
+  "/manufacturing/rfid-cards/": {
+    "hash": "39f14718e2324808",
+    "date": "2026-09-23"
+  },
+  "/manufacturing/distribution/": {
+    "hash": "e3012a56886716dc",
+    "date": "2026-09-23"
   }
 }

@@ -54,11 +54,6 @@ const MARKS = [
   // signed. Left unbuilt, not just unreferenced: a file under assets/ is a
   // public URL whether anything links to it or not.
   // { name: 'milkymist', file: 'milkymist.png' },
-  // Same reason: Extramarks do not permit use of their mark before the
-  // channel partner contract is executed. Both entries stay commented.
-  // { name: 'extramarks', file: 'extramarks.svg' },
-  // The largest Forte mark they publish is 179x101, so this one is upscaled.
-  // { name: 'extramarksforte', file: 'extramarksforte.webp' },
   { name: 'jsglobal', file: 'jsglobal.jpg', crop: { left: 60, top: 40, width: 730, height: 610 } },
 ];
 

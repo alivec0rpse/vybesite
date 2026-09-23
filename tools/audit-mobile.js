@@ -21,6 +21,8 @@ const PAGES = process.argv.slice(2).length
       '/registrations/',
       '/audits/',
       '/audits/schools-institutions/',
+      '/manufacturing/',
+      '/manufacturing/distribution/',
       '/contact/',
     ];
 

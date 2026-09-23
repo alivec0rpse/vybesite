@@ -338,7 +338,7 @@ const NAV_GROUPS = [
     items: [
       { nav: 'erp', href: '/erp/', label: 'Vybe ERP', blurb: 'School and college administration.', icon: 'dashboard_customize' },
       { nav: 'cms', href: '/cms/', label: 'Vybe CMS', blurb: '100% cashless cafeteria.', icon: 'fastfood' },
-      { nav: 'classroom', href: '/smart-classroom/', label: 'Smart Classrooms', blurb: 'Flat panels, hybrid class rigs, Extramarks.', icon: 'smart_display' },
+      { nav: 'classroom', href: '/smart-classroom/', label: 'Smart Classrooms', blurb: 'Logic flat panels, hybrid class rigs, boards.', icon: 'smart_display' },
       { nav: 'workspace', href: '/workspace/', label: 'Workspace &amp; Email', blurb: 'Google Workspace, Microsoft 365, Zoho.', icon: 'alternate_email' },
       { nav: 'it', href: '/it-solutions/', label: 'IT &amp; Cyber', blurb: 'Custom apps, security, managed IT.', icon: 'code_blocks' },
       ...(published('cloud')
@@ -382,6 +382,17 @@ const NAV_GROUPS = [
       { nav: 'audit-kitchen', href: '/audits/kitchen-food-safety/', label: 'Kitchens &amp; food businesses', blurb: 'FSSAI Schedule 4 hygiene, layout, pest control records.', icon: 'soup_kitchen' },
       { nav: 'audit-institutions', href: '/audits/schools-institutions/', label: 'Schools &amp; institutions', blurb: 'Fire, canteen, POCSO, transport, security, SDG &amp; sustainability.', icon: 'school' },
       { nav: 'audit-workplace', href: '/audits/workplace-compliance/', label: 'Offices &amp; workplaces', blurb: 'POSH, software licensing, DPDP, labour law, office fire.', icon: 'corporate_fare' },
+    ],
+  },
+  {
+    id: 'manufacturing',
+    label: 'Manufacturing',
+    blurb: 'Cards we make, and hardware we supply. Quoted per order — no prices or stock counts on the site.',
+    items: [
+      { nav: 'manufacturing', href: '/manufacturing/', label: 'All manufacturing &amp; supply', blurb: 'What we make and what we distribute.', icon: 'precision_manufacturing' },
+      { nav: 'mfg-rfid', href: '/manufacturing/rfid-cards/', label: 'RFID &amp; NFC cards', blurb: 'MIFARE, DESFire, NTAG and UHF, encoded to your readers.', icon: 'contactless' },
+      { nav: 'mfg-distribution', href: '/manufacturing/distribution/', label: 'IT hardware distribution', blurb: 'Dell, HP, Lenovo, Asus, Apple and Logitech.', icon: 'local_shipping' },
+      { href: '/manufacturing/distribution/#laptops', label: 'Laptops &amp; desktops', blurb: 'Contact us for stock, configuration and warranty.', icon: 'laptop_windows' },
     ],
   },
 ];
@@ -547,6 +558,7 @@ function footer() {
                     ${link('/printing/', 'Printing Services')}
                     ${link('/registrations/', 'Business Registrations')}
                     ${link('/audits/', 'Compliance Audits')}
+                    ${link('/manufacturing/', 'Manufacturing &amp; Supply')}
                 </ul>
             </div>
 
@@ -697,13 +709,14 @@ function faqSchema(url, faqs) {
 const PRODUCTS = [
   { nav: 'erp', href: '/erp/', name: 'Vybe ERP', blurb: 'Cloud ERP for school and college administration.', icon: 'dashboard_customize' },
   { nav: 'cms', href: '/cms/', name: 'Vybe CMS', blurb: '100% cashless cafeteria ordering and payouts.', icon: 'fastfood' },
-  { nav: 'classroom', href: '/smart-classroom/', name: 'Smart Classrooms', blurb: 'Interactive flat panels, online class rigs and Extramarks content.', icon: 'smart_display' },
+  { nav: 'classroom', href: '/smart-classroom/', name: 'Smart Classrooms', blurb: 'Logic interactive flat panels, online class rigs and writing boards.', icon: 'smart_display' },
   { nav: 'workspace', href: '/workspace/', name: 'Workspace & Email', blurb: 'Google Workspace, Microsoft 365, Zoho Mail and student email.', icon: 'alternate_email' },
   { nav: 'it', href: '/it-solutions/', name: 'IT & Cyber', blurb: 'Custom software, security and managed IT.', icon: 'code_blocks' },
   { nav: 'cloud', href: '/cloud/', name: 'Vybe Cloud', blurb: 'Scalable servers, hosting and DDoS protection.', icon: 'cloud' },
   { nav: 'printing', href: '/printing/', name: 'Printing', blurb: 'Everything from business cards to banners, standees and RFID cards.', icon: 'print' },
   { nav: 'registrations', href: '/registrations/', name: 'Business Registrations', blurb: 'GST, Udyam (MSME), FSSAI and Startup India recognition, from ₹199, plus ISO, NSDC consulting and digital signatures.', icon: 'receipt_long' },
   { nav: 'audits', href: '/audits/', name: 'Compliance Audits', blurb: 'Hygiene, fire, child safety, SDG, POSH and data protection audits for kitchens, campuses and offices. Report, certificate and badge.', icon: 'fact_check' },
+  { nav: 'manufacturing', href: '/manufacturing/', name: 'Manufacturing & Supply', blurb: 'RFID and NFC cards made and encoded to your system, plus Dell, HP, Lenovo, Asus and Apple hardware. Contact us for stock and pricing.', icon: 'precision_manufacturing' },
 ];
 
 /**
@@ -776,6 +789,19 @@ function beyondSoftwareSection() {
                         'Offices: POSH, software licences, DPDP, labour law, fire',
                         'Written report, graded findings, and a re-check',
                         'Scoped and quoted before anything is booked',
+                      ]
+                    )}
+                    ${card(
+                      '/manufacturing/',
+                      'precision_manufacturing',
+                      'Manufacturing &amp; supply',
+                      'RFID and NFC cards made, encoded and personalised to your readers, and IT hardware supplied from Dell, HP, Lenovo, Asus, Apple and Logitech. No prices or stock counts here on purpose — both move weekly, so ask and you get a current answer.',
+                      [
+                        'RFID and NFC cards, fobs, tags and wristbands',
+                        'Desktops, all-in-ones, mini PCs, laptops and monitors',
+                        'Keyboards, mice, headsets, adapters and spares',
+                        'Imaged, domain-joined and asset-tagged before delivery',
+                        'Contact us for stock, lead time, warranty and pricing',
                       ]
                     )}
                 </div>
@@ -864,28 +890,11 @@ const PARTNERS = [
   */
   {
     label: 'Brand Partners',
-    note: 'Brands we are an authorised channel partner or dealer for, and deploy on campus.',
+    note: 'Brands and distributors we are an authorised channel partner or dealer for, and deploy on campus.',
     items: [
-      /* Held back until the channel partner contract is executed. Also
-       * commented out of tools/gen-partner-logos.mjs, so uncommenting here
-       * alone will not render them; rerun `npm run logos`.
-       *
-      {
-        name: 'Extramarks Education',
-        meta: 'Channel partner — digital learning for K-12 schools',
-        url: 'https://www.extramarks.com/',
-        logo: 'extramarks',
-      },
-      {
-        name: 'Extramarks Forte',
-        meta: 'Channel partner — smart LMS for universities',
-        url: 'https://www.extramarksforte.com/',
-        logo: 'extramarksforte',
-      },
-      */
       {
         name: 'JS Global Industries',
-        meta: 'Partner and dealer — classroom boards, Bengaluru',
+        meta: 'Authorised distributor, Logic interactive flat panels — Bengaluru',
         url: 'https://www.jsglobalindustries.co.in/',
         logo: 'jsglobal',
       },
@@ -1116,16 +1125,16 @@ const DEEP_DIVE = {
         p: 'This is the least interesting section on this page and the one that decides whether the room is still working in two years. A panel and a PC on an unprotected supply in most of India will eventually meet a surge or an outage mid-period. So the install includes UPS backup sized to carry the panel and PC through a typical cut, surge protection, dedicated power points, and concealed cabling. The alternative is the arrangement you find in a depressing number of smart classrooms: a forty-thousand-rupee panel running off an extension board trailing across a doorway.',
       },
       {
-        h: 'Extramarks Smart Class Plus, for schools',
-        p: 'Hardware with nothing on it is a very expensive television. As an Extramarks channel partner we license and deploy Smart Class Plus, which is curriculum-mapped animated content for K-12 — the lessons where an animation genuinely explains something a diagram cannot, which is most of physics, chemistry and biology — together with LMS modules for assignments and assessment. Because we are the channel partner rather than a middleman, the content licensing and the panel it runs on are the same purchase order and the same support line, and there is nobody to point at when the two do not talk to each other.',
+        h: 'Logic interactive flat panels, through an authorised distributor',
+        p: 'The panels we fit are Logic, supplied through JS Global Industries in Bengaluru, who are the authorised distributor for the range and who we work with as a partner and dealer. That matters for two unglamorous reasons. The first is warranty: a panel bought through the authorised channel is replaced without an argument, and one bought from whoever quoted lowest very often is not. The second is proximity — the distributor is across town rather than across the country, so a dead panel in the middle of March is a van and an afternoon rather than a freight consignment and a fortnight. Sizes run from 65 to 98 inches, decided by the depth of the room and the back row&rsquo;s eyesight rather than by the budget line.',
       },
       {
-        h: 'Extramarks Forte, for colleges and universities',
-        p: 'Higher education has a different shape of problem. The content need is smaller and the delivery need is larger: course structures, assessments, submissions and results across departments that each do things slightly differently. Extramarks Forte is the product built for that, and we deploy it for universities and colleges department by department rather than as one institution-wide switch, because a rollout that starts everywhere at once tends to finish nowhere. We are a channel partner for Forte on the same terms as Smart Class Plus.',
+        h: 'Teaching content is yours to choose',
+        p: 'A panel with nothing on it is a very expensive television, and the room is only worth what gets taught on it. We do not publish curriculum content of our own and we would rather say so than imply otherwise. What we do is make sure whatever you have licensed actually runs on the room we built: the panel and the classroom PC specified against that software rather than against a brochure, accounts provisioned through your <a class="text-brand font-bold" href="/workspace/">Google Workspace or Microsoft 365 tenant</a>, and where the institution runs <a class="text-brand font-bold" href="/erp/">Vybe ERP</a>, the room sitting inside the same timetable and attendance rather than beside it. If you have not settled on a content provider yet, we will tell you what schools around you are using and what they complain about.',
       },
       {
         h: 'Boards, because the panel is not the whole wall',
-        p: 'Almost every teacher wants a writing surface beside the panel. Working through a derivation or a correction is faster on a board than on a touchscreen, and the panel should be showing the material while that happens rather than being cleared for it. We are a partner and dealer for JS Global Industries, who manufacture classroom display and writing boards in Bengaluru, so the board and the panel are specified together and the wall gets laid out once instead of being retrofitted after somebody notices.',
+        p: 'Almost every teacher wants a writing surface beside the panel. Working through a derivation or a correction is faster on a board than on a touchscreen, and the panel should be showing the material while that happens rather than being cleared for it. JS Global Industries, the same partner the panels come through, manufacture classroom display and writing boards here in Bengaluru, so the board and the panel are specified together and the wall gets laid out once instead of being retrofitted after somebody notices.',
       },
       {
         h: 'Handover, and the reason rooms go unused',
@@ -1427,7 +1436,7 @@ const PAGES = [
     faqs: [
       {
         q: 'What does Vybe Technologies do?',
-        a: 'Vybe Technologies is a software company based in Bengaluru. Our flagship products are <strong>Vybe ERP</strong> for school and college administration, <strong>Vybe CMS</strong> for 100% cashless cafeterias, and <strong>Vybe Cloud</strong> for scalable servers and hosting. We set up <strong>smart classrooms</strong> — interactive flat panels, online and hybrid class systems and Extramarks content — and handle <strong>workspace and email setup</strong>: Google Workspace, Microsoft 365 and Zoho Mail, staff and student accounts, single sign-on and secure online classes. Alongside those, <strong>Vybe IT Solutions</strong> takes on custom software work for businesses of any size or sector — web and mobile apps, business ERPs, retail POS, bespoke SaaS, internal tools — together with cybersecurity and managed IT. If your requirement does not match a product off our shelf, we build it to fit.',
+        a: 'Vybe Technologies is a software company based in Bengaluru. Our flagship products are <strong>Vybe ERP</strong> for school and college administration, <strong>Vybe CMS</strong> for 100% cashless cafeterias, and <strong>Vybe Cloud</strong> for scalable servers and hosting. We set up <strong>smart classrooms</strong> — interactive flat panels, online and hybrid class systems and writing boards — and handle <strong>workspace and email setup</strong>: Google Workspace, Microsoft 365 and Zoho Mail, staff and student accounts, single sign-on and secure online classes. Alongside those, <strong>Vybe IT Solutions</strong> takes on custom software work for businesses of any size or sector — web and mobile apps, business ERPs, retail POS, bespoke SaaS, internal tools — together with cybersecurity and managed IT. If your requirement does not match a product off our shelf, we build it to fit.',
       },
       {
         q: 'Who does Vybe work with?',
@@ -1443,7 +1452,7 @@ const PAGES = [
       },
       {
         q: 'Do you set up smart classrooms?',
-        a: 'Yes — <a href="/smart-classroom/">smart classroom setup</a> end to end: smart interactive flat panels sized to the room, online and hybrid class systems (classroom PC, camera, chat monitor, lighting and audio), UPS-backed power and cabling, and teacher training at handover. We are an <strong>Extramarks channel partner</strong> for Smart Class Plus in schools and Extramarks Forte in colleges and universities, and a partner and dealer for <strong>JS Global Industries</strong> classroom boards.',
+        a: 'Yes — <a href="/smart-classroom/">smart classroom setup</a> end to end: smart interactive flat panels sized to the room, online and hybrid class systems (classroom PC, camera, chat monitor, lighting and audio), UPS-backed power and cabling, and teacher training at handover. The panels are Logic, supplied through <strong>JS Global Industries</strong> in Bengaluru — the authorised distributor for the range, and a partner and dealer we work with for classroom boards as well.',
       },
       {
         q: 'Is Vybe an accredited partner of any cloud or hardware vendor?',
@@ -1462,13 +1471,14 @@ const PAGES = [
       itemListElement: [
         { nav: 'erp', name: 'Vybe ERP', url: `${SITE}/erp/`, description: 'Cloud-based Educational Resource Planning suite for schools and colleges.' },
         { nav: 'cms', name: 'Vybe CMS', url: `${SITE}/cms/`, description: '100% cashless cafeteria management system with QR pickup and split payouts.' },
-        { nav: 'classroom', name: 'Smart Classrooms', url: `${SITE}/smart-classroom/`, description: 'Smart classroom setup — interactive flat panels, online and hybrid class systems, UPS-backed power and Extramarks content.' },
+        { nav: 'classroom', name: 'Smart Classrooms', url: `${SITE}/smart-classroom/`, description: 'Smart classroom setup — Logic interactive flat panels supplied through an authorised distributor, online and hybrid class systems, writing boards and UPS-backed power.' },
         { nav: 'workspace', name: 'Workspace & Email', url: `${SITE}/workspace/`, description: 'Google Workspace, Microsoft 365 and Zoho Mail setup, staff and student email, single sign-on, secure online classes and phishing training.' },
         { nav: 'it', name: 'Vybe IT Solutions', url: `${SITE}/it-solutions/`, description: 'Custom app development, penetration testing and managed security operations.' },
         { nav: 'cloud', name: 'Vybe Cloud', url: `${SITE}/cloud/`, description: 'Scalable cloud architecture, game servers and DDoS protection.' },
         { nav: 'printing', name: 'Printing Services', url: `${SITE}/printing/`, description: 'Commercial printing — business and RFID cards, letterheads, bill books, brochures, flex banners, roll-up standees and signage, printed to your artwork.' },
         { nav: 'registrations', name: 'Business Registrations', url: `${SITE}/registrations/`, description: 'GST, Udyam (MSME) and FSSAI registrations and DPIIT / Startup India recognition, prepared and filed at a flat professional fee with government charges separate, plus non-accredited ISO certification issued by Vybe, consulting on NSDC / Skill India and affiliation applications, and Class 3 digital signature certificates as a registered partner of eMudhra and Capricorn.' },
         { nav: 'audits', name: 'Compliance Audits', url: `${SITE}/audits/`, description: 'Advisory, non-statutory hygiene, safety and compliance audits — kitchen hygiene to the FSSAI Schedule 4 standard, kitchen layout and pest control records, fire and electrical safety to the National Building Code, canteen and mess hygiene, child safety to the POCSO standard, school transport safety, campus security, a NAAC/NIRF-ready SDG and sustainability audit, POSH Act Internal Committee compliance, software licensing and IT assets, DPDP Act data protection readiness and labour law records. Reports, certificates and badges are issued by Vybe Technologies alone and are not a licence, rating, accreditation or No Objection Certificate.' },
+        { nav: 'manufacturing', name: 'Manufacturing & Supply', url: `${SITE}/manufacturing/`, description: 'Manufacture of RFID and NFC cards, fobs, tags and wristbands at 125 kHz, 13.56 MHz and UHF — MIFARE Classic, MIFARE DESFire, NTAG and EM4100 — personalised and encoded to your access control, attendance and cafeteria systems, and distribution of IT hardware from Dell, HP, Lenovo, Asus, Apple, Logitech and Alienware, including desktops, all-in-one PCs, mini PCs, laptops, monitors, keyboards, mice, headsets, conferencing equipment and power adapters. Supplied against purchase orders and tenders with manufacturer warranty and GST invoicing. Pricing, stock availability and warranty terms are quoted per enquiry rather than listed.' },
       ].filter((s) => published(s.nav)).map((s, i) => ({
         '@type': 'ListItem',
         position: i + 1,
@@ -1605,16 +1615,16 @@ const PAGES = [
         a: 'Yes. UPS backup sized to keep the panel and PC running through a typical outage, surge protection, dedicated power points and concealed cabling are part of the installation. This is the part most commonly skipped, and it is why so many smart classrooms end up with a panel running off an extension board trailing across a doorway.',
       },
       {
-        q: 'Are you an Extramarks partner?',
-        a: 'Yes, we are an Extramarks channel partner. That covers <strong>Extramarks Smart Class Plus</strong> — curriculum-mapped animated lessons and LMS modules for K-12 schools — and <strong>Extramarks Forte</strong>, the higher-education stack for universities and colleges. We license, deploy and support both, so the content and the hardware it runs on come from one place and there is nobody to point at when something does not work.',
+        q: 'Which interactive flat panels do you supply?',
+        a: 'Logic panels, supplied through <strong>JS Global Industries</strong> in Bengaluru, who are the authorised distributor for the range and who we work with as a partner and dealer. Buying through the authorised channel is what turns a warranty claim into a phone call rather than an argument, and having the distributor in the same city means a panel that dies mid-term is replaced in an afternoon. Sizes run from 65 to 98 inches. If you are standardising on a different brand across a group of campuses, say so and we will quote the installation around it.',
       },
       {
-        q: 'What is the difference between Extramarks Smart Class Plus and Extramarks Forte?',
-        a: 'Smart Class Plus is built for K-12: animated lessons mapped to the syllabus, delivered on the classroom panel, with LMS modules for assignments and assessment. Forte is the higher-education product, aimed at universities and colleges, covering LMS, course delivery and assessments at degree level. Schools generally want the first; colleges and universities want the second. Both can sit alongside Vybe ERP.',
+        q: 'Do you supply the teaching content that runs on the panels?',
+        a: 'No, and we would rather be plain about it than imply otherwise. We do not publish curriculum content of our own. What we do is make sure whatever your institution has licensed actually runs on the room we built: the panel and classroom PC specified against that software, accounts provisioned through your <a class="text-brand font-bold" href="/workspace/">Google Workspace or Microsoft 365 tenant</a>, and the room inside <a class="text-brand font-bold" href="/erp/">Vybe ERP</a> where you run it. If you have not chosen a content provider yet, we are happy to tell you what is being used around you and what people say about it.',
       },
       {
         q: 'Do you supply writing boards as well as panels?',
-        a: 'Yes. We are a partner and dealer for JS Global Industries, who manufacture classroom display and writing boards in Bengaluru. Most rooms want both — a panel for delivery and a writing surface beside it for working through a problem — and specifying them together means the wall is laid out once rather than retrofitted.',
+        a: 'Yes. JS Global Industries, the same partner our panels come through, manufacture classroom display and writing boards in Bengaluru. Most rooms want both — a panel for delivery and a writing surface beside it for working through a problem — and specifying them together means the wall is laid out once rather than retrofitted.',
       },
       {
         q: 'Do you train our teachers, and what happens after installation?',
@@ -1651,12 +1661,12 @@ const PAGES = [
       },
       {
         '@type': 'Service',
-        '@id': `${url}#content`,
-        name: 'Extramarks Smart Class Plus & Forte Deployment',
+        '@id': `${url}#panels`,
+        name: 'Logic Interactive Flat Panel & Writing Board Supply',
         url,
-        serviceType: 'Digital learning content and LMS deployment',
+        serviceType: 'Interactive flat panel and classroom board supply',
         description:
-          'Licensing, deployment and support of Extramarks Smart Class Plus curriculum-mapped animated lessons and LMS modules for K-12 schools, and Extramarks Forte LMS and course delivery for universities and colleges, as an Extramarks channel partner.',
+          'Supply and installation of Logic interactive flat panels from 65 to 98 inches for schools and colleges, sourced through JS Global Industries of Bengaluru, the authorised distributor for the range, together with classroom display and writing boards manufactured by the same partner.',
         provider: { '@id': `${SITE}/#organization` },
         areaServed: { '@type': 'Country', name: 'India' },
       },
@@ -2343,7 +2353,7 @@ const PRINT_CATEGORIES = [
       },
       {
         h: 'RFID and NFC cards',
-        p: 'Cards, tags, key fobs and wristbands, printed with your branding. The part worth getting right first is the chip: 125 kHz and 13.56 MHz are different technologies, and a card of the wrong sort is a coaster no matter how well it is printed. Tell us the chip your readers expect, or, if you do not know, what access control, attendance or cafeteria system you run, and we will confirm the right card before anything is ordered in bulk.',
+        p: 'Cards, tags, key fobs and wristbands, printed with your branding. The part worth getting right first is the chip: 125 kHz and 13.56 MHz are different technologies, and a card of the wrong sort is a coaster no matter how well it is printed. Tell us the chip your readers expect, or, if you do not know, what access control, attendance or cafeteria system you run, and we will confirm the right card before anything is ordered in bulk. If the card has to open a door, mark attendance or pay for lunch rather than simply look right, the chip choice, encoding and keys are covered properly on <a class="text-brand font-bold" href="/manufacturing/rfid-cards/">RFID and NFC card manufacturing</a>.',
       },
       {
         h: 'Cards that have to talk to your system',
@@ -4569,6 +4579,868 @@ ${relatedSection('audits', { dark: false })}
   });
 }
 
+/* ---------------------------------------------------------- manufacturing */
+
+/**
+ * Two quite different things share this line of business, and the nav groups
+ * them because a buyer's question is the same for both: can you supply it,
+ * and who do I talk to.
+ *
+ *   - What we make. RFID and NFC cards, encoded and personalised, which is a
+ *     manufacturing job rather than a printing one once a chip is involved.
+ *     /printing/cards/ still owns the artwork-and-finish side of the same
+ *     product; the two pages cross-link rather than duplicate.
+ *   - What we distribute. Desktops, laptops, displays and peripherals from
+ *     Dell, HP, Lenovo, Asus, Apple and Logitech.
+ *
+ * Deliberately no prices and no stock figures anywhere in this section. Both
+ * move weekly, a stale number on a static site is worse than no number, and
+ * the honest answer to "do you have twelve of these" is a conversation. Every
+ * card therefore ends at contact rather than at a cart.
+ */
+
+const MFG_ENQUIRY = 'Hi Vybe, I would like to talk about hardware supply.';
+
+/**
+ * One representative render per category, produced by tools/gen-product-images.mjs.
+ * A category with no `img` falls back to its icon on its own, which is what
+ * happens if a vendor ever asks for artwork to come down.
+ */
+const DIST_CATEGORIES = [
+  {
+    id: 'desktops',
+    icon: 'desktop_windows',
+    img: 'desktops',
+    name: 'Desktops & towers',
+    brands: 'Dell · HP · Lenovo · Alienware',
+    blurb:
+      'Slim, SFF and full tower builds from Core i3 up to Core Ultra 9 and Ryzen 7, on Windows 11 Home or Pro, FreeDOS or Ubuntu.',
+    lines: [
+      'Dell Slim ECS1250 — Core i3, i5 and i7 14th gen, 8–16 GB, 512 GB NVMe',
+      'HP Pro 280 G9 and Pro Tower 280 G9 — Core i3 13th gen to i5-13500, up to 1 TB NVMe',
+      'HP ProDesk 2 G1a — Ryzen 5 8500G and Ryzen 7 8700G on the AMD PRO 665 chipset',
+      'Lenovo ThinkCentre neo 50t and M70t Gen 5/6 — up to Core Ultra 7 265 with vPro',
+      'Alienware Aurora ACT1250 — Core Ultra 9 285K, Z890, for workstation and gaming loads',
+    ],
+  },
+  {
+    id: 'all-in-ones',
+    icon: 'desktop_mac',
+    img: 'allinone',
+    name: 'All-in-one PCs',
+    brands: 'HP · Lenovo · Dell',
+    blurb:
+      'One cable, no tower and nothing on the floor. What front desks, labs and admin rooms usually want once they have seen one.',
+    lines: [
+      'HP 27-cr1000i — 27" Full HD, Core Ultra 5 125U, 16 GB, 1 TB SSD',
+      'HP ProOne 440 G9 — the 23.8" business all-in-one, wall and arm mountable',
+      'Keyboard and mouse included on most SKUs; check the config before you assume it',
+    ],
+  },
+  {
+    id: 'mini-pcs',
+    icon: 'memory',
+    img: 'minipc',
+    name: 'Mini PCs & small form factor',
+    brands: 'HP · Lenovo · Dell',
+    blurb:
+      'A litre of machine that VESA-mounts behind the display. The right answer for digital signage, kiosks, labs and any desk short of room.',
+    lines: [
+      'HP Pro Mini 400 G9 — Core i5, 16 GB, 512 GB, mounts behind the monitor',
+      'Lenovo ThinkCentre neo 50q Gen 5 and Gen 6 Tiny — Core i3-1315U up to Core Ultra 7 Series 2',
+      'Lenovo ThinkCentre neo 50s Gen 5 — small form factor where a tiny will not take the cards',
+    ],
+  },
+  {
+    id: 'laptops',
+    icon: 'laptop_windows',
+    img: 'laptops',
+    name: 'Laptops & notebooks',
+    brands: 'Apple · Dell · HP · Lenovo · Asus',
+    blurb:
+      'Business notebooks, student machines and creative laptops, including Apple. Bulk configurations are quoted per order.',
+    lines: [
+      'Apple MacBook Pro 16" — M5 Pro, 24 GB, 1 TB, 120 Hz, English (India) keyboard',
+      'Asus Vivobook X1504MA and the rest of the education range',
+      'Dell, HP and Lenovo commercial notebooks with on-site warranty options',
+      'Imaging, asset tagging and enrolment can be done before delivery — ask',
+    ],
+  },
+  {
+    id: 'monitors',
+    icon: 'monitor',
+    img: 'monitors',
+    name: 'Monitors & displays',
+    brands: 'HP · Dell · Lenovo',
+    blurb:
+      'Full HD through to 4K, in the sizes people actually order. Arms, stands and dual-display brackets alongside.',
+    lines: [
+      'HP S3 Pro 322PE and the S-series Full HD line',
+      '24" and 27" IPS panels for offices, labs and reception',
+      'Larger panels and interactive displays sit under Smart Classrooms instead',
+    ],
+  },
+  {
+    id: 'input',
+    icon: 'keyboard',
+    img: 'kbmouse',
+    name: 'Keyboards, mice & input',
+    brands: 'Dell · HP · Asus · Logitech · Lenovo',
+    blurb:
+      'Wired and wireless, combos and singles, in the volumes an office refresh actually needs rather than in ones and twos.',
+    lines: [
+      'Dell KM555 and Pro KM526 wireless combos; Pro MS3220 and Premier MS900 and MS7421W mice',
+      'HP 455 programmable keyboard, 655 wireless combo, 125, 245 and 435 mice',
+      'Asus Marshmallow KW100 keyboards and MD100 mice, ROG MW203, SmartO MD200, U2000 wired combo',
+      'Logitech Combo Touch keyboard cases for iPad and iPad Pro',
+      'Dell Pro Bluetooth Stylus and Lenovo Tab folio keyboards for tablet fleets',
+    ],
+  },
+  {
+    id: 'audio',
+    icon: 'headset_mic',
+    img: 'audio',
+    name: 'Headsets & conferencing',
+    brands: 'Dell · HP · Logitech',
+    blurb:
+      'Headsets for support desks and classrooms, and the soundbar and camera end of a meeting room that people can actually hear.',
+    lines: [
+      'Dell Pro Premier conferencing soundbar SB725',
+      'Wired and wireless UC headsets, certified for Teams and Zoom',
+      'Room cameras and speakerphones quoted against the room, not off a list',
+    ],
+  },
+  {
+    id: 'power',
+    icon: 'power',
+    img: 'power',
+    name: 'Power, adapters & spares',
+    brands: 'Asus · Dell · HP · Lenovo',
+    blurb:
+      'Genuine adapters, docks and the replacement parts that keep a fleet running once the original brick has gone missing.',
+    lines: [
+      'Asus 45 W, 65 W USB-C and 180 W notebook adapters',
+      'USB-C docks and port replicators matched to the machine, not to the connector',
+      'Batteries, keyboards, palm rests and other service spares, to order',
+    ],
+  },
+];
+
+/** Brand marks are named rather than drawn: no third-party logo files to host. */
+const DIST_BRANDS = ['Dell', 'HP', 'Lenovo', 'Asus', 'Apple', 'Logitech', 'Alienware', 'Microsoft'];
+
+/* ------------------------------------------------ manufacturing, the hub */
+
+const MFG_LINES = [
+  {
+    href: '/manufacturing/rfid-cards/',
+    icon: 'contactless',
+    name: 'RFID & NFC cards',
+    blurb:
+      'Cards, fobs, tags and wristbands, with the chip chosen for the job, encoded to your system and personalised per person.',
+  },
+  {
+    href: '/manufacturing/distribution/',
+    icon: 'local_shipping',
+    name: 'IT hardware distribution',
+    blurb:
+      'Desktops, all-in-ones, mini PCs, laptops, displays and peripherals from Dell, HP, Lenovo, Asus, Apple and Logitech.',
+  },
+];
+
+const mfgFaqs = [
+  {
+    q: 'Why is there no price list on these pages?',
+    a: 'Because any figure we published would be wrong within the week. Hardware pricing moves with the distributor’s rate, the configuration, the quantity, the warranty term and what the rupee did on Tuesday. A card quantity moves with the chip, the finish and the run length. Rather than print a number we would have to caveat into meaninglessness, we quote against what you actually need. Tell us the configuration and the quantity and a figure comes back the same day in most cases.',
+  },
+  {
+    q: 'Do you hold stock?',
+    a: 'Some, and the rest comes in against the order. What we will not do is publish a stock count on a website, because it would be stale by the time you read it and the disappointment lands on you rather than on us. Ask us about a specific model and quantity and you will get a straight answer about availability and lead time, including when the answer is that it is a four-week wait.',
+  },
+  {
+    q: 'What warranty do these carry?',
+    a: 'Manufacturer warranty, and it varies by product and SKU rather than by us — typically one to three years on desktops and notebooks, with on-site and extended options available on the commercial ranges from Dell, HP and Lenovo. Refurbished units carry a shorter warranty, stated per unit before you buy. Ask about a specific model and we will tell you the term, what it covers and what an upgrade to on-site costs.',
+  },
+  {
+    q: 'Can you supply against a purchase order or a tender?',
+    a: 'Yes. We are set up for institutional and corporate purchase orders, we can supply the quotations, specification sheets and compliance documents a tender file needs, and we can quote on a GeM-comparable basis where a school, college or office needs a like-for-like reference. Tell us the format your procurement wants and we will match it.',
+  },
+  {
+    q: 'Do you install and set it up, or just deliver?',
+    a: 'Either. Plenty of orders are simply delivered against an invoice. Where you want it, we image the machines, join them to your domain or tenant, asset-tag them, install the software you standardise on and take the packaging away. For a campus, that is usually cheaper than your own team doing it around their day job. It is quoted as part of the order rather than bolted on afterwards.',
+  },
+  {
+    q: 'Do you take old equipment away?',
+    a: 'We can, and for an office or a campus refresh we usually do. Buy-back on anything with life left in it, responsible disposal through an authorised e-waste handler for anything that does not, and a certificate of disposal for your records — which matters if you are ever audited on it. Say so at quote stage and it comes off the price of the new kit.',
+  },
+  {
+    q: 'Is the hardware you supply genuine?',
+    a: 'Yes, sourced through authorised distribution, with the manufacturer warranty intact and the invoice, serial numbers and HSN codes to show it. Refurbished units are labelled refurbished, plainly, on the quote and on the invoice. We would rather lose an order to somebody quoting grey stock than explain later why the warranty will not honour.',
+  },
+  {
+    q: 'What is the smallest order you will take?',
+    a: 'For hardware there is no formal minimum, though for a single mouse you are better off at a shop. Where we are worth talking to is anything from a handful of machines upward, or a standing arrangement where you come back each time you need something. RFID cards have a practical minimum that depends on the chip and the finish — ask, and if the run is too small to make sense we will tell you rather than take it.',
+  },
+];
+
+const mfgBody = `<div class="w-full bg-surface-main">
+${breadcrumbs([CRUMB_HOME, { name: 'Manufacturing', url: '/manufacturing/' }], false)}
+
+        <section class="px-6 pt-12 pb-20 md:pb-28 relative overflow-hidden">
+            <div class="absolute inset-0 bg-grid-faint" aria-hidden="true"></div>
+            <div class="max-w-6xl mx-auto relative z-10">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-3">Manufacturing &amp; Supply</p>
+                <h1 class="text-5xl md:text-7xl font-black font-display tracking-tighter text-slate-900">What we make, and what we supply.</h1>
+                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">RFID and NFC cards manufactured, encoded and personalised to your system. Desktops, laptops, displays and peripherals distributed from Dell, HP, Lenovo, Asus, Apple and Logitech. Both are quoted against what you need rather than listed off a shelf.</p>
+
+                ${ctaRow({
+                  waText: MFG_ENQUIRY,
+                  waLabel: 'WhatsApp us',
+                  email: ORG.sales,
+                  subject: 'Manufacturing and supply enquiry',
+                  emailLabel: `Email ${ORG.sales}`,
+                })}
+
+                <div class="mt-12">
+                    ${noticePanel(
+                      'No prices and no stock counts on this site, on purpose',
+                      `<p>Hardware pricing and availability move weekly, and card pricing moves with the chip, the finish and the run length. A number published here would be wrong by the time you read it, and being wrong in your favour is as unhelpful as being wrong the other way.</p>
+                        <p>So ask. Tell us the model or the specification and the quantity and you get a current figure, the real lead time, and the warranty term that actually applies — usually the same day. If something is a four-week wait, we will say four weeks rather than let you find out after the purchase order.</p>`
+                    )}
+                </div>
+
+                <div class="mt-16 grid gap-5 md:grid-cols-2">
+                    ${MFG_LINES.map(
+                      (l) => `<a href="${l.href}" class="group flex flex-col rounded-2xl border border-slate-200 bg-white p-8 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-brand/40">
+                        <span class="material-symbols-outlined text-brand text-[28px]" aria-hidden="true">${l.icon}</span>
+                        <h2 class="mt-4 text-2xl font-bold font-display tracking-tight text-slate-900 group-hover:text-brand transition-colors">${esc(l.name)}</h2>
+                        <p class="mt-3 text-sm text-slate-600 leading-relaxed">${esc(l.blurb)}</p>
+                        <span class="mt-auto pt-6 inline-flex items-center gap-2 text-sm font-bold text-brand group-hover:gap-3 transition-all">
+                            ${esc(l.name)} in detail
+                            <span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_forward</span>
+                        </span>
+                    </a>`
+                    ).join('\n                    ')}
+                </div>
+
+                ${checklistPanel('What comes with an order, whichever side of the business it is', [
+                  'A written quotation with the exact configuration or specification on it',
+                  'The real lead time, including when the real answer is weeks rather than days',
+                  'Manufacturer warranty, with the term and what it covers stated up front',
+                  'GST invoice with serial numbers and HSN codes, for your asset register',
+                  'Imaging, asset tagging, encoding and enrolment before delivery, where you want it',
+                  'Buy-back or authorised e-waste disposal of what the new kit replaces',
+                ])}
+            </div>
+        </section>
+
+${proseSections({
+  id: 'manufacturing-detail',
+  eyebrow: 'How we work',
+  heading: 'Quoted against the job, not listed off a shelf.',
+  sections: [
+    {
+      h: 'Why we are not a storefront',
+      p: 'Because the things that decide whether a purchase is a good one — the configuration, the warranty term, whether it will be imaged before it arrives, what happens to the machines it replaces — are exactly the things a cart cannot ask you about. Most of the orders we take change shape between the first message and the quotation, usually because we asked what the machines are actually for and the answer pointed somewhere cheaper. That conversation is worth more to both sides than a checkout button.',
+    },
+    {
+      h: 'Where we are worth talking to, and where we are not',
+      p: 'We are worth talking to for a fleet: an office refresh, a lab, a new campus block, a card programme for a school. There you get a configuration chosen against the workload, one invoice, one warranty conversation and one number to call when something fails. We are not worth talking to for a single mouse, and we will say so rather than take the order. If you are buying one laptop for yourself, a retail site will serve you faster and probably cheaper.',
+    },
+    {
+      h: 'The same people run the software',
+      p: 'Which matters more than it sounds. When the machines going into a school are the machines that will run Vybe ERP, and the cards going to the students are the cards the cafeteria terminals will read, nobody is standing between two vendors translating. The specification is set against the software it has to run, the cards are encoded to the format the readers expect, and if something does not work on day one it is our problem in both directions.',
+    },
+    {
+      h: 'Genuine, invoiced, and labelled for what it is',
+      p: 'Everything is sourced through authorised distribution with the manufacturer warranty intact, and it ships with a GST invoice carrying serial numbers and HSN codes, because that is what your asset register and your auditor will want. Refurbished stock is labelled refurbished on the quotation and on the invoice, with its own shorter warranty stated before you agree to it. Grey imports and pulled-warranty stock are cheaper and we do not sell them, which occasionally costs us an order and has never once cost us a customer.',
+    },
+  ],
+})}
+
+${siblingSection({
+  eyebrow: 'Related',
+  heading: 'What usually goes with it.',
+  items: [
+    ...MFG_LINES.map((l) => ({ href: l.href, icon: l.icon, name: l.name, blurb: l.blurb })),
+    {
+      href: '/printing/cards/',
+      icon: 'badge',
+      name: 'Card printing',
+      blurb: 'The artwork, finish and print side of ID and visiting cards, including short runs.',
+    },
+    {
+      href: '/smart-classroom/',
+      icon: 'smart_display',
+      name: 'Smart classrooms',
+      blurb: 'Interactive flat panels and hybrid teaching rigs, specified and installed.',
+    },
+    {
+      href: '/it-solutions/',
+      icon: 'code_blocks',
+      name: 'IT & cyber',
+      blurb: 'Managed IT, networking and the people who will look after the fleet afterwards.',
+    },
+    {
+      href: '/audits/workplace-compliance/',
+      icon: 'verified_user',
+      name: 'Software licence audit',
+      blurb: 'Count what is installed against what is paid for, before a vendor does it for you.',
+    },
+  ],
+})}
+
+${faqSection(mfgFaqs, { dark: false })}
+${relatedSection('manufacturing', { dark: false })}
+</div>`;
+
+{
+  const url = '/manufacturing/';
+  const lastmod = lastmodFor(url, mfgBody);
+  DOCS.push({
+    file: 'manufacturing/index.html',
+    priority: '0.8',
+    changefreq: 'monthly',
+    page: {
+      url,
+      nav: 'manufacturing',
+      title: 'Manufacturing & IT Hardware Supply in Bengaluru | Vybe',
+      ogTitle: 'Vybe manufacturing and supply: RFID cards and IT hardware',
+      description:
+        'RFID and NFC cards made and encoded, plus Dell, HP, Lenovo and Apple hardware distribution in Bengaluru. Contact us for stock, pricing and warranty.',
+      lastmod,
+      trail: [CRUMB_HOME, { name: 'Manufacturing', url }],
+      faqs: mfgFaqs,
+      body: mfgBody,
+      schema: (u) => ({
+        '@type': 'Service',
+        '@id': `${u}#service`,
+        name: 'Vybe manufacturing and IT hardware supply',
+        serviceType: 'RFID card manufacturing and IT hardware distribution',
+        description:
+          'Manufacture of RFID and NFC cards, fobs, tags and wristbands with chip selection, encoding and personalisation, and distribution of IT hardware — desktops, all-in-one PCs, mini PCs, laptops, monitors, keyboards, mice, headsets, conferencing equipment, power adapters and spares — from Dell, HP, Lenovo, Asus, Apple and Logitech, to businesses, schools and colleges in Bengaluru. Supplied against purchase orders and tenders, with manufacturer warranty, GST invoicing, optional imaging and asset tagging, and buy-back or authorised e-waste disposal. Pricing, stock availability and warranty terms are quoted per enquiry rather than listed.',
+        provider: { '@id': `${SITE}/#organization` },
+        areaServed: { '@type': 'City', name: 'Bengaluru' },
+        url: u,
+        hasOfferCatalog: {
+          '@type': 'OfferCatalog',
+          name: 'Manufacturing and supply',
+          itemListElement: MFG_LINES.map((l) => ({
+            '@type': 'Offer',
+            name: l.name,
+            priceCurrency: 'INR',
+            description: `${l.blurb} Quoted per enquiry; contact us for current pricing, stock availability and warranty terms.`,
+            url: `${SITE}${l.href}`,
+            itemOffered: { '@type': 'Service', name: l.name, provider: { '@id': `${SITE}/#organization` } },
+          })),
+        },
+      }),
+    },
+  });
+}
+
+/* ------------------------------------------------ manufacturing, RFID cards */
+
+const RFID_SPECS = [
+  {
+    icon: 'contactless',
+    h: 'Frequency, chosen for the job',
+    items: [
+      '125 kHz low frequency — EM4100, EM4200, T5577. Cheap, read-only, fine for a simple door',
+      '13.56 MHz high frequency — MIFARE Classic 1K and 4K, MIFARE DESFire EV1, EV2 and EV3, NTAG213, NTAG215, NTAG216',
+      '860–960 MHz UHF — for vehicle tags, gate reads and anything that has to work at a distance',
+      'Dual-frequency cards where a campus is halfway through replacing its readers, which is most of them',
+    ],
+  },
+  {
+    icon: 'credit_card',
+    h: 'Format',
+    items: [
+      'CR80 ISO cards, 0.76 mm, the standard credit-card size every reader and wallet expects',
+      'Key fobs and keyrings, for staff and for anyone who will not carry a card',
+      'Silicone and fabric wristbands, for events, hostels and swimming pools',
+      'Adhesive tags and on-metal tags, for asset tracking where the surface fights the antenna',
+      'Clamshell cards, where the environment is rough and the card will be dropped',
+    ],
+  },
+  {
+    icon: 'tune',
+    h: 'Personalisation',
+    items: [
+      'Photo identity printing, edge-to-edge, in full colour on both sides',
+      'Sequential numbering, printed and encoded to match, so the card and the record agree',
+      'Barcode and QR alongside the chip, for readers that have not been replaced yet',
+      'Magnetic stripe and signature panel where a legacy system still needs one',
+      'Matte, gloss and frosted finishes; rounded corners, slot punch and lanyard holes',
+    ],
+  },
+  {
+    icon: 'key',
+    h: 'Encoding',
+    items: [
+      'Encoded to your system before delivery, so cards arrive working rather than blank',
+      'Sector and application keys set to yours, not left on the factory default — which is how most card systems are actually broken into',
+      'Access control formats: Wiegand 26 and 34, and the custom formats panels expect',
+      'NDEF encoding for NFC cards that have to open a URL or a payment flow on a phone',
+      'Card data supplied back as a file your system can import, matched to the printed numbers',
+    ],
+  },
+];
+
+const rfidFaqs = [
+  {
+    q: 'How is this different from the cards under Printing?',
+    a: 'It is the same physical card, approached from opposite ends. <a class="text-brand font-bold" href="/printing/cards/">Card printing</a> is about the artwork, the finish and short runs — visiting cards, plain ID cards, a hundred passes for an event. This page is about what happens once a chip is involved: which chip, at which frequency, encoded to which system, with which keys, matched to the readers you already own. If your card has to open a door, mark attendance or pay for lunch, you are on the right page. If it just has to look good, the printing page is the cheaper one.',
+  },
+  {
+    q: 'Will these work with the readers we already have?',
+    a: 'That is the first thing to settle and it is why we ask for the reader model before quoting. A 125 kHz reader will never read a 13.56 MHz card, and a MIFARE Classic reader will not read DESFire unless it was set up for it. Tell us what is on your doors and turnstiles — a photograph of the unit is usually enough — and we will tell you which chip you need. Where a campus is mid-migration between two systems, a dual-frequency card buys you the time to finish.',
+  },
+  {
+    q: 'Do you encode them, or do we?',
+    a: 'Whichever you prefer, and most people prefer us to. Cards encoded before delivery arrive working and matched to your data, with the printed number and the chip number agreeing, and we hand back a file your system can import. If your security policy says the keys never leave your building, that is a good policy and we will supply the cards blank with the numbering you specified.',
+  },
+  {
+    q: 'Can they work with Vybe ERP and the cafeteria system?',
+    a: 'Yes, and that is a large part of why we make them. Cards for a school running <a class="text-brand font-bold" href="/erp/">Vybe ERP</a> come encoded for attendance, and cards for a campus on <a class="text-brand font-bold" href="/cms/">Vybe CMS</a> come ready for the cashless cafeteria terminals. One card usually does the gate, the classroom and the canteen. Because both ends are ours, there is nobody in the middle explaining why the format does not match.',
+  },
+  {
+    q: 'What is the minimum quantity?',
+    a: 'It depends on the chip and the finish rather than being one fixed number, and blank stock cards run far smaller than fully personalised ones. Tell us what you are after and we will give you the practical minimum and the point at which the per-card price drops. If your run is too small to be worth doing properly, we will say so rather than take the order and disappoint you.',
+  },
+  {
+    q: 'How long do they take?',
+    a: 'Plain encoded cards from stock are quick. Fully personalised cards — photo, name, number, encoded and verified — depend on how fast the data and the photographs reach us, and that is almost always the slow part rather than the printing. Send a clean spreadsheet and named photograph files and you will have a realistic date; send four hundred photographs called IMG_0423.jpg and it will take longer, for reasons nobody can fix at our end.',
+  },
+  {
+    q: 'What does it cost?',
+    a: `Quoted, because the chip choice moves the per-card price more than anything else does — an EM4100 fob and a DESFire EV3 card are not in the same bracket. Quantity, finish, whether it is personalised and whether we encode it do the rest. Tell us the chip or the reader, the quantity and what has to go on the face of the card at <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a> and a figure comes back.`,
+  },
+];
+
+const rfidBody = `<div class="w-full bg-surface-main">
+${breadcrumbs(
+  [CRUMB_HOME, { name: 'Manufacturing', url: '/manufacturing/' }, { name: 'RFID & NFC cards', url: '/manufacturing/rfid-cards/' }],
+  false
+)}
+
+        <section class="px-6 pt-12 pb-20 md:pb-28 relative overflow-hidden">
+            <div class="absolute inset-0 bg-grid-faint" aria-hidden="true"></div>
+            <div class="max-w-6xl mx-auto relative z-10">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-3">Manufacturing</p>
+                <h1 class="text-5xl md:text-7xl font-black font-display tracking-tighter text-slate-900">RFID and NFC cards, encoded to your system.</h1>
+                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">Cards, fobs, tags and wristbands at 125 kHz, 13.56 MHz and UHF. Chip chosen against the readers you already own, personalised per person, encoded before delivery so they arrive working rather than blank.</p>
+
+                <p class="mt-8 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <span class="text-5xl font-black font-display tracking-tight text-slate-900">On quote</span>
+                    <span class="text-sm font-bold text-slate-500">the chip drives the price more than the quantity does</span>
+                </p>
+                <p class="mt-1 text-xs font-bold uppercase tracking-[0.15em] text-brand">Contact us for stock, minimum run, lead time and warranty</p>
+
+                ${ctaRow({
+                  waText: 'Hi Vybe, I would like a quote for RFID cards.',
+                  waLabel: 'WhatsApp us',
+                  email: ORG.sales,
+                  subject: 'RFID and NFC card enquiry',
+                  emailLabel: `Email ${ORG.sales}`,
+                })}
+
+                <div class="mt-12">
+                    ${noticePanel(
+                      'Tell us the reader before you tell us the card',
+                      `<p>The single most expensive mistake in a card order is buying the wrong frequency. A 125 kHz reader will never read a 13.56 MHz card no matter how good the card is, and a panel configured for MIFARE Classic will not read DESFire unless somebody reconfigures it.</p>
+                        <p>So send us a photograph of the reader on your door or turnstile, or its model number, before anything is ordered. It takes a minute and it is the difference between cards that work on the morning they arrive and a box of very well-printed coasters.</p>`
+                    )}
+                </div>
+
+                <div class="mt-14 grid gap-5 md:grid-cols-2">
+                    ${RFID_SPECS.map(
+                      (s) => `<div class="flex flex-col rounded-2xl border border-slate-200 bg-white p-8">
+                        <span class="material-symbols-outlined text-brand text-[28px]" aria-hidden="true">${s.icon}</span>
+                        <h2 class="mt-4 text-xl font-bold font-display tracking-tight text-slate-900">${esc(s.h)}</h2>
+                        <ul class="mt-5 grid gap-2 text-sm text-slate-600">
+                            ${s.items
+                              .map(
+                                (i) => `<li class="flex items-start gap-2">
+                                <span class="material-symbols-outlined text-brand text-[18px] shrink-0 mt-0.5" aria-hidden="true">check_circle</span>
+                                <span>${esc(i)}</span>
+                            </li>`
+                              )
+                              .join('\n                            ')}
+                        </ul>
+                    </div>`
+                    ).join('\n                    ')}
+                </div>
+            </div>
+        </section>
+
+${proseSections({
+  id: 'rfid-detail',
+  eyebrow: 'In detail',
+  heading: 'A card is only as good as what is on the chip.',
+  sections: [
+    {
+      h: 'Which chip, and why it matters more than the price',
+      p: 'An EM4100 card at 125 kHz is cheap, read-only and carries a number anybody with a fifteen-hundred-rupee cloner can copy in seconds. That is genuinely fine for a store room. It is not fine for a payroll gate, a hostel door or a cafeteria wallet. MIFARE DESFire EV2 and EV3 are a different class of thing — mutual authentication, encrypted communication, and no meaningful cloning risk in practice. The honest advice usually lands between the two: put the good chip where the money or the safety is, and do not pay for it on the visitor pass.',
+    },
+    {
+      h: 'The default keys problem',
+      p: 'Most card systems that get broken into are not broken by cryptography. They are broken because the MIFARE sector keys were left on the factory default, which is published in every datasheet and known to everybody. It costs nothing to set your own keys at encoding time and it is the single highest-value thing you can do to a card programme, so we do it by default and tell you what was set. If you have an existing estate still on factory keys, that is worth fixing before you buy a single new card.',
+    },
+    {
+      h: 'Personalisation is a data job, not a printing job',
+      p: 'The printing is the easy part. What determines whether a run of two thousand student cards goes smoothly is the quality of the spreadsheet and the photographs: consistent columns, names that match the enrolment system, photographs named by the same identifier as the rows. Where that is clean, cards are printed, encoded, verified and boxed in order. Where it is not, somebody spends three days matching faces to names, and that somebody is going to be one of us. We will tell you exactly what format to send before you start collecting it.',
+    },
+    {
+      h: 'One card, several systems',
+      p: 'The point of choosing the chip properly is that one card can do everything. The same card opens the gate, marks attendance in Vybe ERP, pays for lunch through Vybe CMS, borrows a book and gets the student into the exam hall. That only works if the format, the numbering and the keys are agreed once at the start, across every reader and every system that will touch the card. Retrofitting a second system onto a card programme that was not planned for it is where most campuses end up carrying two cards and resenting both.',
+    },
+  ],
+})}
+
+${siblingSection({
+  eyebrow: 'Related',
+  heading: 'What usually goes with a card programme.',
+  items: [
+    {
+      href: '/manufacturing/',
+      icon: 'precision_manufacturing',
+      name: 'All manufacturing & supply',
+      blurb: 'What we make and what we distribute, in one place.',
+    },
+    {
+      href: '/manufacturing/distribution/',
+      icon: 'local_shipping',
+      name: 'IT hardware distribution',
+      blurb: 'Desktops, laptops, displays and peripherals from Dell, HP, Lenovo, Asus and Apple.',
+    },
+    {
+      href: '/printing/cards/',
+      icon: 'badge',
+      name: 'Card printing',
+      blurb: 'Visiting cards, plain ID cards and short runs, where no chip is involved.',
+    },
+    {
+      href: '/erp/',
+      icon: 'dashboard_customize',
+      name: 'Vybe ERP',
+      blurb: 'Attendance, admissions and fees, with the card as the front end.',
+    },
+    {
+      href: '/cms/',
+      icon: 'fastfood',
+      name: 'Vybe CMS',
+      blurb: 'Cashless cafeteria that reads the same card as the gate.',
+    },
+    {
+      href: '/it-solutions/',
+      icon: 'code_blocks',
+      name: 'IT & cyber',
+      blurb: 'Access control, networking and the readers the cards have to talk to.',
+    },
+  ],
+})}
+
+${faqSection(rfidFaqs, { dark: false })}
+${relatedSection('manufacturing', { dark: false })}
+</div>`;
+
+{
+  const url = '/manufacturing/rfid-cards/';
+  const lastmod = lastmodFor(url, rfidBody);
+  DOCS.push({
+    file: 'manufacturing/rfid-cards/index.html',
+    priority: '0.7',
+    changefreq: 'monthly',
+    page: {
+      url,
+      nav: 'mfg-rfid',
+      title: 'RFID & NFC Card Manufacturing in Bengaluru | Vybe',
+      ogTitle: 'RFID and NFC cards, encoded to your system',
+      description:
+        'RFID and NFC cards, fobs, tags and wristbands made in Bengaluru. MIFARE, DESFire, NTAG and UHF, personalised and encoded. Contact us for pricing and lead time.',
+      lastmod,
+      trail: [
+        CRUMB_HOME,
+        { name: 'Manufacturing', url: '/manufacturing/' },
+        { name: 'RFID & NFC cards', url },
+      ],
+      faqs: rfidFaqs,
+      body: rfidBody,
+      schema: (u) => ({
+        '@type': 'Service',
+        '@id': `${u}#service`,
+        name: 'RFID and NFC card manufacturing',
+        serviceType: 'RFID and NFC card manufacturing, personalisation and encoding',
+        description:
+          'Manufacture of RFID and NFC cards, key fobs, wristbands and asset tags in Bengaluru, at 125 kHz (EM4100, EM4200, T5577), 13.56 MHz (MIFARE Classic 1K and 4K, MIFARE DESFire EV1, EV2 and EV3, NTAG213, NTAG215, NTAG216) and UHF, including dual-frequency cards. Photo identity personalisation, sequential numbering, barcode and QR, magnetic stripe and signature panel, and encoding to Wiegand and custom access control formats with customer-set sector keys. Integrates with Vybe ERP attendance and Vybe CMS cashless cafeteria. Pricing, minimum run and lead time are quoted per enquiry.',
+        provider: { '@id': `${SITE}/#organization` },
+        areaServed: { '@type': 'City', name: 'Bengaluru' },
+        url: u,
+        isRelatedTo: { '@id': `${SITE}/manufacturing/#service` },
+      }),
+    },
+  });
+}
+
+/* ---------------------------------------------- manufacturing, distribution */
+
+/**
+ * One card per category. The image is a manufacturer render used as a
+ * representative shot of the category, not a photograph of stock we hold —
+ * which is why the card says "contact for stock" rather than showing a count.
+ */
+function distCard(c) {
+  const art = c.img
+    ? picture({
+        base: `products/${c.img}`,
+        alt: `${c.name} of the kind Vybe supplies`,
+        cls: 'w-full h-48 object-contain',
+        h: 320,
+        aspect: 1,
+      })
+    : `<div class="w-full h-48 flex items-center justify-center"><span class="material-symbols-outlined text-brand text-[64px]" aria-hidden="true">${c.icon}</span></div>`;
+
+  return `<li id="${c.id}" class="flex flex-col h-full rounded-2xl border border-slate-200 bg-white p-8 scroll-mt-28 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-brand/40">
+                        <div class="rounded-xl bg-white">${art}</div>
+                        <span class="material-symbols-outlined text-brand text-[24px] mt-6" aria-hidden="true">${c.icon}</span>
+                        <h3 class="mt-2 text-xl font-bold font-display tracking-tight text-slate-900">${esc(c.name)}</h3>
+                        <p class="mt-1 text-xs font-bold uppercase tracking-[0.15em] text-brand">${esc(c.brands)}</p>
+                        <p class="mt-3 text-sm text-slate-600 leading-relaxed">${esc(c.blurb)}</p>
+
+                        <ul class="mt-5 grid gap-2 text-sm text-slate-600">
+                            ${c.lines
+                              .map(
+                                (l) => `<li class="flex items-start gap-2">
+                                <span class="material-symbols-outlined text-brand text-[18px] shrink-0 mt-0.5" aria-hidden="true">check_circle</span>
+                                <span>${esc(l)}</span>
+                            </li>`
+                              )
+                              .join('\n                            ')}
+                        </ul>
+
+                        <p class="mt-auto pt-6 text-sm text-slate-500 leading-relaxed"><span class="font-bold uppercase tracking-[0.15em] text-xs text-slate-400 block mb-1">Before you order</span>Contact us for current stock, configuration options, lead time and warranty. We do not publish those here because they change weekly.</p>
+                    </li>`;
+}
+
+const distFaqs = [
+  {
+    q: 'Where are the prices?',
+    a: 'Not on the page, and that is deliberate rather than coy. Hardware pricing moves with the distributor rate, the configuration, the quantity and the warranty term, and a figure printed here would be wrong within the week. Send us the model or the specification and the quantity and you will have a current, firm figure — usually the same day, and valid for long enough to get it approved.',
+  },
+  {
+    q: 'Do you have it in stock?',
+    a: 'Ask us, and you will get a straight answer per model rather than a badge on a page. Some lines we hold, most come in against the order, and lead times move constantly. What we will not do is publish a stock count that is stale by the time you read it. If something is four weeks out, we will tell you four weeks before you raise the purchase order rather than after.',
+  },
+  {
+    q: 'What warranty comes with it?',
+    a: 'The manufacturer’s, and the term varies by product and by SKU — usually one to three years on desktops and notebooks, with on-site and extended cover available across the Dell, HP and Lenovo commercial ranges. Refurbished units carry their own shorter warranty, stated per unit on the quotation. Ask about a specific model and we will tell you the term, what it actually covers, and what upgrading to on-site would cost.',
+  },
+  {
+    q: 'Can I get a configuration that is not listed here?',
+    a: 'Almost certainly. The lines on this page are what moves regularly, not the extent of what we can source. More memory, a bigger or second drive, a discrete graphics card, a different operating system, a specific keyboard layout, a particular warranty term — all of it is configurable, and on the commercial ranges a build-to-order usually beats buying a stock machine and upgrading it afterwards. Tell us the workload rather than the part numbers and we will come back with the specification.',
+  },
+  {
+    q: 'Do you supply refurbished machines?',
+    a: 'Yes, and we label them plainly as refurbished on the quotation and the invoice. Refurbished Dell OptiPlex small form factor units and HP ProDesk 400 G4 and G5 Minis are the ones that move most — genuinely sensible for a lab, a reception desk, a signage player or anywhere the workload is light and the budget is real. They carry a shorter warranty, stated per unit, and we will tell you honestly when spending a little more on new is the better decision.',
+  },
+  {
+    q: 'Will you image and asset-tag them before delivery?',
+    a: 'Yes, and for anything above a handful of machines it is usually the cheaper way round. We image to your standard build, join them to your domain or tenant, install what you standardise on, asset-tag them against a register we hand back as a spreadsheet, and take the packaging away. Your own team then spends the day doing their job rather than unboxing.',
+  },
+  {
+    q: 'Do you deliver outside Bengaluru?',
+    a: 'Yes, across Karnataka and beyond it for orders of a reasonable size, with freight quoted openly in the scope rather than buried in the unit price. Installation and imaging outside the city depend on the size of the order — for a full campus it is straightforward, for four machines it rarely justifies the travel and we will say so.',
+  },
+  {
+    q: 'Can you quote for a tender or a GeM comparison?',
+    a: 'Yes. We can supply quotations in the format your procurement needs, with specification sheets, make and model detail, HSN codes and the compliance documents a tender file asks for, and we can quote on a like-for-like basis against a GeM listing where a school, college or office needs the comparison on record. Tell us the format and the deadline.',
+  },
+];
+
+const distBody = `<div class="w-full bg-surface-main">
+${breadcrumbs(
+  [CRUMB_HOME, { name: 'Manufacturing', url: '/manufacturing/' }, { name: 'Distribution', url: '/manufacturing/distribution/' }],
+  false
+)}
+
+        <section class="px-6 pt-12 pb-20 md:pb-28 relative overflow-hidden">
+            <div class="absolute inset-0 bg-grid-faint" aria-hidden="true"></div>
+            <div class="max-w-6xl mx-auto relative z-10">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-3">Distribution</p>
+                <h1 class="text-5xl md:text-7xl font-black font-display tracking-tighter text-slate-900">IT hardware, supplied and set up.</h1>
+                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">Desktops, all-in-ones, mini PCs, laptops, monitors and peripherals from Dell, HP, Lenovo, Asus, Apple and Logitech. Sourced through authorised distribution, with the manufacturer warranty intact and a GST invoice that your asset register will accept.</p>
+
+                <p class="mt-8 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <span class="text-5xl font-black font-display tracking-tight text-slate-900">On quote</span>
+                    <span class="text-sm font-bold text-slate-500">configuration and quantity decide the number</span>
+                </p>
+                <p class="mt-1 text-xs font-bold uppercase tracking-[0.15em] text-brand">Contact us for stock, lead time, configuration and warranty</p>
+
+                ${ctaRow({
+                  waText: MFG_ENQUIRY,
+                  waLabel: 'WhatsApp us',
+                  email: ORG.sales,
+                  subject: 'IT hardware supply enquiry',
+                  emailLabel: `Email ${ORG.sales}`,
+                })}
+
+                <div class="mt-12">
+                    ${noticePanel(
+                      'No prices, no stock counts. Ask and you get both.',
+                      `<p>Everything below is what we supply regularly. What is not below is a price or a stock figure, because both move weekly and a stale number helps nobody — least of all you, when you have already taken it to your finance team.</p>
+                        <p>Tell us the model or the specification and the quantity, and you get a current figure, the real lead time, the configuration options and the warranty term that applies. <strong>Product images are manufacturers’ own renders shown to illustrate each category — not photographs of stock in hand, and all brand names and marks belong to their owners.</strong></p>`
+                    )}
+                </div>
+
+                <div class="mt-14 rounded-2xl border border-slate-200 bg-white p-8">
+                    <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Brands we supply</h2>
+                    <ul class="mt-5 flex flex-wrap gap-x-8 gap-y-3">
+                        ${DIST_BRANDS.map(
+                          (b) => `<li class="text-lg font-bold font-display tracking-tight text-slate-700">${esc(b)}</li>`
+                        ).join('\n                        ')}
+                    </ul>
+                    <p class="mt-5 text-sm text-slate-500 leading-relaxed">All trademarks are the property of their respective owners. Vybe Technologies is a reseller; listing a brand here describes what we supply and is not a claim of endorsement, authorisation tier or partnership beyond ordinary distribution.</p>
+                </div>
+
+                <ul class="mt-8 grid gap-5 lg:grid-cols-3">
+                    ${DIST_CATEGORIES.map(distCard).join('\n                    ')}
+                </ul>
+
+                <div class="mt-8">
+                    ${noticePanel('Refurbished, where it genuinely makes sense', `<p>We also supply refurbished business machines — Dell OptiPlex small form factor units, HP ProDesk 400 G4 and G5 Minis and similar. For a lab, a reception desk, a signage player or a back-office role where the workload is light, they are a sensible use of a real budget.</p>
+                        <p>They are labelled refurbished on the quotation and on the invoice, never quietly mixed in with new, and they carry their own shorter warranty which is stated per unit before you agree to anything. Where spending a little more on new is the better decision, we will say so.</p>`)}
+                </div>
+
+                ${checklistPanel('What we can do before it reaches your desk', [
+                  'Image every machine to your standard build, so they arrive identical',
+                  'Join them to your domain, Microsoft 365 tenant or Google Workspace',
+                  'Install the software you standardise on, licensed and activated',
+                  'Asset-tag each unit and hand back the register as a spreadsheet',
+                  'Deliver to the room rather than the loading bay, and take the packaging away',
+                  'Buy back or responsibly dispose of what the new kit replaces, with a disposal certificate',
+                ])}
+            </div>
+        </section>
+
+${proseSections({
+  id: 'distribution-detail',
+  eyebrow: 'In detail',
+  heading: 'Buying hardware well is mostly about asking better questions.',
+  sections: [
+    {
+      h: 'Specify against the workload, not the spec sheet',
+      p: 'The most common way to waste money on a fleet is to buy one configuration for everybody. A reception desk, a computer lab, an accounts team running heavy spreadsheets and a designer are four different machines, and buying the designer’s specification for all of them costs several times what buying the reception desk’s would. Tell us what the machines are actually for, floor by floor if need be, and the quotation will come back split accordingly — which more often than not is how the total comes down rather than up.',
+    },
+    {
+      h: 'Memory and storage are where the real decisions are',
+      p: 'Processor generation is what the spec sheet leads with and it is rarely what anybody feels. What people feel is 8 GB of memory on a machine running a browser with thirty tabs, a video call and an ERP client, and a mechanical drive on a machine that boots twenty times a day. Sixteen gigabytes and an NVMe SSD change the experience of a mid-range machine more than a processor tier does, and cost less. Where a budget is tight, that is the trade we will recommend every time.',
+    },
+    {
+      h: 'The warranty question worth asking',
+      p: 'Not how long, but what happens. A one-year carry-in warranty means somebody in your office packs the machine and takes it somewhere, and the machine is gone for a fortnight. Three-year on-site means an engineer comes to the desk. For a school or an office where nobody has a spare machine to hand out, the difference in downtime is worth far more than the difference in price, and on the commercial ranges from Dell, HP and Lenovo it is a modest uplift at the point of purchase and impossible to add later. Ask about it before you order, not after.',
+    },
+    {
+      h: 'What happens to the old machines',
+      p: 'They should not go in a cupboard, which is where most of them go. Anything with life left in it has a buy-back value that comes straight off the cost of the new kit, and anything that does not needs to go to an authorised e-waste handler — not to the scrap dealer at the gate, who will take the payment and the liability stays with you. We handle both, and for anything carrying data we can wipe drives to a documented standard and give you a certificate of destruction and disposal for your records. That is the piece that matters if you are ever audited on it, and it is the piece almost everybody forgets to ask for.',
+    },
+  ],
+})}
+
+${siblingSection({
+  eyebrow: 'Related',
+  heading: 'What usually goes with a hardware order.',
+  items: [
+    {
+      href: '/manufacturing/',
+      icon: 'precision_manufacturing',
+      name: 'All manufacturing & supply',
+      blurb: 'What we make and what we distribute, in one place.',
+    },
+    {
+      href: '/manufacturing/rfid-cards/',
+      icon: 'contactless',
+      name: 'RFID & NFC cards',
+      blurb: 'Cards, fobs and tags, encoded to your access control and attendance systems.',
+    },
+    {
+      href: '/smart-classroom/',
+      icon: 'smart_display',
+      name: 'Smart classrooms',
+      blurb: 'Interactive flat panels and hybrid teaching rigs, specified and installed.',
+    },
+    {
+      href: '/it-solutions/',
+      icon: 'code_blocks',
+      name: 'IT & cyber',
+      blurb: 'Networking, security and managed IT for the fleet once it is in.',
+    },
+    {
+      href: '/workspace/',
+      icon: 'alternate_email',
+      name: 'Workspace & email',
+      blurb: 'Google Workspace and Microsoft 365, so the new machines have something to join.',
+    },
+    {
+      href: '/audits/workplace-compliance/',
+      icon: 'verified_user',
+      name: 'Software licence audit',
+      blurb: 'Count what is installed against what is paid for, before a vendor does it for you.',
+    },
+  ],
+})}
+
+${faqSection(distFaqs, { dark: false })}
+${relatedSection('manufacturing', { dark: false })}
+</div>`;
+
+{
+  const url = '/manufacturing/distribution/';
+  const lastmod = lastmodFor(url, distBody);
+  DOCS.push({
+    file: 'manufacturing/distribution/index.html',
+    priority: '0.7',
+    changefreq: 'monthly',
+    page: {
+      url,
+      nav: 'mfg-distribution',
+      title: 'IT Hardware Distribution in Bengaluru | Vybe',
+      ogTitle: 'IT hardware distribution: desktops, laptops, displays, peripherals',
+      description:
+        'Dell, HP, Lenovo, Asus and Apple desktops, laptops, monitors and peripherals supplied in Bengaluru. Contact us for stock, pricing and warranty.',
+      lastmod,
+      trail: [CRUMB_HOME, { name: 'Manufacturing', url: '/manufacturing/' }, { name: 'Distribution', url }],
+      faqs: distFaqs,
+      body: distBody,
+      schema: (u) => ({
+        '@type': 'Service',
+        '@id': `${u}#service`,
+        name: 'IT hardware distribution',
+        serviceType: 'IT hardware supply and distribution',
+        description:
+          'Supply of IT hardware to businesses, schools and colleges in Bengaluru: desktops and towers, all-in-one PCs, mini PCs and small form factor machines, laptops and notebooks, monitors and displays, keyboards, mice and input devices, headsets and conferencing equipment, and power adapters and spares, from Dell, HP, Lenovo, Asus, Apple, Logitech and Alienware, including refurbished business machines labelled as such. Sourced through authorised distribution with manufacturer warranty, supplied against purchase orders and tenders with GST invoicing, and optionally imaged, domain-joined and asset-tagged before delivery, with buy-back and authorised e-waste disposal of replaced equipment. Pricing, stock availability, configuration options and warranty terms are quoted per enquiry rather than published. All trademarks are the property of their respective owners.',
+        provider: { '@id': `${SITE}/#organization` },
+        areaServed: { '@type': 'City', name: 'Bengaluru' },
+        url: u,
+        isRelatedTo: { '@id': `${SITE}/manufacturing/#service` },
+        hasOfferCatalog: {
+          '@type': 'OfferCatalog',
+          name: 'IT hardware',
+          itemListElement: DIST_CATEGORIES.map((c) => ({
+            '@type': 'Offer',
+            name: c.name,
+            priceCurrency: 'INR',
+            description: `${c.blurb} Brands: ${c.brands.replace(/ · /g, ', ')}. Quoted per enquiry; contact us for current pricing, stock availability, configuration options and warranty terms.`,
+            url: `${u}#${c.id}`,
+            itemOffered: { '@type': 'Product', name: c.name, category: 'IT hardware' },
+          })),
+        },
+      }),
+    },
+  });
+}
+
+
 /* ------------------------------------------------------------------ 404 page */
 
 const notFoundLink = (href, label, desc) =>
@@ -4616,6 +5488,7 @@ write(
                     ${notFoundLink('/printing/', 'Printing', 'Cards, banners, standees, RFID and stationery.')}
                     ${notFoundLink('/registrations/', 'Registrations', 'GST, MSME, FSSAI and Startup India, filed for you, plus ISO, NSDC and DSC.')}
                     ${notFoundLink('/audits/', 'Audits', 'Hygiene, fire, child safety, SDG, POSH and data protection audits.')}
+                    ${notFoundLink('/manufacturing/', 'Manufacturing', 'RFID and NFC cards, plus Dell, HP, Lenovo and Apple hardware.')}
                     ${notFoundLink('/contact/', 'Contact Us', 'Phone, email and where to find us.')}
                 </div>
             </div>
@@ -4785,4 +5658,3 @@ write(LASTMOD_FILE, JSON.stringify(lastmodDb, null, 2) + '\n');
 
 console.log(`built ${emitted.length} pages:`);
 for (const e of emitted) console.log('  ', e.url.padEnd(22), e.lastmod);
-
