@@ -33,6 +33,16 @@ for (const file of htmlFiles()) {
   }
 }
 
+/* The verify card's icons are concatenated in JS rather than written into the
+   HTML, so they are declared in the generated file's header instead. Same list
+   tools/gen-fonts.mjs subsets against — checked here so the two cannot drift. */
+for (const m of fs.readFileSync(path.join(ROOT, 'assets/verify.js'), 'utf8').matchAll(/material-symbols-outlined:\s*([a-z0-9_,\s]+)/g)) {
+  for (const n of m[1].split(/[,\s]+/).filter(Boolean)) {
+    if (!used.has(n)) used.set(n, new Set());
+    used.get(n).add('assets/verify.js');
+  }
+}
+
 (async () => {
   const browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox'] });
   const page = await browser.newPage();

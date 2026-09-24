@@ -114,6 +114,12 @@
     { "route": "/software-licence-audit", "redirect": "/audits/workplace-compliance/", "statusCode": 301 },
     { "route": "/labour-law-audit", "redirect": "/audits/workplace-compliance/", "statusCode": 301 },
 
+    { "route": "/verify", "redirect": "/verify/", "statusCode": 301 },
+    { "route": "/verification", "redirect": "/verify/", "statusCode": 301 },
+    { "route": "/verify-certificate", "redirect": "/verify/", "statusCode": 301 },
+    { "route": "/certificate", "redirect": "/verify/", "statusCode": 301 },
+    { "route": "/certificates", "redirect": "/verify/", "statusCode": 301 },
+
     { "route": "/manufacturing", "redirect": "/manufacturing/", "statusCode": 301 },
     { "route": "/rfid", "redirect": "/manufacturing/rfid-cards/", "statusCode": 301 },
     { "route": "/rfid-cards", "redirect": "/manufacturing/rfid-cards/", "statusCode": 301 },
@@ -170,6 +176,7 @@
     ".svg": "image/svg+xml",
     ".xml": "application/xml",
     ".txt": "text/plain",
+    ".pdf": "application/pdf",
     ".ico": "image/x-icon"
   }
 }

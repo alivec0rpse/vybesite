@@ -35,6 +35,15 @@ for (const file of htmlFiles()) {
   }
 }
 
+/* assets/verify.js builds the certificate result card by concatenation, so its
+   ligature names never sit next to the class name in any file the walk above
+   reads. build.js writes them into a `material-symbols-outlined:` line in that
+   file's header for exactly this reason; drop it and those glyphs get subset
+   out and render as their literal names. */
+for (const m of readFileSync(join(ROOT, 'assets/verify.js'), 'utf8').matchAll(/material-symbols-outlined:\s*([a-z0-9_,\s]+)/g)) {
+  for (const n of m[1].split(/[,\s]+/).filter(Boolean)) icons.add(n);
+}
+
 const names = [...icons].sort();
 if (!names.length) throw new Error('no icons found — run `node build.js` first');
 

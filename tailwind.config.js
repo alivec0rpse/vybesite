@@ -1,6 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ['./index.html', './404.html', './*/index.html', './*/*/index.html'],
+  // assets/verify.js builds the certificate result card in the browser, so the
+  // only place those class names appear is inside that generated file. Without
+  // it in the content list Tailwind purges the card's styles.
+  content: ['./index.html', './404.html', './*/index.html', './*/*/index.html', './assets/verify.js'],
   theme: {
     extend: {
       colors: {

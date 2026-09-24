@@ -47,6 +47,30 @@ Web Apps serves these files directly (`app_location: "/"`, no build step).
 Adding a new Material Symbols icon to a page? Run `npm run fonts` afterwards,
 or the glyph will render as its literal ligature text.
 
+## Certificate verification
+
+`/verify/` is the public register behind the certificate number printed on
+every ISO and audit certificate we issue. The register is the `CERTIFICATES`
+array in `build.js` and nothing else: the build serialises it into
+`assets/verify.js`, and the lookup runs in the visitor's browser, because
+Azure Static Web Apps serves files and there is no database to query.
+
+To issue a certificate: add an entry to `CERTIFICATES`, drop the signed PDF in
+`assets/certificates/`, and `npm run build`. To withdraw one, set its `status`
+to `'withdrawn'` and rebuild — the number stops returning a valid result that
+day, whatever the expiry printed on the paper says. Expiry itself is derived
+from `expires` against the visitor's date, so it needs no maintenance.
+
+`specimen: true` marks a demonstration record: the result card labels it as
+one, which is what keeps the published sample from being mistaken for a real
+certificate. Never edit `assets/verify.js` by hand; it is generated output.
+
+The card builds its markup in JavaScript, so two things it needs are declared
+rather than discovered: its Tailwind classes, via `./assets/verify.js` in the
+`content` list in `tailwind.config.js`, and its Material Symbols names, via the
+`material-symbols-outlined:` line `build.js` writes into the generated file's
+header, which `tools/gen-fonts.mjs` and `tools/audit-icons.js` both read.
+
 ## SEO notes
 
 - One canonical URL, title, description and JSON-LD graph per page.

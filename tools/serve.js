@@ -18,6 +18,7 @@ const MIME = {
   '.ico': 'image/x-icon',
   '.xml': 'application/xml',
   '.txt': 'text/plain',
+  '.pdf': 'application/pdf',
   '.json': 'application/json',
   '.webmanifest': 'application/manifest+json',
 };

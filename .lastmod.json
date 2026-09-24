@@ -84,8 +84,8 @@
     "date": "2026-09-23"
   },
   "/registrations/iso-certification/": {
-    "hash": "71fcb95bc605136e",
-    "date": "2026-09-23"
+    "hash": "d644aae6b2c6dba9",
+    "date": "2026-09-24"
   },
   "/registrations/nsdc-skill-india/": {
     "hash": "28b41d5abb0abefd",
@@ -96,20 +96,20 @@
     "date": "2026-09-23"
   },
   "/audits/": {
-    "hash": "db3f2ceaae3344ca",
-    "date": "2026-09-23"
+    "hash": "e712f1d07ae1a384",
+    "date": "2026-09-24"
   },
   "/audits/kitchen-food-safety/": {
-    "hash": "5a0bc38cb84a29fb",
-    "date": "2026-09-23"
+    "hash": "0ee95b9ad849ffe4",
+    "date": "2026-09-24"
   },
   "/audits/schools-institutions/": {
-    "hash": "9d690a92ba987122",
-    "date": "2026-09-23"
+    "hash": "f4fc0470f572bc52",
+    "date": "2026-09-24"
   },
   "/audits/workplace-compliance/": {
-    "hash": "11af6f260fb1537b",
-    "date": "2026-09-23"
+    "hash": "7feb7a35ecddc5c4",
+    "date": "2026-09-24"
   },
   "/manufacturing/": {
     "hash": "ff3d9e67544fb7a1",
@@ -126,5 +126,9 @@
   "/manufacturing/iot/": {
     "hash": "73544668d5ae4649",
     "date": "2026-09-23"
+  },
+  "/verify/": {
+    "hash": "0e32f4959960e759",
+    "date": "2026-09-24"
   }
 }

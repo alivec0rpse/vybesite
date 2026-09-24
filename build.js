@@ -585,6 +585,7 @@ function footer() {
                     ${link('/terms/', 'Terms of Service')}
                     ${link('/refund-policy/', 'Cancellation &amp; Refund')}
                     ${link('/shipping-policy/', 'Shipping &amp; Exchange')}
+                    ${link('/verify/', 'Verify a Certificate')}
                     ${link('/contact/', 'Contact Us')}
                 </ul>
             </div>
@@ -1436,6 +1437,7 @@ ${page.body}
 ${footer()}
 
 <script src="/assets/site.js" defer></script>
+${(page.scripts || []).map((s) => `<script src="${s}" defer></script>`).join('\n')}
 </body>
 </html>
 `;
@@ -3062,7 +3064,7 @@ const REGISTRATIONS = [
       },
       {
         q: 'How is the certificate verified?',
-        a: `On our portal, and only there. Each certificate carries a number, and the number resolves to the holder, the standard, the scope and the validity dates, so a customer can confirm it themselves without asking you for a scan. The verification link is issued along with the certificate. If you want to confirm a certificate somebody has shown you, write to <a class="text-brand font-bold" href="mailto:${ORG.legal}">${ORG.legal}</a> with the number.`,
+        a: `On our portal, and only there: <a class="text-brand font-bold" href="/verify/">vybe.net.in/verify</a>. Each certificate carries a number, and the number resolves to the holder, the standard, the scope and the validity dates, so a customer can confirm it themselves without asking you for a scan. Verification is free and needs no account, and the certificate carries a QR code that goes straight to its own result. If a number you have been shown does not resolve, write to <a class="text-brand font-bold" href="mailto:${ORG.legal}">${ORG.legal}</a> and we will confirm in writing whether it came from us.`,
       },
       {
         q: 'Can we use the ISO logo on our website?',
@@ -4277,7 +4279,7 @@ function certificateSection() {
                       `<p>They are issued by <strong>Vybe Technologies</strong> and by nobody else. <strong>We are not accredited by, affiliated to, appointed by, empanelled with or recognised by</strong> FSSAI, the Karnataka State Fire and Emergency Services or any fire authority, any State Pollution Control Board, NAAC, NIRF, the UGC, the Labour Department, the Data Protection Board of India, the BSA, any software vendor, NABCB, any member of the International Accreditation Forum, or any other regulator, accreditation body or certification body.</p>
                         <p>So the certificate is <strong>not</strong> an FSSAI licence, approval or hygiene rating; <strong>not</strong> a fire No Objection Certificate; <strong>not</strong> a pollution control consent; <strong>not</strong> a NAAC or NIRF accreditation, score or endorsement; <strong>not</strong> a vehicle fitness certificate; <strong>not</strong> a vendor’s licensing clearance; and <strong>not</strong> a finding by any authority that your organisation is legally compliant. It carries no government, regulatory or accreditation mark, and it must not be presented, described or displayed as though it does.</p>
                         <p>What it does say is exactly this: that Vybe Technologies audited a named site against a named standard on a named date, and that it met the threshold we publish for that audit. That is a real and checkable statement, and it is the only one being made.</p>
-                        <p>It is verifiable in one place: our own portal. Anyone can check the number and see who holds it, for which audit, against which standard, for what scope and until when. If a customer, a parent body, a tender, a regulator or an accreditation team requires an <em>official</em> or <em>accredited</em> certificate, ours is not it. Ask them what they need before you buy one from us or from anybody, and we will tell you which body issues it.</p>`
+                        <p>It is verifiable in one place: our own portal, at <a class="font-bold text-brand hover:underline" href="/verify/">vybe.net.in/verify</a>. Anyone can check the number and see who holds it, for which audit, against which standard, for what scope and until when. If a customer, a parent body, a tender, a regulator or an accreditation team requires an <em>official</em> or <em>accredited</em> certificate, ours is not it. Ask them what they need before you buy one from us or from anybody, and we will tell you which body issues it.</p>`
                     )}
                 </div>
             </div>
@@ -5728,6 +5730,410 @@ ${relatedSection('manufacturing', { dark: false })}
 }
 
 
+/* --------------------------------------------------- certificate verification */
+
+/**
+ * The certificate register. This array is the whole source of truth: it is
+ * serialised into /assets/verify.js at build time and looked up client-side,
+ * because Azure Static Web Apps serves files and nothing else — there is no
+ * database to query and no API to call.
+ *
+ * Adding a certificate is a line here followed by `npm run build`. Never edit
+ * assets/verify.js by hand; it is generated output like every other page.
+ *
+ * `status` is 'active' or 'withdrawn'. Expiry is not a status: it is derived
+ * from `expires` against the day the visitor loads the page, so a certificate
+ * cannot sit here reading "valid" a year after it lapsed.
+ *
+ * `specimen: true` marks a record that is not a real issued certificate. The
+ * PDF it points at is watermarked SAMPLE and the result card says so, so that
+ * a demonstration record can never be mistaken for a live one.
+ */
+const CERTIFICATES = [
+  {
+    number: 'VYB-QMS-2026-0417',
+    specimen: true,
+    holder: 'Sample Organisation Pvt Ltd',
+    address: '#00, Sample Building, Sample Road, Sample Layout, Bengaluru, Karnataka 560000, India',
+    scheme: 'Quality Management System',
+    standard: 'ISO 9001:2015',
+    scope: 'Distribution, supply and after-sales support of IT hardware, RFID and NFC access cards, and allied accessories.',
+    initial: '2026-09-15',
+    issued: '2026-09-15',
+    expires: '2029-09-14',
+    status: 'active',
+    pdf: '/assets/certificates/VYB-QMS-2026-0417.pdf',
+  },
+];
+
+const SPECIMEN = CERTIFICATES.find((c) => c.specimen) || CERTIFICATES[0];
+
+/* Ligature names the result card can render. They are written into the
+   generated file as a declaration because the card builds its markup by
+   concatenation, so the icon name never appears next to the class name for
+   tools/gen-fonts.mjs to find. Left undeclared, `npm run fonts` would subset
+   these glyphs out and the card would render the words "verified" and
+   "open_in_new" in place of the icons. */
+const VERIFY_ICONS = ['verified', 'info', 'gavel', 'search', 'description', 'open_in_new'];
+
+/* The lookup runs in the browser, so it ships as a real file rather than an
+   inline <script>: the CSP is script-src 'self' with no 'unsafe-inline', and
+   an inline block would be dropped by the browser before it ran. Because it
+   lives under /assets/, tools/stamp-assets.js hashes its URL and a revised
+   register reaches visitors instead of sitting in a year-long edge cache. */
+write(
+  'assets/verify.js',
+  `/*
+ * GENERATED by build.js from the CERTIFICATES register. Do not edit.
+ *
+ * The certificate verifier behind /verify/. Progressive enhancement: the page,
+ * the form and the guidance are all in the HTML before this deferred file
+ * runs. Without it the form still submits, as a plain GET to /verify/?cert=…,
+ * and the <noscript> panel tells the visitor how to check by email instead.
+ *
+ * material-symbols-outlined: ${VERIFY_ICONS.join(', ')}
+ */
+(function () {
+  'use strict';
+
+  var CERTS = ${JSON.stringify(CERTIFICATES, null, 2).replace(/</g, '\\u003c').split('\n').join('\n  ')};
+  var LEGAL = ${JSON.stringify(ORG.legal)};
+
+  var form = document.getElementById('verify-form');
+  var input = document.getElementById('verify-number');
+  var out = document.getElementById('verify-result');
+  if (!form || !input || !out) return;
+
+  /* Certificate numbers get retyped off paper and pasted out of PDFs, where a
+     dash can arrive as an en dash and a space can arrive anywhere. Matching on
+     letters and digits alone means "vyb qms 2026 0417" finds the same record
+     as "VYB-QMS-2026-0417", without loosening what counts as a match. */
+  var key = function (s) {
+    return String(s).toUpperCase().replace(/[^A-Z0-9]/g, '');
+  };
+
+  var index = {};
+  for (var i = 0; i < CERTS.length; i++) index[key(CERTS[i].number)] = CERTS[i];
+
+  var esc = function (s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  };
+
+  /* Dates are stored ISO and shown the way the certificate itself shows them.
+     Formatting here rather than through toLocaleDateString keeps the card and
+     the paper identical whatever locale the visitor's browser is set to. */
+  var dmy = function (iso) {
+    var p = String(iso).split('-');
+    return p[2] + '/' + p[1] + '/' + p[0];
+  };
+
+  var today = function () {
+    var d = new Date();
+    var m = String(d.getMonth() + 1);
+    var day = String(d.getDate());
+    return d.getFullYear() + '-' + (m.length < 2 ? '0' + m : m) + '-' + (day.length < 2 ? '0' + day : day);
+  };
+
+  /* ISO dates compare correctly as strings, which is the point of storing them
+     that way: no Date parsing, no timezone sliding the expiry by a day. */
+  var state = function (c) {
+    if (c.status === 'withdrawn') {
+      return { tone: 'amber', icon: 'gavel', label: 'Withdrawn', note: 'This certificate was withdrawn by Vybe Technologies before its expiry date. It must not be relied on or displayed.' };
+    }
+    if (c.expires < today()) {
+      return { tone: 'rose', icon: 'info', label: 'Expired', note: 'This certificate has passed its expiry date and is no longer valid. It must not be displayed as current.' };
+    }
+    return { tone: 'emerald', icon: 'verified', label: 'Valid', note: 'This certificate is on our register and is valid on today\\u2019s date.' };
+  };
+
+  var TONES = {
+    emerald: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    rose: 'bg-rose-50 text-rose-700 border-rose-200',
+    amber: 'bg-amber-50 text-amber-700 border-amber-200',
+    slate: 'bg-slate-100 text-slate-700 border-slate-300',
+  };
+
+  var row = function (label, value) {
+    return (
+      '<div class="border-t border-slate-200 pt-4">' +
+      '<dt class="text-xs font-bold uppercase tracking-[0.15em] text-slate-400">' + esc(label) + '</dt>' +
+      '<dd class="mt-1 text-sm text-slate-700 leading-relaxed">' + esc(value) + '</dd>' +
+      '</div>'
+    );
+  };
+
+  var chip = function (s) {
+    return (
+      '<span class="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-bold ' + TONES[s.tone] + '">' +
+      '<span class="material-symbols-outlined text-[18px]" aria-hidden="true">' + s.icon + '</span>' + esc(s.label) +
+      '</span>'
+    );
+  };
+
+  var found = function (c) {
+    var s = state(c);
+    return (
+      '<div class="rounded-2xl border border-slate-200 bg-white p-8 md:p-10 shadow-xl">' +
+      '<div class="flex flex-wrap items-center gap-3">' + chip(s) +
+      (c.specimen
+        ? '<span class="inline-flex items-center gap-2 rounded-full border ' + TONES.slate + ' px-4 py-1.5 text-sm font-bold">' +
+          '<span class="material-symbols-outlined text-[18px]" aria-hidden="true">description</span>Specimen record</span>'
+        : '') +
+      '<span class="text-xs font-bold uppercase tracking-[0.15em] text-slate-400">Checked ' + dmy(today()) + '</span>' +
+      '</div>' +
+      '<p class="mt-6 text-xs font-bold uppercase tracking-[0.2em] text-brand">' + esc(c.number) + '</p>' +
+      '<h2 class="mt-2 text-3xl md:text-4xl font-black font-display tracking-tight text-slate-900">' + esc(c.holder) + '</h2>' +
+      '<p class="mt-2 text-sm text-slate-600 leading-relaxed">' + esc(c.address) + '</p>' +
+      '<p class="mt-5 text-sm text-slate-600 leading-relaxed">' + esc(s.note) + '</p>' +
+      (c.specimen
+        ? '<p class="mt-3 text-sm text-slate-600 leading-relaxed"><strong>This is a demonstration record.</strong> ' +
+          'No organisation of this name holds a Vybe certificate. It is published so that anyone can see exactly what a real ' +
+          'verification result shows before they are handed a number to check.</p>'
+        : '') +
+      '<dl class="mt-8 grid gap-5 sm:grid-cols-2">' +
+      row('Standard', c.standard) +
+      row('Scheme', c.scheme) +
+      row('Scope of certification', c.scope) +
+      row('Issued by', 'Vybe Technologies, Bengaluru') +
+      row('Initial certification', dmy(c.initial)) +
+      row('Issue date', dmy(c.issued)) +
+      row('Expiry date', dmy(c.expires)) +
+      '</dl>' +
+      (c.pdf
+        ? '<a href="' + esc(c.pdf) + '" class="mt-8 inline-flex items-center gap-2 text-sm font-bold text-brand hover:gap-3 transition-all" target="_blank" rel="noopener">' +
+          '<span class="material-symbols-outlined text-[18px]" aria-hidden="true">description</span>View the certificate as issued (PDF)' +
+          '<span class="material-symbols-outlined text-[18px]" aria-hidden="true">open_in_new</span></a>'
+        : '') +
+      '</div>'
+    );
+  };
+
+  var missing = function (n) {
+    return (
+      '<div class="rounded-2xl border border-slate-200 bg-white p-8 md:p-10 shadow-xl">' +
+      '<div class="flex flex-wrap items-center gap-3">' + chip({ tone: 'slate', icon: 'search', label: 'Not on the register' }) + '</div>' +
+      '<h2 class="mt-6 text-2xl md:text-3xl font-black font-display tracking-tight text-slate-900">No certificate matches ' + esc(n) + '.</h2>' +
+      '<p class="mt-4 text-sm text-slate-600 leading-relaxed">Nothing on our register carries that number. That means one of three things, ' +
+      'and it is worth ruling out the first two before acting on the third: the number was mistyped or read wrong off a scan; the certificate ' +
+      'was issued by some other body and not by us; or the document you are holding was never issued at all.</p>' +
+      '<p class="mt-4 text-sm text-slate-600 leading-relaxed">Check the number against the document and try again. If it still does not resolve, ' +
+      'send us a scan at <a class="font-bold text-brand hover:underline" href="mailto:' + LEGAL + '?subject=Certificate%20verification">' + LEGAL + '</a> ' +
+      'and we will tell you in writing whether it came from us.</p>' +
+      '</div>'
+    );
+  };
+
+  var render = function (raw) {
+    var n = String(raw).trim();
+    if (!n) {
+      out.innerHTML = '';
+      return;
+    }
+    var c = index[key(n)];
+    out.innerHTML = c ? found(c) : missing(n);
+  };
+
+  /* The number belongs in the URL: a verification result is the kind of thing
+     people bookmark, forward to a colleague or attach to a tender file, and
+     the QR code on the certificate itself points straight at ?cert=. */
+  var param = function () {
+    var m = /[?&]cert=([^&]*)/.exec(window.location.search);
+    return m ? decodeURIComponent(m[1].replace(/\\+/g, ' ')) : '';
+  };
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var n = input.value.trim();
+    var url = n ? window.location.pathname + '?cert=' + encodeURIComponent(n) : window.location.pathname;
+    window.history.replaceState({}, '', url);
+    render(n);
+    out.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+
+  // Back and forward through results the visitor has already looked at.
+  window.addEventListener('popstate', function () {
+    input.value = param();
+    render(input.value);
+  });
+
+  var initial = param();
+  if (initial) {
+    input.value = initial;
+    render(initial);
+  }
+})();
+`
+);
+
+const verifyFaqs = [
+  {
+    q: 'What does a valid result here actually prove?',
+    a: 'Exactly one thing, and it is worth being precise about it: that Vybe Technologies issued that certificate to that organisation, for that scope, against that standard, and that it has not expired or been withdrawn. It is our register saying our own certificate is genuine. It is not a statement by any regulator, accreditation body or government department, and a valid result does not make the certificate an accredited one.',
+  },
+  {
+    q: 'Are Vybe certificates accredited?',
+    a: 'No. Our ISO certificates and audit certificates are issued by Vybe Technologies on a non-accredited basis. We are not accredited by, affiliated to, appointed by or recognised by NABCB, any member of the International Accreditation Forum, FSSAI, any fire authority, NAAC, NIRF, the Labour Department, the Data Protection Board or any other regulator or accreditation body, and our certificates carry no IAF, ILAC, UKAS or NABCB mark. If a tender, a regulator or an overseas buyer requires an <em>accredited</em> certificate, ours is not it, and we say so on <a href="/registrations/iso-certification/" class="text-brand font-bold">the page where we sell it</a>.',
+  },
+  {
+    q: 'The number on the document does not resolve. What now?',
+    a: `Check it character by character against the document first: these numbers are commonly retyped off a printed copy, and a misread digit is the usual explanation. Spaces, dashes and case do not matter here, so only the letters and digits need to be right. If it still does not resolve, email a scan to <a class="text-brand font-bold" href="mailto:${ORG.legal}">${ORG.legal}</a> and we will confirm in writing whether the document came from us. Do not accept a certificate that does not verify.`,
+  },
+  {
+    q: 'Can an organisation stay on the register after it stops meeting the standard?',
+    a: 'No, and that is the point of a register rather than a printed certificate. Where we withdraw a certificate — because a surveillance check failed, because the scope changed, or because the holder asked us to — the number stops returning a valid result on the same day, whatever the expiry date printed on the paper says. Always check the number rather than reading the dates off a scan.',
+  },
+  {
+    q: 'Do you charge to verify a certificate?',
+    a: 'No. Verification is free, needs no account, and is open to anybody holding a number — a customer, a tender committee, a parent body or an auditor. Nothing you type here is stored or sent anywhere: the register ships with the page and the lookup happens in your own browser.',
+  },
+];
+
+const verifyBody = `<div class="w-full bg-surface-main">
+${breadcrumbs([CRUMB_HOME, { name: 'Verify a certificate', url: '/verify/' }], false)}
+
+        <section class="px-6 pt-12 pb-20 md:pb-24 relative overflow-hidden">
+            <div class="absolute inset-0 bg-grid-faint" aria-hidden="true"></div>
+            <div class="max-w-6xl mx-auto relative z-10">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-3">Certificate verification</p>
+                <h1 class="text-5xl md:text-7xl font-black font-display tracking-tighter text-slate-900">Check a certificate we issued.</h1>
+                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">Every ISO and audit certificate issued by Vybe Technologies carries a number. Type it in and the register will tell you who holds it, for what scope, against which standard and until when. Free, no account, and open to anybody holding a number.</p>
+
+                <form id="verify-form" action="/verify/" method="get" class="mt-10 max-w-2xl">
+                    <label for="verify-number" class="block text-xs font-bold uppercase tracking-[0.15em] text-slate-400">Certificate number</label>
+                    <div class="mt-3 flex flex-col sm:flex-row gap-3">
+                        <input id="verify-number" name="cert" type="text" inputmode="text" autocomplete="off" spellcheck="false"
+                               placeholder="VYB-QMS-2026-0417"
+                               class="flex-1 rounded-full border border-slate-300 bg-white px-6 py-4 text-sm font-bold text-slate-900 placeholder:font-normal placeholder:text-slate-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30">
+                        <button type="submit" class="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white px-7 py-4 rounded-full text-sm font-bold transition-all active:scale-95">
+                            <span class="material-symbols-outlined text-[20px]" aria-hidden="true">search</span>
+                            Verify
+                        </button>
+                    </div>
+                    <p class="mt-3 text-xs text-slate-500 leading-relaxed">Spaces, dashes and capitals do not matter. Scanning the QR code on the certificate brings you straight here with the number filled in.</p>
+                </form>
+
+                <div id="verify-result" class="mt-10 max-w-3xl" role="status" aria-live="polite"></div>
+
+                <noscript>
+                    <div class="mt-10 max-w-3xl">
+                        ${noticePanel(
+                          'The lookup needs JavaScript',
+                          `<p>The register is checked in your own browser, which is why nothing you type is stored or sent anywhere — and it is also why this one feature needs JavaScript switched on.</p>
+                        <p>If you would rather not, email the certificate number, or a scan of the document, to <a class="font-bold text-brand hover:underline" href="mailto:${ORG.legal}">${ORG.legal}</a> and we will confirm in writing whether it came from us.</p>`
+                        )}
+                    </div>
+                </noscript>
+
+                <div class="mt-10 max-w-3xl rounded-2xl border border-slate-200 bg-white/70 p-6 md:p-8 flex flex-col sm:flex-row gap-5 sm:items-start">
+                    <span class="material-symbols-outlined text-brand text-[28px] shrink-0" aria-hidden="true">description</span>
+                    <div>
+                        <h2 class="text-base font-bold font-display tracking-tight text-slate-900">Want to see what a result looks like first?</h2>
+                        <p class="mt-2 text-sm text-slate-600 leading-relaxed">We publish one specimen record so nobody has to take our word for what this page returns. <a href="/verify/?cert=${encodeURIComponent(SPECIMEN.number)}" class="font-bold text-brand hover:underline">Verify ${esc(SPECIMEN.number)}</a> to see the full card, marked as a specimen. No organisation of that name holds a certificate with us.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+${proseSections({
+  id: 'verify-meaning',
+  eyebrow: 'What this page settles',
+  heading: 'A number that resolves, or it is not our certificate.',
+  lede:
+    'A certificate is only worth what somebody can check independently of the person showing it to you. That is the entire job of this page, and it is worth being exact about what a result does and does not mean.',
+  sections: [
+    {
+      h: 'Why the number and not the paper',
+      p: 'A printed certificate proves very little on its own. It can be edited, it can be reprinted after it lapses, and it can be issued by a body that has since withdrawn it. The number is the durable part: it resolves against our register on the day you check it, so a certificate withdrawn this morning stops verifying this morning, whatever the expiry date printed on the copy in front of you says. If somebody sends you a scan, check the number rather than reading the dates off the image.',
+    },
+    {
+      h: 'What a valid result asserts',
+      p: 'That Vybe Technologies issued this certificate to this organisation, for this scope, against this standard, on these dates, and has not withdrawn it. That is a real, checkable statement and we stand behind it. It is the only statement being made.',
+    },
+    {
+      h: 'What it does not assert',
+      p: 'Our certificates are issued on a <strong>non-accredited</strong> basis. We are not accredited by, affiliated to, appointed by or recognised by NABCB, any member of the International Accreditation Forum, FSSAI, any fire authority, any Pollution Control Board, NAAC, NIRF, the Labour Department, the Data Protection Board of India or any other regulator, accreditation body or certification body. So a valid result is not a licence, not a government approval, not a hygiene rating, not a fire No Objection Certificate, not an accreditation, and not a finding by any authority that the holder is legally compliant. It carries no IAF, ILAC, UKAS or NABCB mark, and it must not be presented as though it does.',
+    },
+    {
+      h: 'If accreditation is what you require',
+      p: 'Then ours is not the certificate you are looking for, and we would rather say that here than have you discover it later. Tell the organisation you are assessing that you need a certificate from a body accredited under the International Accreditation Forum — in India, that means NABCB — and they will need to go to one. Everything they documented for us carries over to that audit, but the certificate itself does not.',
+    },
+    {
+      h: 'Nothing you type is collected',
+      p: `The register is compiled into the page assets and the lookup runs entirely in your browser. There is no form submission, no logging of who checked what, and no record kept of a number that was typed in. If you would prefer a written confirmation on our letterhead for a tender or an audit file, email <a class="text-brand font-bold" href="mailto:${ORG.legal}">${ORG.legal}</a> with the number and we will send one.`,
+    },
+  ],
+})}
+
+        <section class="bg-surface-main border-t border-slate-200 py-20 md:py-24 px-6 relative z-10" aria-labelledby="verify-where-heading">
+            <div class="max-w-6xl mx-auto">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-2">Where our certificates come from</p>
+                <h2 id="verify-where-heading" class="text-3xl md:text-4xl font-black font-display tracking-tight text-slate-900">The two things that put a number on this register.</h2>
+                <p class="mt-5 text-lg leading-relaxed text-slate-600 max-w-3xl">If somebody has handed you a Vybe certificate, it came out of one of these. Both are described in full, fine print included, on their own pages.</p>
+
+                <div class="mt-12 grid gap-5 md:grid-cols-2">
+                    <a href="/registrations/iso-certification/" class="group block rounded-2xl border border-slate-200 bg-white p-8 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-brand/40">
+                        <span class="material-symbols-outlined text-brand text-[28px]" aria-hidden="true">workspace_premium</span>
+                        <h3 class="mt-4 text-xl font-bold font-display tracking-tight text-slate-900 group-hover:text-brand transition-colors">ISO certification</h3>
+                        <p class="mt-3 text-sm text-slate-600 leading-relaxed">ISO 9001, ISO 22000 and ISO 27001. A gap review against the standard, help writing what is missing, a documented audit, and then a numbered certificate with a scope and an expiry. Non-accredited, and the page says so before the price does.</p>
+                    </a>
+                    <a href="/audits/" class="group block rounded-2xl border border-slate-200 bg-white p-8 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-brand/40">
+                        <span class="material-symbols-outlined text-brand text-[28px]" aria-hidden="true">fact_check</span>
+                        <h3 class="mt-4 text-xl font-bold font-display tracking-tight text-slate-900 group-hover:text-brand transition-colors">Compliance &amp; safety audits</h3>
+                        <p class="mt-3 text-sm text-slate-600 leading-relaxed">Kitchen hygiene, fire and electrical safety, POCSO and transport, SDG and sustainability, POSH, software licensing, DPDP and labour law records. Where an audit closes at or above our threshold it produces a numbered certificate and a badge.</p>
+                    </a>
+                </div>
+
+                <div class="mt-8">
+                    ${noticePanel(
+                      'Seen a Vybe logo or badge that will not verify?',
+                      `<p>Every certificate and every digital badge we issue carries a number, and every number resolves on this page. A badge on a website or a certificate on a reception wall with no number on it, or with a number that does not resolve here, was not issued by us or is no longer current.</p>
+                        <p>Tell us at <a class="font-bold text-brand hover:underline" href="mailto:${ORG.legal}">${ORG.legal}</a> and we will confirm in writing, one way or the other. We would much rather hear about it than not.</p>`
+                    )}
+                </div>
+            </div>
+        </section>
+
+${faqSection(verifyFaqs, { dark: false })}
+${relatedSection('verify', { dark: false })}
+</div>`;
+
+{
+  const url = '/verify/';
+  const lastmod = lastmodFor(url, verifyBody);
+  DOCS.push({
+    file: 'verify/index.html',
+    priority: '0.6',
+    changefreq: 'monthly',
+    page: {
+      url,
+      nav: null,
+      title: 'Verify a Certificate | Vybe Technologies',
+      ogTitle: 'Verify a Vybe certificate by its number',
+      description:
+        'Check any ISO or audit certificate issued by Vybe Technologies. Enter the certificate number to see the holder, scope, standard and validity dates. Free.',
+      lastmod,
+      trail: [CRUMB_HOME, { name: 'Verify a certificate', url }],
+      faqs: verifyFaqs,
+      body: verifyBody,
+      scripts: ['/assets/verify.js'],
+      schema: (u) => ({
+        '@type': 'WebApplication',
+        '@id': `${u}#app`,
+        name: 'Vybe certificate verification',
+        applicationCategory: 'BusinessApplication',
+        browserRequirements: 'Requires JavaScript',
+        operatingSystem: 'Any',
+        url: u,
+        description:
+          'Public register lookup for certificates issued by Vybe Technologies. A certificate number returns the holder, the certified scope, the standard assessed against, the issue and expiry dates and the current status. Certificates are issued by Vybe Technologies on a non-accredited basis and carry no IAF, ILAC, UKAS or NABCB endorsement.',
+        provider: { '@id': `${SITE}/#organization` },
+        isAccessibleForFree: true,
+        offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
+      }),
+    },
+  });
+}
+
 /* ------------------------------------------------------------------ 404 page */
 
 const notFoundLink = (href, label, desc) =>
@@ -5929,7 +6335,9 @@ write(LASTMOD_FILE, JSON.stringify(lastmodDb, null, 2) + '\n');
   for (const file of [...emitted.map((e) => (e.url === '/' ? 'index.html' : `${e.url.slice(1)}index.html`)), '404.html']) {
     const html = read(file);
     for (const m of html.matchAll(/\shref="(\/[^"#]*)"/g)) {
-      const href = m[1];
+      // A query string is read by the page, not by the server: /verify/?cert=…
+      // is still the /verify/ document, so the path is what has to resolve.
+      const href = m[1].replace(/\?.*$/, '');
       if (pages.has(href)) continue;
       if (fs.existsSync(path.join(ROOT, href.replace(/^\//, '')))) continue;
       broken.push(`${file} -> ${href}`);

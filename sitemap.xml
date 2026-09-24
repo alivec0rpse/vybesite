@@ -149,7 +149,7 @@
   </url>
   <url>
     <loc>https://vybe.net.in/registrations/iso-certification/</loc>
-    <lastmod>2026-09-23</lastmod>
+    <lastmod>2026-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image><image:loc>https://vybe.net.in/assets/og-image.png</image:loc><image:caption>Vybe Technologies | Smart. Simple. Affordable.</image:caption></image:image>
@@ -170,28 +170,28 @@
   </url>
   <url>
     <loc>https://vybe.net.in/audits/</loc>
-    <lastmod>2026-09-23</lastmod>
+    <lastmod>2026-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <image:image><image:loc>https://vybe.net.in/assets/og-image.png</image:loc><image:caption>Vybe Technologies | Smart. Simple. Affordable.</image:caption></image:image>
   </url>
   <url>
     <loc>https://vybe.net.in/audits/kitchen-food-safety/</loc>
-    <lastmod>2026-09-23</lastmod>
+    <lastmod>2026-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image><image:loc>https://vybe.net.in/assets/og-image.png</image:loc><image:caption>Vybe Technologies | Smart. Simple. Affordable.</image:caption></image:image>
   </url>
   <url>
     <loc>https://vybe.net.in/audits/schools-institutions/</loc>
-    <lastmod>2026-09-23</lastmod>
+    <lastmod>2026-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image><image:loc>https://vybe.net.in/assets/og-image.png</image:loc><image:caption>Vybe Technologies | Smart. Simple. Affordable.</image:caption></image:image>
   </url>
   <url>
     <loc>https://vybe.net.in/audits/workplace-compliance/</loc>
-    <lastmod>2026-09-23</lastmod>
+    <lastmod>2026-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image><image:loc>https://vybe.net.in/assets/og-image.png</image:loc><image:caption>Vybe Technologies | Smart. Simple. Affordable.</image:caption></image:image>
@@ -222,6 +222,13 @@
     <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image><image:loc>https://vybe.net.in/assets/og-image.png</image:loc><image:caption>Vybe Technologies | Smart. Simple. Affordable.</image:caption></image:image>
+  </url>
+  <url>
+    <loc>https://vybe.net.in/verify/</loc>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
     <image:image><image:loc>https://vybe.net.in/assets/og-image.png</image:loc><image:caption>Vybe Technologies | Smart. Simple. Affordable.</image:caption></image:image>
   </url>
 </urlset>
