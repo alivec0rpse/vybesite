@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -119,6 +119,7 @@
     <div class="sh-body" id="shBody">
       <div class="step on" data-step="1">
         <div class="opts" role="radiogroup" aria-label="Purpose of the meeting" id="topics">
+          <!-- [html-validate-disable-block prefer-native-element -- a WAI-ARIA radio group: these carry aria-checked and a styled thumb/pill treatment that a native <input type="radio"> cannot take] -->
           <button class="opt" type="button" role="radio" aria-checked="false" data-v="Vybe ERP demonstration" data-p="a demonstration of Vybe ERP"><span class="tx"><span class="ot">Vybe ERP demonstration</span><span class="od">Student records, attendance and fee collection.</span></span><span class="tick"></span></button>
           <button class="opt" type="button" role="radio" aria-checked="false" data-v="Cashless cafeteria (Vybe CMS)" data-p="the Vybe CMS cashless cafeteria system"><span class="tx"><span class="ot">Cashless cafeteria</span><span class="od">Vybe CMS for your campus cafeteria.</span></span><span class="tick"></span></button>
           <button class="opt" type="button" role="radio" aria-checked="false" data-v="Smart classroom setup" data-p="a smart classroom setup"><span class="tx"><span class="ot">Smart classroom setup</span><span class="od">Interactive panels, hybrid classes and content.</span></span><span class="tick"></span></button>
@@ -130,6 +131,7 @@
       <div class="step" data-step="2">
         <span class="lbl">Mode of meeting</span>
         <div class="seg" role="radiogroup" aria-label="Mode of meeting" id="modes">
+          <!-- [html-validate-disable-block prefer-native-element -- a WAI-ARIA radio group: these carry aria-checked and a styled thumb/pill treatment that a native <input type="radio"> cannot take] -->
           <span class="thumb" id="thumb"></span>
           <button type="button" role="radio" aria-checked="true" data-v="Google Meet">Google Meet</button>
           <button type="button" role="radio" aria-checked="false" data-v="Telephone">Telephone</button>
@@ -151,6 +153,7 @@
         <div class="fld"><label for="iOrg">Institution or organisation <span class="o">(optional)</span></label><input id="iOrg" type="text" autocomplete="organization" placeholder="e.g. St. Joseph's College" enterkeyhint="next"></div>
         <span class="lbl">Organisation type <span class="o">(optional)</span></span>
         <div class="pills2" role="radiogroup" aria-label="Organisation type" id="insts">
+          <!-- [html-validate-disable-block prefer-native-element -- a WAI-ARIA radio group: these carry aria-checked and a styled thumb/pill treatment that a native <input type="radio"> cannot take] -->
           <button class="pill" type="button" role="radio" aria-checked="false" data-v="School">School</button>
           <button class="pill" type="button" role="radio" aria-checked="false" data-v="College">College</button>
           <button class="pill" type="button" role="radio" aria-checked="false" data-v="Corporate campus">Corporate campus</button>

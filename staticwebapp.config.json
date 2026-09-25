@@ -62,6 +62,72 @@
       }
     },
 
+    { "route": "/manjunath", "redirect": "/manjunath/", "statusCode": 301 },
+    { "route": "/manjunath-d", "redirect": "/manjunath/", "statusCode": 301 },
+    {
+      "route": "/manjunath/contact.vcf",
+      "headers": {
+        "Content-Type": "text/vcard; charset=utf-8",
+        "Content-Disposition": "inline; filename=\"Manjunath-D-Vybe-Technologies.vcf\"",
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "X-Robots-Tag": "noindex, nofollow, noarchive"
+      }
+    },
+    {
+      "route": "/manjunath/sw.js",
+      "headers": {
+        "Cache-Control": "no-cache",
+        "X-Robots-Tag": "noindex, nofollow, noarchive"
+      }
+    },
+    {
+      "route": "/manjunath/assets/*",
+      "headers": {
+        "Cache-Control": "public, max-age=604800",
+        "X-Robots-Tag": "noindex, nofollow, noarchive"
+      }
+    },
+    {
+      "route": "/manjunath/*",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "X-Robots-Tag": "noindex, nofollow, noarchive"
+      }
+    },
+
+    { "route": "/harsha", "redirect": "/harsha/", "statusCode": 301 },
+    { "route": "/harsha-r", "redirect": "/harsha/", "statusCode": 301 },
+    {
+      "route": "/harsha/contact.vcf",
+      "headers": {
+        "Content-Type": "text/vcard; charset=utf-8",
+        "Content-Disposition": "inline; filename=\"Harsha-R-Vybe-Technologies.vcf\"",
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "X-Robots-Tag": "noindex, nofollow, noarchive"
+      }
+    },
+    {
+      "route": "/harsha/sw.js",
+      "headers": {
+        "Cache-Control": "no-cache",
+        "X-Robots-Tag": "noindex, nofollow, noarchive"
+      }
+    },
+    {
+      "route": "/harsha/assets/*",
+      "headers": {
+        "Cache-Control": "public, max-age=604800",
+        "X-Robots-Tag": "noindex, nofollow, noarchive"
+      }
+    },
+    {
+      "route": "/harsha/*",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "X-Robots-Tag": "noindex, nofollow, noarchive"
+      }
+    },
+
     { "route": "/src/*", "statusCode": 404 },
     { "route": "/tools/*", "statusCode": 404 },
     { "route": "/node_modules/*", "statusCode": 404 },
