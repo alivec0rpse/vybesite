@@ -14,6 +14,8 @@ const MIME = {
   '.png': 'image/png',
   '.webp': 'image/webp',
   '.jpg': 'image/jpeg',
+  '.svg': 'image/svg+xml',
+  '.vcf': 'text/vcard; charset=utf-8',
   '.woff2': 'font/woff2',
   '.ico': 'image/x-icon',
   '.xml': 'application/xml',
@@ -30,8 +32,21 @@ delete globalHeaders['Strict-Transport-Security'];
 
 http
   .createServer((req, res) => {
-    const url = decodeURIComponent(req.url.split('?')[0]);
+    const [pathname, query] = req.url.split('?');
+    const url = decodeURIComponent(pathname);
     let file = path.join(ROOT, url);
+
+    /* Azure 301s /dir onto /dir/, and that slash decides what a relative URL on
+     * the page resolves against. Serving /dir directly makes the browser read
+     * `styles.css` as /styles.css rather than /dir/styles.css, so a page whose
+     * CSS and JS are relative — the cards under /ankit/ and friends — arrives
+     * as bare unstyled HTML. The site's own pages hide this by linking assets
+     * from the root. */
+    if (!url.endsWith('/') && fs.existsSync(file) && fs.statSync(file).isDirectory()) {
+      res.writeHead(301, { Location: `${pathname}/${query ? `?${query}` : ''}` });
+      res.end();
+      return;
+    }
 
     if (fs.existsSync(file) && fs.statSync(file).isDirectory()) file = path.join(file, 'index.html');
 
