@@ -1,7 +1,7 @@
 (function () {
   "use strict";
     // qr.html sits beside the card, so its own directory is the card's URL.
-  var URL_ = /^https?:$/.test(location.protocol) ? new URL("./", location.href).href : "https://vybe.net.in/harsha/";
+  var URL_ = /^https?:$/.test(location.protocol) ? new URL("./", document.baseURI).href : "https://vybe.net.in/harsha/";
   var q = qrcode(0, "H"); q.addData(URL_); q.make();
   var n = q.getModuleCount(), vb = n + 8, out = [];
   var cw = Math.round(n * 0.3); if (cw % 2 === 0) cw++;

@@ -36,18 +36,13 @@ http
     const url = decodeURIComponent(pathname);
     let file = path.join(ROOT, url);
 
-    /* Azure 301s /dir onto /dir/, and that slash decides what a relative URL on
-     * the page resolves against. Serving /dir directly makes the browser read
-     * `styles.css` as /styles.css rather than /dir/styles.css, so a page whose
-     * CSS and JS are relative — the cards under /ankit/ and friends — arrives
-     * as bare unstyled HTML. The site's own pages hide this by linking assets
-     * from the root. */
-    if (!url.endsWith('/') && fs.existsSync(file) && fs.statSync(file).isDirectory()) {
-      res.writeHead(301, { Location: `${pathname}/${query ? `?${query}` : ''}` });
-      res.end();
-      return;
-    }
-
+    /* Serve a folder's index at the slashless URL, with no redirect, because
+     * that is what Azure does: it resolves a real directory to its index
+     * document before it ever looks at the redirect rules, so every
+     * `"/x" -> "/x/"` rule in staticwebapp.config.json whose source is a real
+     * folder never fires. Redirecting here instead would hide the consequence,
+     * which is that /x and /x/ give a page two different bases for resolving
+     * its relative URLs. Pages that rely on that must pin it with <base>. */
     if (fs.existsSync(file) && fs.statSync(file).isDirectory()) file = path.join(file, 'index.html');
 
     const notFound = !fs.existsSync(file) || !fs.statSync(file).isFile();
