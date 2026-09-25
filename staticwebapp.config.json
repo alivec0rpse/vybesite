@@ -29,6 +29,39 @@
       "headers": { "Cache-Control": "public, max-age=3600" }
     },
 
+    { "route": "/ankit", "redirect": "/ankit/", "statusCode": 301 },
+    { "route": "/ankit-sabu", "redirect": "/ankit/", "statusCode": 301 },
+    {
+      "route": "/ankit/contact.vcf",
+      "headers": {
+        "Content-Type": "text/vcard; charset=utf-8",
+        "Content-Disposition": "inline; filename=\"Ankit-Sabu-Vybe-Technologies.vcf\"",
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "X-Robots-Tag": "noindex, nofollow, noarchive"
+      }
+    },
+    {
+      "route": "/ankit/sw.js",
+      "headers": {
+        "Cache-Control": "no-cache",
+        "X-Robots-Tag": "noindex, nofollow, noarchive"
+      }
+    },
+    {
+      "route": "/ankit/assets/*",
+      "headers": {
+        "Cache-Control": "public, max-age=604800",
+        "X-Robots-Tag": "noindex, nofollow, noarchive"
+      }
+    },
+    {
+      "route": "/ankit/*",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "X-Robots-Tag": "noindex, nofollow, noarchive"
+      }
+    },
+
     { "route": "/src/*", "statusCode": 404 },
     { "route": "/tools/*", "statusCode": 404 },
     { "route": "/node_modules/*", "statusCode": 404 },
@@ -177,6 +210,7 @@
     ".xml": "application/xml",
     ".txt": "text/plain",
     ".pdf": "application/pdf",
+    ".vcf": "text/vcard",
     ".ico": "image/x-icon"
   }
 }

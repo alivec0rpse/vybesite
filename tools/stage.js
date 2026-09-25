@@ -111,7 +111,9 @@ if (CDN) {
   for (const file of distHtml()) {
     const before = fs.readFileSync(file, 'utf8');
     let after = before.replace(re, `$1${CDN}/assets/`);
-    after = after.replace(/<link rel="preload"/, `${preconnect}$&`);
+    // Only pages that now point at the CDN benefit from the hint. /ankit/ ships
+    // its own assets from the origin, so warming a CDN connection there is waste.
+    if (after !== before) after = after.replace(/<link rel="preload"/, `${preconnect}$&`);
     if (after !== before) {
       fs.writeFileSync(file, after);
       rewritten++;

@@ -7,6 +7,11 @@
 # would be checked out as CRLF and Apple would reject the domain.
 .well-known/** -text
 
+# A vCard is CRLF by specification (RFC 6350). Left to normalise, the repo
+# would hold LF and a Linux build agent would check out and ship LF, which the
+# stricter phone contact importers reject.
+*.vcf -text
+
 # Fonts and images are binary; never line-ending convert or diff them.
 *.woff2 binary
 *.png binary
