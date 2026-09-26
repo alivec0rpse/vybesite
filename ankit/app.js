@@ -13,8 +13,6 @@
   /* ---------------- identity (assembled here, not written in the HTML) ---------------- */
   var P = ["+91", "99641", "77677"], E = ["ankit", "vybe.net.in"];
   var PHONE = P.join(""), PHONE_SHOW = P.join(" "), PHONE_WA = PHONE.slice(1), EMAIL = E.join("@");
-  // The card lives under a path, not at the origin root, so derive it from the
-  // page's own directory. Opened from a file:// copy there is no origin to read.
   var CARD_URL = /^https?:$/.test(location.protocol) ? new URL("./", document.baseURI).href : "https://vybe.net.in/ankit/";
   $("#aCall").href = "tel:" + PHONE;
   $("#aWa").href = "https://wa.me/" + PHONE_WA + "?text=" + encodeURIComponent("Dear Mr. Ankit, I received your digital visiting card and would like to connect with you regarding Vybe Technologies.");

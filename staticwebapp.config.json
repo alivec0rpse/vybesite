@@ -95,6 +95,39 @@
       }
     },
 
+    { "route": "/tejas", "redirect": "/tejas/", "statusCode": 301 },
+    { "route": "/tejas-c", "redirect": "/tejas/", "statusCode": 301 },
+    {
+      "route": "/tejas/contact.vcf",
+      "headers": {
+        "Content-Type": "text/vcard; charset=utf-8",
+        "Content-Disposition": "inline; filename=\"Tejas-C-Vybe-Technologies.vcf\"",
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "X-Robots-Tag": "noindex, nofollow, noarchive"
+      }
+    },
+    {
+      "route": "/tejas/sw.js",
+      "headers": {
+        "Cache-Control": "no-cache",
+        "X-Robots-Tag": "noindex, nofollow, noarchive"
+      }
+    },
+    {
+      "route": "/tejas/assets/*",
+      "headers": {
+        "Cache-Control": "public, max-age=604800",
+        "X-Robots-Tag": "noindex, nofollow, noarchive"
+      }
+    },
+    {
+      "route": "/tejas/*",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "X-Robots-Tag": "noindex, nofollow, noarchive"
+      }
+    },
+
     { "route": "/harsha", "redirect": "/harsha/", "statusCode": 301 },
     { "route": "/harsha-r", "redirect": "/harsha/", "statusCode": 301 },
     {
