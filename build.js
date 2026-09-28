@@ -28,11 +28,43 @@ const ORG = {
   legal: 'legal@vybe.net.in',
   // Escalation of last resort. A person, not a role alias, on purpose.
   grievance: 'manjunath@vybe.net.in',
+  // The registered office, and the address every legal document carries. It is
+  // a temporary premises: once the NOC for the corporate office below comes
+  // through, that one becomes both headquarters and registered address, and
+  // this entry goes away. `streetLines` is the same address broken for display;
+  // `street` is the one-line form schema.org and prose want.
   street: '#103, First Floor, 10th Main, Gaurav Nagar, J.P Nagar 7th Phase',
+  streetLines: ['#103, First Floor, 10th Main', 'Gaurav Nagar, J.P Nagar 7th Phase'],
   locality: 'Bengaluru',
   region: 'Karnataka',
   postal: '560078',
   country: 'IN',
+  /*
+   * The corporate office, which is where the work actually happens. It is a
+   * second address today rather than a replacement, because the registered
+   * office is still the registered one until the NOC is issued.
+   *
+   * When that lands: delete the five `street`/`streetLines`/`postal` fields
+   * above along with anything that reads them as "registered", change this
+   * label to 'Headquarters & Registered Office', and promote these fields into
+   * the ORG top level so the schema graph picks them up. Nothing else on the
+   * site hardcodes either address.
+   */
+  corporate: {
+    label: 'Corporate Office',
+    street:
+      '4th Floor, IIIC, Christ Academy Institute of Advanced Studies, Christ Nagar, Hullahalli, Begur - Koppa Road, Sakkalwara Post',
+    streetLines: [
+      '4th Floor, IIIC, Christ Academy',
+      'Institute of Advanced Studies',
+      'Christ Nagar, Hullahalli',
+      'Begur &ndash; Koppa Road, Sakkalwara Post',
+    ],
+    locality: 'Bengaluru',
+    region: 'Karnataka',
+    postal: '560083',
+    country: 'IN',
+  },
   // schema.org accepts 24-hour times only.
   opens: '09:00',
   closes: '18:30',
@@ -791,12 +823,19 @@ function footer() {
             </div>
 
             <div>
-                <h2 class="text-white font-bold mb-4 uppercase tracking-widest text-xs">Registered Office</h2>
+                <h2 class="text-white font-bold mb-4 uppercase tracking-widest text-xs">Our Offices</h2>
+                <p class="text-[0.7rem] font-bold text-brand uppercase tracking-[0.2em] mb-2">Registered Office</p>
                 <address class="text-sm not-italic leading-relaxed">
-                    #103, First Floor, 10th Main<br>
-                    Gaurav Nagar, J.P Nagar 7th Phase<br>
-                    Bengaluru, Karnataka - ${ORG.postal}<br><br>
-                    <a href="${telHref(ORG.phone)}" class="hover:text-brand transition-colors block mt-2">${telText(ORG.phone)}</a>
+                    ${ORG.streetLines.join('<br>\n                    ')}<br>
+                    ${ORG.locality}, ${ORG.region} - ${ORG.postal}
+                </address>
+                <p class="text-[0.7rem] font-bold text-brand uppercase tracking-[0.2em] mt-5 mb-2">${ORG.corporate.label}</p>
+                <address class="text-sm not-italic leading-relaxed">
+                    ${ORG.corporate.streetLines.join('<br>\n                    ')}<br>
+                    ${ORG.corporate.locality}, ${ORG.corporate.region} - ${ORG.corporate.postal}
+                </address>
+                <address class="text-sm not-italic leading-relaxed mt-5">
+                    <a href="${telHref(ORG.phone)}" class="hover:text-brand transition-colors block">${telText(ORG.phone)}</a>
                     <a href="${telHref(ORG.phoneSupport)}" class="hover:text-brand transition-colors block mt-1">${telText(ORG.phoneSupport)}</a>
                     <a href="${telHref(ORG.phoneOffice)}" class="hover:text-brand transition-colors block mt-1">${telText(ORG.phoneOffice)}</a>
                     <a href="mailto:${ORG.sales}" class="hover:text-brand transition-colors block mt-1">${ORG.sales}</a>
@@ -827,6 +866,9 @@ const organization = {
   // The full lockup, not the bare glyph: it spells the company name.
   logo: { '@type': 'ImageObject', '@id': `${SITE}/#logo`, url: `${SITE}/assets/vybe-lockup.png`, width: 892, height: 118, caption: ORG.name },
   image: { '@type': 'ImageObject', '@id': `${SITE}/#image`, url: `${SITE}/assets/og-image.png`, width: 1200, height: 630, caption: `${ORG.name} | ${ORG.slogan}` },
+  // `address` is the registered one, singular on purpose: it is what the
+  // company is registered at and what an invoice carries. The corporate office
+  // is a second premises, and `location` is where schema.org puts those.
   address: {
     '@type': 'PostalAddress',
     streetAddress: ORG.street,
@@ -835,6 +877,7 @@ const organization = {
     postalCode: ORG.postal,
     addressCountry: ORG.country,
   },
+  location: [{ '@id': `${SITE}/#office` }, { '@id': `${SITE}/#corporate-office` }],
   contactPoint: [
     { '@type': 'ContactPoint', telephone: ORG.phone, contactType: 'sales', email: ORG.sales, areaServed: 'IN', availableLanguage: ['en', 'hi', 'kn'] },
     { '@type': 'ContactPoint', telephone: ORG.phoneSupport, contactType: 'customer support', email: ORG.support, areaServed: 'IN', availableLanguage: ['en', 'hi', 'kn'] },
@@ -901,6 +944,27 @@ const localBusiness = {
       closes: ORG.closes,
     },
   ],
+};
+
+/**
+ * The corporate office. Deliberately a bare Place and not a second
+ * ProfessionalService: two LocalBusiness nodes carrying the same name, the same
+ * phone numbers and the same hours invite Google to treat them as rival
+ * candidates for one local entity. A Place hung off #organization states the
+ * second premises without competing with #office for that.
+ */
+const corporateOffice = {
+  '@type': 'Place',
+  '@id': `${SITE}/#corporate-office`,
+  name: `${ORG.name} ${ORG.corporate.label}`,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: ORG.corporate.street,
+    addressLocality: ORG.corporate.locality,
+    addressRegion: ORG.corporate.region,
+    postalCode: ORG.corporate.postal,
+    addressCountry: ORG.corporate.country,
+  },
 };
 
 const website = {
@@ -1555,7 +1619,7 @@ function faqSection(faqs, { dark = false } = {}) {
 
 function shell(page) {
   const url = SITE + page.url;
-  const graph = [organization, localBusiness, website];
+  const graph = [organization, localBusiness, corporateOffice, website];
 
   graph.push({
     // ContactPage / AboutPage where the page is a named subtype, else WebPage.
@@ -1701,7 +1765,9 @@ const PAGES = [
       },
       {
         q: 'Where is Vybe Technologies located?',
-        a: `We are based in Bengaluru, Karnataka, at ${esc(ORG.street)}, ${ORG.postal}. You can reach sales on ${telLink(ORG.phone)} or <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a>.`,
+        a: `We are based in Bengaluru, Karnataka. Our registered office is at ${esc(ORG.street)}, ${ORG.postal}, and our corporate office is at ${esc(
+          ORG.corporate.street
+        )}, ${ORG.corporate.postal}. You can reach sales on ${telLink(ORG.phone)} or <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a>.`,
       },
       {
         q: 'Can Vybe build software that is specific to our campus?',
@@ -2228,9 +2294,32 @@ for (const doc of LEGAL) {
  * form would have nowhere to POST. Every number and address comes from ORG, so
  * this page, the footer and the schema cannot disagree.
  */
-const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-  `${ORG.name}, ${ORG.street}, ${ORG.locality}, ${ORG.region} ${ORG.postal}`
-)}`;
+const mapsUrl = (o) =>
+  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    `${ORG.name}, ${o.street}, ${o.locality}, ${o.region} ${o.postal}`
+  )}`;
+
+/**
+ * One address on the dark office band. `o` is ORG itself for the registered
+ * office and ORG.corporate for the other, which is the whole reason both carry
+ * the same field names: dropping one office is then deleting one call.
+ */
+function officeBlock(label, o) {
+  return `<div class="mt-8">
+                        <p class="text-[0.7rem] font-bold uppercase tracking-[0.2em] text-slate-400">${label}</p>
+                        <address class="mt-3 not-italic text-base leading-relaxed text-slate-300">
+                            ${o.streetLines.join('<br>\n                            ')}<br>
+                            ${o.locality}, ${o.region} &ndash; ${o.postal}<br>
+                            India
+                        </address>
+                        <a href="${mapsUrl(o)}" target="_blank" rel="noopener"
+                           class="mt-4 inline-flex items-center gap-2 text-sm font-bold text-white hover:text-brand transition-colors">
+                            <span class="material-symbols-outlined text-[20px]" aria-hidden="true">location_on</span>
+                            Open in Google Maps
+                            <span class="material-symbols-outlined text-[18px]" aria-hidden="true">open_in_new</span>
+                        </a>
+                    </div>`;
+}
 
 // `phone` is optional: legal correspondence wants a written record.
 function contactCard({ icon, label, blurb, email, phone, phoneLabel }) {
@@ -2269,7 +2358,13 @@ const contactFaqs = [
   },
   {
     q: 'Where are you located, and can we visit?',
-    a: `Our registered office is at ${esc(ORG.street)}, ${esc(ORG.locality)}, ${esc(ORG.region)} ${ORG.postal}. You are welcome to come and see the products running. Call ahead on ${telLink(ORG.phone)} so somebody who can answer your questions is in the office.`,
+    a: `We have two addresses in Bengaluru. Our registered office is at ${esc(ORG.street)}, ${esc(ORG.locality)}, ${esc(ORG.region)} ${
+      ORG.postal
+    }, and our corporate office is at ${esc(ORG.corporate.street)}, ${esc(ORG.corporate.locality)}, ${esc(ORG.corporate.region)} ${
+      ORG.corporate.postal
+    }. You are welcome at either to come and see the products running. Call ahead on ${telLink(
+      ORG.phone
+    )} so somebody who can answer your questions is there, and we will tell you which one to come to.`,
   },
   {
     q: 'Do you work with institutions outside Bengaluru?',
@@ -2329,23 +2424,13 @@ ${breadcrumbs([CRUMB_HOME, { name: 'Contact Us', url: '/contact/' }], false)}
         <section class="bg-corporate dark-section text-slate-300 py-20 md:py-28 px-6 relative z-10" aria-labelledby="office-heading">
             <div class="max-w-6xl mx-auto grid gap-12 md:grid-cols-2">
                 <div>
-                    <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-2">Registered office</p>
+                    <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-2">Our offices</p>
                     <h2 id="office-heading" class="text-3xl md:text-4xl font-black font-display tracking-tight text-white">Come and see it running.</h2>
-                    <address class="mt-6 not-italic text-base leading-relaxed text-slate-300">
-                        #103, First Floor, 10th Main<br>
-                        Gaurav Nagar, J.P Nagar 7th Phase<br>
-                        ${ORG.locality}, ${ORG.region} &ndash; ${ORG.postal}<br>
-                        India
-                    </address>
-                    <p class="mt-5 text-sm text-slate-400 leading-relaxed">Second office line: <a class="font-bold text-white hover:text-brand transition-colors" href="${telHref(
+                    ${officeBlock('Registered office', ORG)}
+                    ${officeBlock(ORG.corporate.label, ORG.corporate)}
+                    <p class="mt-8 text-sm text-slate-400 leading-relaxed">Second office line: <a class="font-bold text-white hover:text-brand transition-colors" href="${telHref(
                       ORG.phoneOffice
-                    )}">${telText(ORG.phoneOffice)}</a>. It reaches the same office, and is the number to try if the sales and support lines are both busy.</p>
-                    <a href="${MAPS_URL}" target="_blank" rel="noopener"
-                       class="mt-6 inline-flex items-center gap-2 text-sm font-bold text-white hover:text-brand transition-colors">
-                        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">location_on</span>
-                        Open in Google Maps
-                        <span class="material-symbols-outlined text-[18px]" aria-hidden="true">open_in_new</span>
-                    </a>
+                    )}">${telText(ORG.phoneOffice)}</a>. It reaches us either way, and is the number to try if the sales and support lines are both busy.</p>
                 </div>
 
                 <div class="rounded-2xl border border-white/10 bg-white/5 p-8">
@@ -6589,7 +6674,7 @@ ${PRODUCTS.filter((p) => published(p.nav))
 
 ## Contact
 
-- [Contact Us](${SITE}/contact/): Phone, email, registered office and opening hours.
+- [Contact Us](${SITE}/contact/): Phone, email, our registered and corporate offices, and opening hours.
 - Sales: ${ORG.sales} / ${ORG.phone} for quotes, demos, new deployments, hardware, printing and registrations.
 - Support: ${ORG.support} / ${ORG.phoneSupport} for existing Vybe deployments.
 - Second office line: ${ORG.phoneOffice}, which reaches the same office.
