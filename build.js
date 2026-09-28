@@ -257,11 +257,17 @@ function transformView(view, { dark = false } = {}) {
   out = divClickToAnchor(out);
 
   // Drop the grid card for any unpublished product. No nested <a>, so
-  // matching to the first </a> takes exactly one card.
+  // matching to the first </a> takes exactly one card. The card's "PILLAR n:"
+  // comment goes with it — left behind it is the one trace of an unpublished
+  // product that still ships in the emitted HTML.
   for (const nav of UNPUBLISHED) {
     const href = (PRODUCTS.find((p) => p.nav === nav) || {}).href;
     if (!href) continue;
-    out = out.replace(new RegExp(`<a href="${href}"[^>]*>[\\s\\S]*?</a>\\s*`, 'g'), '');
+    // [^>]* rather than [\s\S]*? on the comment: a lazy any-character run will
+    // happily start at the first comment in the document and swallow the hero
+    // on its way here. A comment body cannot contain '>', so this cannot cross
+    // a tag boundary.
+    out = out.replace(new RegExp(`(?:<!--[^>]*-->\\s*)?<a href="${href}"[^>]*>[\\s\\S]*?</a>\\s*`, 'g'), '');
   }
 
   // Two columns: an odd count leaves the last card beside an empty cell, so
@@ -844,9 +850,9 @@ function beyondSoftwareSection() {
   return `
         <section id="beyond-software" class="bg-surface-main border-t border-slate-200 py-20 md:py-28 px-6 relative z-10" aria-labelledby="beyond-software-heading">
             <div class="max-w-6xl mx-auto">
-                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-2">Beyond the software</p>
-                <h2 id="beyond-software-heading" class="text-3xl md:text-4xl font-black font-display tracking-tight text-slate-900">Printing, registrations and audits, under the same roof.</h2>
-                <p class="mt-5 text-lg leading-relaxed text-slate-600 max-w-3xl">Three things our customers kept asking us to sort out for them, so we do. All three start with a message rather than a meeting.</p>
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-2">Separate services</p>
+                <h2 id="beyond-software-heading" class="text-3xl md:text-4xl font-black font-display tracking-tight text-slate-900">Printing, registrations, audits and supply.</h2>
+                <p class="mt-5 text-lg leading-relaxed text-slate-600 max-w-3xl">These are not part of the campus platform and do not need it. Any business can buy them on their own, and most of our customers here never touch the software. All four start with a message rather than a meeting.</p>
                 <div class="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                     ${card(
                       '/printing/',
@@ -1016,31 +1022,42 @@ const PARTNER_ORGS = PARTNERS.flatMap((g) =>
  * Vendor programmes we are enrolled in. Text rather than logos: AWS, Google,
  * Microsoft and Ingram Micro all restrict their marks and issue partners a
  * specific badge instead. Every `tier` is the entry-level wording on purpose.
+ *
+ * These are not accreditations, and the section no longer calls them that. An
+ * accreditation is a third party attesting that we meet a standard; enrolling
+ * in a reseller programme is a commercial relationship we opted into. `kind`
+ * keeps the two apart, because Microsoft for Startups is a grant we received
+ * rather than a partnership at all, and lumping it in with the other three
+ * overstates it.
  */
 const CREDENTIALS = [
   {
     name: 'Ingram Micro',
-    tier: 'Registered partner',
-    note: 'Distribution and licensing for the hardware and software we resell.',
+    tier: 'Distribution partner',
+    kind: 'Reseller programme',
+    note: 'Registered partner. How we source and license the hardware and software we resell.',
   },
   {
     name: 'AWS Partner Network',
     tier: 'Registered partner',
-    note: 'Amazon Web Services, for the infrastructure we design and run.',
+    kind: 'Vendor programme',
+    note: 'Entry tier. Gives us Amazon Web Services support channels for the infrastructure we run.',
   },
   {
     name: 'Google Cloud Partner Advantage',
     tier: 'Programme member',
-    note: 'Covers Google Cloud Platform and Google Workspace deployments.',
+    kind: 'Vendor programme',
+    note: 'Covers Google Cloud Platform and Google Workspace deployments we set up for customers.',
   },
   {
     name: 'Microsoft for Startups',
     tier: 'Azure credits grant',
-    note: 'Awarded Azure credits under the Microsoft for Startups programme.',
+    kind: 'Startup support',
+    note: 'A credits grant awarded to us as a startup. Not a partnership, and not a Microsoft endorsement.',
   },
 ];
 
-/** Accreditation strip. Dark under the partner wall, light on /cloud/. */
+/** Partner-programme strip. Dark under the partner wall, light standalone. */
 function credentialsSection({ dark = false, standalone = false } = {}) {
   const head = dark ? 'text-white' : 'text-slate-900';
   const muted = dark ? 'text-slate-400' : 'text-slate-500';
@@ -1050,15 +1067,15 @@ function credentialsSection({ dark = false, standalone = false } = {}) {
 
   const items = CREDENTIALS.map(
     (c) => `<li class="rounded-2xl border ${card} p-6">
-                            <span class="material-symbols-outlined ${icon} text-[22px]" aria-hidden="true">verified</span>
+                            <p class="text-[10px] font-bold uppercase tracking-[0.15em] ${label}">${esc(c.kind)}</p>
                             <h3 class="mt-3 text-base font-bold ${head} tracking-tight">${esc(c.name)}</h3>
-                            <p class="mt-1 text-xs font-bold uppercase tracking-[0.15em] ${label}">${esc(c.tier)}</p>
+                            <p class="mt-1 text-xs font-bold uppercase tracking-[0.15em] ${icon}">${esc(c.tier)}</p>
                             <p class="mt-3 text-sm ${muted} leading-relaxed">${esc(c.note)}</p>
                         </li>`
   ).join('\n                        ');
 
-  const body = `<h2 id="accreditations-heading" class="text-xs font-bold uppercase tracking-[0.2em] ${label}">Accreditations</h2>
-                    <p class="mt-2 text-sm ${muted}">Vendor programmes we are enrolled in, and the grant we have received.</p>
+  const body = `<h2 id="partner-programmes-heading" class="text-xs font-bold uppercase tracking-[0.2em] ${label}">Partner programmes &amp; startup support</h2>
+                    <p class="mt-2 text-sm ${muted}">Programmes we are enrolled in and a grant we received. None of these is an accreditation, a certification or a vendor endorsement of our work.</p>
                     <ul class="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         ${items}
                     </ul>`;
@@ -1066,9 +1083,9 @@ function credentialsSection({ dark = false, standalone = false } = {}) {
   if (!standalone) return body;
 
   return `
-        <section id="accreditations" class="${
+        <section id="partner-programmes" class="${
           dark ? 'bg-slate-950 dark-section' : 'bg-surface-main'
-        } border-t ${dark ? 'border-white/10' : 'border-slate-200'} py-16 px-6 relative z-10" aria-labelledby="accreditations-heading">
+        } border-t ${dark ? 'border-white/10' : 'border-slate-200'} py-16 px-6 relative z-10" aria-labelledby="partner-programmes-heading">
             <div class="max-w-6xl mx-auto">
                 ${body}
             </div>
@@ -1526,7 +1543,7 @@ const PAGES = [
     title: 'Vybe Technologies | Campus ERP, Cashless Cafeteria & Cloud',
     ogTitle: 'Vybe Technologies | Smart. Simple. Affordable.',
     description:
-      'Campus software for schools, colleges and corporate campuses in India: cloud ERP, a 100% cashless cafeteria, custom apps, cybersecurity and cloud servers.',
+      'Campus software for schools, colleges and corporate campuses in India: cloud ERP, a 100% cashless cafeteria, smart classrooms, campus IT and cybersecurity.',
     trail: [CRUMB_HOME],
     priority: '1.0',
     view: home,
@@ -1534,7 +1551,7 @@ const PAGES = [
     faqs: [
       {
         q: 'What does Vybe Technologies do?',
-        a: 'Vybe Technologies is a software company based in Bengaluru. Our flagship products are <strong>Vybe ERP</strong> for school and college administration, <strong>Vybe CMS</strong> for 100% cashless cafeterias, and <strong>Vybe Cloud</strong> for scalable servers and hosting. We set up <strong>smart classrooms</strong> (interactive flat panels, online and hybrid class systems and writing boards) and handle <strong>workspace and email setup</strong>: Google Workspace, Microsoft 365 and Zoho Mail, staff and student accounts, single sign-on and secure online classes. Alongside those, <strong>Vybe IT Solutions</strong> takes on custom software work for businesses of any size or sector: web and mobile apps, business ERPs, retail POS, bespoke SaaS and internal tools, together with cybersecurity and managed IT. If your requirement does not match a product off our shelf, we build it to fit.',
+        a: 'Vybe Technologies is a software company based in Bengaluru. Our flagship products are <strong>Vybe ERP</strong> for school and college administration and <strong>Vybe CMS</strong> for 100% cashless cafeterias. We set up <strong>smart classrooms</strong> (interactive flat panels, online and hybrid class systems and writing boards) and handle <strong>workspace and email setup</strong>: Google Workspace, Microsoft 365 and Zoho Mail, staff and student accounts, single sign-on and secure online classes. Alongside those, <strong>Vybe IT Solutions</strong> takes on custom software work for businesses of any size or sector: web and mobile apps, business ERPs, retail POS, bespoke SaaS and internal tools, together with cybersecurity and managed IT. If your requirement does not match a product off our shelf, we build it to fit.',
       },
       {
         q: 'Who does Vybe work with?',
@@ -1553,8 +1570,8 @@ const PAGES = [
         a: 'Yes, <a href="/smart-classroom/">smart classroom setup</a> end to end: smart interactive flat panels sized to the room, online and hybrid class systems (classroom PC, camera, chat monitor, lighting and audio), UPS-backed power and cabling, and teacher training at handover. The panels are Logic, supplied through <strong>JS Global Industries</strong> in Bengaluru, the authorised distributor for the range, and a partner and dealer we work with for classroom boards as well.',
       },
       {
-        q: 'Is Vybe an accredited partner of any cloud or hardware vendor?',
-        a: 'Yes. We are a registered <strong>Ingram Micro</strong> partner for distribution and licensing, a registered partner in the <strong>AWS Partner Network</strong>, and a member of the <strong>Google Cloud Partner Advantage</strong> programme, which covers both Google Cloud Platform and Google Workspace. We have also been awarded Azure credits under <strong>Microsoft for Startups</strong>.',
+        q: 'Which vendor programmes is Vybe part of?',
+        a: 'Four, and they are different kinds of thing. <strong>Ingram Micro</strong>: registered distribution partner, which is how we source and license the hardware and software we resell. <strong>AWS Partner Network</strong>: registered partner at the entry tier. <strong>Google Cloud Partner Advantage</strong>: programme member, covering Google Cloud Platform and Google Workspace deployments. <strong>Microsoft for Startups</strong>: a grant of Azure credits awarded to us as a startup, not a partnership. None of the four is an accreditation, a certification, or any vendor’s endorsement of our work.',
       },
       {
         q: 'How do we get a quote?',
@@ -6239,7 +6256,7 @@ write(
     url: '/404.html',
     nav: null,
     title: 'Page not found | Vybe Technologies',
-    description: 'That page does not exist. Browse Vybe ERP, Vybe CMS, IT Solutions and Vybe Cloud instead.',
+    description: 'That page does not exist. Browse Vybe ERP, Vybe CMS, Smart Classrooms and IT Solutions instead.',
     trail: [],
     noindex: true,
     schema: () => [],
