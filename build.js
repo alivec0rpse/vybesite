@@ -47,11 +47,69 @@ const ORG = {
     'https://www.instagram.com/vybe_technologies/',
     'https://share.google/htg8JI6VwCntv1U3Y',
   ],
-  founder: { name: 'Ankit Sabu', profile: 'https://www.linkedin.com/in/ankit-sabu-816769273/' },
+  founder: { name: 'Ankit Sabu', profile: 'https://www.linkedin.com/in/ankit-sabu-816769273/', card: 'ankit' },
   // ISO 8601, which is the only format schema.org reads.
   foundingDate: '2026-04-27',
   gstin: '29DGZPC6225F1Z0',
 };
+
+/*
+ * The staff digital visiting cards under /<slug>/.
+ *
+ * The card markup itself is imported, not generated — tools/import-card.mjs
+ * unpacks an export into the directory. What the import cannot know is how the
+ * page should behave as part of this site, so the build owns that: it rewrites
+ * each card's robots directive and injects the Person graph below. Running the
+ * build after an import is what finishes the job.
+ *
+ * `slug` is the URL path and the key for everything else. `linkedin` is the
+ * only off-site profile that corroborates the person, so it carries the whole
+ * weight of `sameAs`: without it a Person node is an unverifiable assertion.
+ */
+const TEAM = [
+  {
+    slug: 'ankit',
+    name: 'Ankit Sabu',
+    role: 'Founder & CEO',
+    email: 'ankit@vybe.net.in',
+    tel: '+91-99641-77677',
+    linkedin: 'https://www.linkedin.com/in/ankit-sabu-816769273/',
+    bio: 'Ankit Sabu founded Vybe Technologies in Bengaluru and leads the company across campus ERP, cashless cafeteria, cloud and IT.',
+  },
+  {
+    slug: 'harsha',
+    name: 'Harsha R',
+    role: 'Chief Operational Officer',
+    email: 'harsha@vybe.net.in',
+    tel: '+91-99641-77877',
+    linkedin: 'https://www.linkedin.com/in/harsha-r-reddy-43a9b441a/',
+    bio: 'Harsha R runs delivery and operations at Vybe Technologies in Bengaluru, from campus rollouts to day-to-day support.',
+  },
+  {
+    slug: 'manjunath',
+    name: 'Manjunath D',
+    role: 'Enterprise Relations Officer',
+    email: 'manjunath@vybe.net.in',
+    tel: '+91-90198-01319',
+    // "Enterprise Relations Officer" pushes the title past the 60 characters
+    // Google renders. The page still states the full role; only the tag is cut.
+    titleRole: 'Enterprise Relations',
+    linkedin: 'https://www.linkedin.com/in/m-d-714137425/',
+    bio: 'Manjunath D looks after enterprise and institutional relationships at Vybe Technologies in Bengaluru, and is the registered Grievance Officer.',
+  },
+  {
+    slug: 'tejas',
+    name: 'Tejas C',
+    role: 'Chief Technology Officer',
+    email: 'tejas@vybe.net.in',
+    tel: '+91-94565-67283',
+    linkedin: 'https://www.linkedin.com/in/tejasc02/',
+    bio: 'Tejas C leads engineering at Vybe Technologies in Bengaluru, across Vybe ERP, Vybe CMS, cloud infrastructure and security.',
+  },
+];
+
+/** One canonical node per person, so the founder is not also a second entity. */
+const personId = (slug) => `${SITE}/${slug}/#person`;
 
 /** Drops keys whose value is empty, so unfilled ORG fields never reach the graph. */
 const defined = (obj) =>
@@ -645,7 +703,10 @@ const organization = {
     foundingDate: ORG.foundingDate,
     founder: ORG.founder && {
       '@type': 'Person',
-      '@id': `${SITE}/#founder`,
+      // Where the founder also has a visiting card, this is the same @id that
+      // /<slug>/ publishes. Two ids for one human would split the entity and
+      // leave Google to guess which of them the name refers to.
+      '@id': ORG.founder.card ? personId(ORG.founder.card) : `${SITE}/#founder`,
       name: ORG.founder.name,
       jobTitle: 'Founder',
       worksFor: { '@id': `${SITE}/#organization` },
@@ -2141,6 +2202,22 @@ ${breadcrumbs([CRUMB_HOME, { name: 'Contact Us', url: '/contact/' }], false)}
                         </div>
                     </dl>
                     <p class="mt-6 text-sm text-slate-400 leading-relaxed">All times IST (UTC+5:30). Email sent outside working hours is picked up the next working morning.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-20 md:py-28 px-6 bg-surface-main">
+            <div class="max-w-7xl mx-auto">
+                <h2 class="text-3xl md:text-4xl font-black font-display tracking-tight mb-3 text-slate-900">Who you will be talking to.</h2>
+                <p class="text-lg text-slate-600 leading-relaxed mb-10 max-w-2xl">Each card carries a direct line and saves to your phone in one tap.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    ${TEAM.map(
+                      (m) => `<a href="/${m.slug}/" class="block bg-white p-6 rounded-2xl border border-slate-200 hover:border-brand hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                        <span class="block font-black font-display tracking-tight text-slate-900 mb-1">${esc(m.name)}</span>
+                        <span class="block text-sm text-slate-600 leading-relaxed mb-3">${esc(m.role)}</span>
+                        <span class="block text-sm font-bold text-brand">View digital card</span>
+                    </a>`
+                    ).join('\n                    ')}
                 </div>
             </div>
         </section>
@@ -6189,12 +6266,121 @@ write(
   })
 );
 
+/* ------------------------------------------------------------ staff cards */
+
+/*
+ * The cards arrive from the importer as standalone pages: noindex, no graph,
+ * nothing tying them to the company. That is the right default for an export
+ * that does not know where it will be hosted, and the wrong one here, where
+ * each card is the answer to a search for that person's name. This pass makes
+ * them first-class pages of the site.
+ *
+ * It rewrites rather than appends, so running the build twice is a no-op and
+ * re-importing a card cannot leave a stale graph behind.
+ */
+const CARD_MARK = '<!-- build.js: person graph -->';
+
+for (const m of TEAM) {
+  const file = `${m.slug}/index.html`;
+  const full = path.join(ROOT, file);
+  if (!fs.existsSync(full)) {
+    console.warn(`  ${file}: no such card, skipped — import it before building.`);
+    continue;
+  }
+
+  const url = `/${m.slug}/`;
+  const title = `${m.name} | ${m.titleRole || m.role}, ${ORG.name}`;
+  const image = `${SITE}${url}assets/og.png`;
+  let s = read(file);
+
+  // The importer's export is noindex. That is what kept these out of a search
+  // for the person's name, so it is the single most important line here.
+  s = s.replace(
+    /<meta name="robots" content="[^"]*">/,
+    '<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">'
+  );
+  s = s.replace(/<title>[\s\S]*?<\/title>/, `<title>${esc(title)}</title>`);
+  s = s.replace(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${esc(m.bio)}">`);
+
+  // Strip a previous run's graph before writing this one.
+  s = s.replace(new RegExp(`${CARD_MARK}[\\s\\S]*?</script>\\n?`), '');
+
+  const person = defined({
+    '@type': 'Person',
+    '@id': personId(m.slug),
+    name: m.name,
+    jobTitle: m.role,
+    description: m.bio,
+    url: `${SITE}${url}`,
+    image,
+    email: m.email,
+    telephone: m.tel,
+    worksFor: { '@id': `${SITE}/#organization` },
+    // The card is the person's page, so it is also their knowsAbout anchor.
+    workLocation: {
+      '@type': 'Place',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: ORG.street,
+        addressLocality: ORG.locality,
+        addressRegion: ORG.region,
+        postalCode: ORG.postal,
+        addressCountry: ORG.country,
+      },
+    },
+    sameAs: m.linkedin ? [m.linkedin] : '',
+  });
+
+  const graph = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'ProfilePage',
+        '@id': `${SITE}${url}#webpage`,
+        url: `${SITE}${url}`,
+        name: title,
+        description: m.bio,
+        // mainEntity is what tells Google the page is *about* the person
+        // rather than merely mentioning them.
+        mainEntity: { '@id': personId(m.slug) },
+        isPartOf: { '@id': `${SITE}/#website` },
+        inLanguage: 'en-IN',
+        datePublished: ORG.foundingDate,
+        dateModified: BUILD_DATE,
+      },
+      person,
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${SITE}${url}#breadcrumb`,
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE}/` },
+          { '@type': 'ListItem', position: 2, name: m.name, item: `${SITE}${url}` },
+        ],
+      },
+    ],
+  };
+
+  s = s.replace('</head>', `${CARD_MARK}\n${ld(graph)}\n</head>`);
+  write(file, s);
+
+  emitted.push({
+    url,
+    priority: '0.5',
+    changefreq: 'yearly',
+    lastmod: lastmodFor(url, [title, m.bio, m.role, m.linkedin].join('\n')),
+  });
+}
+
 /* --------------------------------------------------------- sitemap & friends */
 
 /** First-party images worth surfacing in Google Images. Nothing decorative. */
 function sitemapImages(url) {
   const img = (loc, caption) =>
     `\n    <image:image><image:loc>${loc}</image:loc><image:caption>${esc(caption)}</image:caption></image:image>`;
+
+  // A card's image is the person, not the company banner.
+  const card = TEAM.find((m) => url === `/${m.slug}/`);
+  if (card) return img(`${SITE}/${card.slug}/assets/og.png`, `${card.name}, ${card.role}, ${ORG.name}`);
 
   let out = img(`${SITE}/assets/og-image.png`, `${ORG.name} | ${ORG.slogan}`);
   if (url === '/') {

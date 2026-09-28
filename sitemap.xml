@@ -79,7 +79,7 @@
   </url>
   <url>
     <loc>https://vybe.net.in/contact/</loc>
-    <lastmod>2026-09-23</lastmod>
+    <lastmod>2026-09-28</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.8</priority>
     <image:image><image:loc>https://vybe.net.in/assets/og-image.png</image:loc><image:caption>Vybe Technologies | Smart. Simple. Affordable.</image:caption></image:image>
@@ -230,5 +230,33 @@
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <image:image><image:loc>https://vybe.net.in/assets/og-image.png</image:loc><image:caption>Vybe Technologies | Smart. Simple. Affordable.</image:caption></image:image>
+  </url>
+  <url>
+    <loc>https://vybe.net.in/ankit/</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+    <image:image><image:loc>https://vybe.net.in/ankit/assets/og.png</image:loc><image:caption>Ankit Sabu, Founder &amp; CEO, Vybe Technologies</image:caption></image:image>
+  </url>
+  <url>
+    <loc>https://vybe.net.in/harsha/</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+    <image:image><image:loc>https://vybe.net.in/harsha/assets/og.png</image:loc><image:caption>Harsha R, Chief Operational Officer, Vybe Technologies</image:caption></image:image>
+  </url>
+  <url>
+    <loc>https://vybe.net.in/manjunath/</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+    <image:image><image:loc>https://vybe.net.in/manjunath/assets/og.png</image:loc><image:caption>Manjunath D, Enterprise Relations Officer, Vybe Technologies</image:caption></image:image>
+  </url>
+  <url>
+    <loc>https://vybe.net.in/tejas/</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+    <image:image><image:loc>https://vybe.net.in/tejas/assets/og.png</image:loc><image:caption>Tejas C, Chief Technology Officer, Vybe Technologies</image:caption></image:image>
   </url>
 </urlset>

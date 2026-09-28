@@ -71,9 +71,44 @@ rather than discovered: its Tailwind classes, via `./assets/verify.js` in the
 `material-symbols-outlined:` line `build.js` writes into the generated file's
 header, which `tools/gen-fonts.mjs` and `tools/audit-icons.js` both read.
 
+## Staff visiting cards
+
+`/ankit/`, `/harsha/`, `/manjunath/` and `/tejas/` are digital visiting cards.
+The markup is imported, not written here: `tools/import-card.mjs` unpacks an
+export built for a standalone origin. The import cannot know how the page
+should behave on this site, so `build.js` owns that half, driven by the `TEAM`
+array:
+
+- rewrites the export's `noindex` to `index, follow` — the cards are meant to
+  rank for the person's name,
+- rewrites the title and description, and injects a `ProfilePage` + `Person`
+  + `BreadcrumbList` graph,
+- adds the card to `sitemap.xml` and renders the team grid on `/contact/`.
+
+So an import is only half a card. Run `npm run build` after one, or you ship a
+page that is indexable but anonymous to a crawler, and orphaned besides.
+
+To add a person: import the card, add the routes the importer prints to
+`staticwebapp.config.json`, add them to `TEAM`, and build.
+
+`<slug>/qr.html` stays `noindex` in both its meta tag and its route: it is the
+same card with none of the content, so indexing it would compete with the page
+that should rank. The card's `assets/` are deliberately *not* `noindex` —
+`og:image` and Google Images both need them crawlable.
+
+A person's `@id` is `/<slug>/#person`, and `ORG.founder.card` points the
+founder node at that same id. One human must not be two entities in one graph,
+or a search for the name has two things to choose between.
+
 ## SEO notes
 
 - One canonical URL, title, description and JSON-LD graph per page.
+- `npm run audit:seo` grades snippet-shaped things — description, title length,
+  the h1, `og:url`, `twitter:card`, `dateModified` — only on indexable pages.
+  The vcard and QR pages under `/tejas/`, `/ankit/` and friends are `noindex`
+  by design and have no snippet to grade, so holding them to those rules only
+  produced errors nobody could act on. Structural checks (title present, valid
+  JSON-LD, image alt, links that resolve) still run everywhere.
 - `sitemap.xml` is regenerated on every build; submit it once in Search Console.
 - Every legacy URL (`/T&C.html`, `/privacy_policy.html`, extensionless paths)
   301s to its new home. See `staticwebapp.config.json`.

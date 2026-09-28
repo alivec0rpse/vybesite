@@ -11,7 +11,14 @@
  *   node tools/import-card.mjs tejas ~/Downloads/vybe-card-tejas.zip
  *
  * Afterwards: add the slug's routes to staticwebapp.config.json (the script
- * prints them if they are missing), then `npm run validate && npm run stage`.
+ * prints them if they are missing), add the person to TEAM in build.js, then
+ * `npm run build && npm run validate`.
+ *
+ * The card is meant to rank for the person's name, so it is left indexable
+ * here and build.js finishes the job: it rewrites the export's robots meta,
+ * title and description and injects the Person graph. Skipping the build
+ * leaves a card that is indexable but anonymous to a crawler. Only qr.html
+ * stays noindex — it duplicates the card with none of the content.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -194,11 +201,15 @@ if (!config.includes(`"/${slug}/*"`)) {
     },
     {
       "route": "/${slug}/assets/*",
-      "headers": { "Cache-Control": "public, max-age=604800", "X-Robots-Tag": "noindex, nofollow, noarchive" }
+      "headers": { "Cache-Control": "public, max-age=604800" }
+    },
+    {
+      "route": "/${slug}/qr.html",
+      "headers": { "Cache-Control": "public, max-age=0, must-revalidate", "X-Robots-Tag": "noindex, nofollow, noarchive" }
     },
     {
       "route": "/${slug}/*",
-      "headers": { "Cache-Control": "public, max-age=0, must-revalidate", "X-Robots-Tag": "noindex, nofollow, noarchive" }
+      "headers": { "Cache-Control": "public, max-age=0, must-revalidate" }
     },`);
 } else if (vcfName && !config.includes(vcfName)) {
   console.log(`\n${slug}: the export serves its vCard as ${vcfName}, which staticwebapp.config.json does not mention. Check the Content-Disposition on /${slug}/contact.vcf.`);

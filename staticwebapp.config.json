@@ -50,15 +50,20 @@
     {
       "route": "/ankit/assets/*",
       "headers": {
-        "Cache-Control": "public, max-age=604800",
+        "Cache-Control": "public, max-age=604800"
+      }
+    },
+    {
+      "route": "/ankit/qr.html",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate",
         "X-Robots-Tag": "noindex, nofollow, noarchive"
       }
     },
     {
       "route": "/ankit/*",
       "headers": {
-        "Cache-Control": "public, max-age=0, must-revalidate",
-        "X-Robots-Tag": "noindex, nofollow, noarchive"
+        "Cache-Control": "public, max-age=0, must-revalidate"
       }
     },
 
@@ -83,15 +88,20 @@
     {
       "route": "/manjunath/assets/*",
       "headers": {
-        "Cache-Control": "public, max-age=604800",
+        "Cache-Control": "public, max-age=604800"
+      }
+    },
+    {
+      "route": "/manjunath/qr.html",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate",
         "X-Robots-Tag": "noindex, nofollow, noarchive"
       }
     },
     {
       "route": "/manjunath/*",
       "headers": {
-        "Cache-Control": "public, max-age=0, must-revalidate",
-        "X-Robots-Tag": "noindex, nofollow, noarchive"
+        "Cache-Control": "public, max-age=0, must-revalidate"
       }
     },
 
@@ -116,15 +126,20 @@
     {
       "route": "/tejas/assets/*",
       "headers": {
-        "Cache-Control": "public, max-age=604800",
+        "Cache-Control": "public, max-age=604800"
+      }
+    },
+    {
+      "route": "/tejas/qr.html",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate",
         "X-Robots-Tag": "noindex, nofollow, noarchive"
       }
     },
     {
       "route": "/tejas/*",
       "headers": {
-        "Cache-Control": "public, max-age=0, must-revalidate",
-        "X-Robots-Tag": "noindex, nofollow, noarchive"
+        "Cache-Control": "public, max-age=0, must-revalidate"
       }
     },
 
@@ -149,15 +164,20 @@
     {
       "route": "/harsha/assets/*",
       "headers": {
-        "Cache-Control": "public, max-age=604800",
+        "Cache-Control": "public, max-age=604800"
+      }
+    },
+    {
+      "route": "/harsha/qr.html",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate",
         "X-Robots-Tag": "noindex, nofollow, noarchive"
       }
     },
     {
       "route": "/harsha/*",
       "headers": {
-        "Cache-Control": "public, max-age=0, must-revalidate",
-        "X-Robots-Tag": "noindex, nofollow, noarchive"
+        "Cache-Control": "public, max-age=0, must-revalidate"
       }
     },
 

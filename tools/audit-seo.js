@@ -45,24 +45,43 @@ for (const file of files) {
     h1s: all(/<h1[^>]*>([\s\S]*?)<\/h1>/g, html).map((h) => h.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()),
     ogTitle: one(/<meta property="og:title" content="([^"]*)"/, html),
     ogImage: one(/<meta property="og:image" content="([^"]*)"/, html),
+    ogUrl: one(/<meta property="og:url" content="([^"]*)"/, html),
     html,
   };
   pages.push(p);
 
   const L = (s) => (s || '').replace(/&amp;/g, '&').length;
+  // A noindex page never reaches a result page, so the snippet-shaped checks —
+  // description, title length, the h1 — have nothing to grade there. Running
+  // them anyway is what made the vcard and QR pages report eight errors that
+  // no one could act on, and an audit that cries wolf stops being read.
+  const indexed = !/noindex/.test(p.robots || '');
 
   if (!p.title) add('ERROR', p.url, 'no <title>');
+  else if (!indexed) { /* length only matters where Google renders it */ }
   else if (L(p.title) > 60) add('WARN', p.url, `title ${L(p.title)} chars (>60, Google truncates): "${p.title}"`);
   else if (L(p.title) < 25) add('WARN', p.url, `title only ${L(p.title)} chars: "${p.title}"`);
 
-  if (!p.desc) add('ERROR', p.url, 'no meta description');
-  else if (L(p.desc) > 160) add('WARN', p.url, `description ${L(p.desc)} chars (>160, truncated)`);
-  else if (L(p.desc) < 70) add('WARN', p.url, `description only ${L(p.desc)} chars`);
+  if (indexed) {
+    if (!p.desc) add('ERROR', p.url, 'no meta description');
+    else if (L(p.desc) > 160) add('WARN', p.url, `description ${L(p.desc)} chars (>160, truncated)`);
+    else if (L(p.desc) < 70) add('WARN', p.url, `description only ${L(p.desc)} chars`);
 
-  if (!p.canonical && !/noindex/.test(p.robots || '')) add('ERROR', p.url, 'no canonical');
+    if (p.h1s.length === 0) add('ERROR', p.url, 'no <h1>');
+    else if (p.h1s.length > 1) add('WARN', p.url, `${p.h1s.length} <h1> elements: ${JSON.stringify(p.h1s)}`);
 
-  if (p.h1s.length === 0) add('ERROR', p.url, 'no <h1>');
-  else if (p.h1s.length > 1) add('WARN', p.url, `${p.h1s.length} <h1> elements: ${JSON.stringify(p.h1s)}`);
+    if (!p.canonical) add('ERROR', p.url, 'no canonical');
+
+    // og:url and the canonical name the same page to two different crawlers.
+    // When they drift, shares consolidate onto one URL and search onto another.
+    if (p.ogUrl && p.canonical && p.ogUrl !== p.canonical)
+      add('ERROR', p.url, `og:url ${p.ogUrl} != canonical ${p.canonical}`);
+
+    if (!/name="twitter:card"/.test(html)) add('WARN', p.url, 'no twitter:card (X renders a bare link)');
+
+    // dateModified is the freshness signal; every page carries a WebPage node.
+    if (!/"dateModified"/.test(html)) add('WARN', p.url, 'no dateModified in JSON-LD');
+  }
 
   // Images: alt text and intrinsic dimensions (CLS).
   for (const tag of html.match(/<img\b[^>]*>/g) || []) {
@@ -129,6 +148,10 @@ const linked = new Set();
 const targets = new Set(indexable.map((p) => p.url));
 for (const p of pages) {
   for (const href of all(/<a\b[^>]*href="([^"]*)"/g, p.html)) {
+    // http:// costs a redirect and trips the mixed-content block. An absolute
+    // https self-link is fine — it is already the canonical form — so it is
+    // deliberately not flagged here.
+    if (/^http:\/\//.test(href)) add('ERROR', p.url, `insecure http:// link: ${href}`);
     if (/^(https?:|mailto:|tel:|#)/.test(href)) continue;
     const clean = href.split('#')[0].split('?')[0];
     if (!clean) continue;
@@ -136,6 +159,9 @@ for (const p of pages) {
     if (!targets.has(clean) && !fs.existsSync(path.join(ROOT, clean))) {
       add('ERROR', p.url, `internal link 404s: ${href}`);
     }
+    // /erp -> /erp/ is a 301 every single crawl. Link the canonical form.
+    if (!clean.endsWith('/') && !path.extname(clean) && targets.has(clean + '/'))
+      add('WARN', p.url, `link missing trailing slash (301 hop): ${href}`);
   }
 }
 for (const p of indexable) {

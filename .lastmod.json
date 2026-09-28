@@ -44,8 +44,8 @@
     "date": "2026-09-23"
   },
   "/contact/": {
-    "hash": "f01de5bdda74f926",
-    "date": "2026-09-23"
+    "hash": "50814db19a5398cd",
+    "date": "2026-09-28"
   },
   "/printing/": {
     "hash": "404f1bdb05ec6565",
@@ -130,5 +130,21 @@
   "/verify/": {
     "hash": "0e32f4959960e759",
     "date": "2026-09-24"
+  },
+  "/ankit/": {
+    "hash": "78a1625385f6bba0",
+    "date": "2026-09-28"
+  },
+  "/harsha/": {
+    "hash": "cc54dc0592e445e4",
+    "date": "2026-09-28"
+  },
+  "/manjunath/": {
+    "hash": "2e14cfd22de54c0e",
+    "date": "2026-09-28"
+  },
+  "/tejas/": {
+    "hash": "5fdb6aa18f1492e7",
+    "date": "2026-09-28"
   }
 }
