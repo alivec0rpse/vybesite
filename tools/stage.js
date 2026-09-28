@@ -42,6 +42,10 @@ const REQUIRED = [
   'site.webmanifest',
   'assets/site.css',
   'assets/site.js',
+  // Vendored by tools/vendor-gsap.mjs. Every page links both, so a stage that
+  // shipped without them would 404 twice per page load.
+  'assets/vendor/gsap.min.js',
+  'assets/vendor/scroll-trigger.min.js',
   // Nothing on the site links to these four, so a missing one is silent: the
   // BIMI mark is reached from DNS, the rest only by crawlers and Apple.
   'llms.txt',

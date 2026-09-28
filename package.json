@@ -10,6 +10,7 @@
     "tslib": "^2.8.1"
   },
   "devDependencies": {
+    "gsap": "^3.15.0",
     "html-validate": "^11.16.0",
     "png-to-ico": "^3.0.2",
     "potrace": "^2.1.8",
@@ -17,7 +18,8 @@
     "tailwindcss": "^3.4.17"
   },
   "scripts": {
-    "build": "node build.js && npm run css && node tools/stamp-assets.js",
+    "build": "node tools/vendor-gsap.mjs && node build.js && npm run css && node tools/stamp-assets.js",
+    "vendor": "node tools/vendor-gsap.mjs",
     "stage": "node tools/stage.js",
     "css": "tailwindcss -i src/input.css -o assets/site.css --minify",
     "images": "node tools/gen-images.mjs",

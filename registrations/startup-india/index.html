@@ -12,7 +12,7 @@
 <link rel="preload" href="/assets/fonts/inter-var.woff2?v=3100e775" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/plus-jakarta-sans-var.woff2?v=153fc85b" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/material-symbols-subset.woff2?v=1de452e9" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=a2c89e95">
+<link rel="stylesheet" href="/assets/site.css?v=d711c7b8">
 
 <!-- Icons & PWA -->
 <link rel="icon" href="/favicon.ico" sizes="32x32">
@@ -418,9 +418,9 @@
             <ol class="flex items-center gap-2 text-slate-400 text-xs uppercase tracking-widest"><li><a href="/" class="hover:text-brand transition-colors font-bold">Home</a></li><li class="text-slate-400" aria-hidden="true">/</li><li><a href="/registrations/" class="hover:text-brand transition-colors font-bold">Registrations</a></li><li class="text-slate-400" aria-hidden="true">/</li><li class="text-slate-700 font-bold" aria-current="page">DPIIT / Startup India recognition</li></ol>
         </nav>
 
-        <section class="px-6 pt-12 pb-20 md:pb-28 relative overflow-hidden">
+        <section class="px-6 pt-12 pb-20 md:pb-28 relative overflow-hidden" data-hero-section>
             <div class="absolute inset-0 bg-grid-faint" aria-hidden="true"></div>
-            <div class="max-w-6xl mx-auto relative z-10">
+            <div class="max-w-6xl mx-auto relative z-10" data-hero>
                 <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-3">Legal &amp; Compliance</p>
                 <h1 class="text-5xl md:text-7xl font-black font-display tracking-tighter text-slate-900">Startup India recognition, written properly.</h1>
                 <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">DPIIT recognition is free to apply for and routinely refused for a weak write-up. The fee here buys the application being put together in a way that stands up, not access to a form that anybody can open.</p>
@@ -719,7 +719,13 @@
         </div>
     </footer>
 
-<script src="/assets/site.js?v=6a827fe1" defer></script>
+<!-- GSAP drives the scroll work in site.js: the staggered section reveals and
+     the scrubbed parallax. Vendored first-party (the CSP is script-src 'self')
+     and deferred, so neither file blocks the parse or the first paint, and
+     both are in place before site.js runs — defer keeps document order. -->
+<script src="/assets/vendor/gsap.min.js?v=ab95a663" defer></script>
+<script src="/assets/vendor/scroll-trigger.min.js?v=8a70391f" defer></script>
+<script src="/assets/site.js?v=8c8270e5" defer></script>
 
 </body>
 </html>

@@ -8,6 +8,30 @@
 
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // GSAP and ScrollTrigger are vendored under /assets/vendor and loaded with
+  // `defer` ahead of this file, so they are parsed by the time this runs — but
+  // this file is the one that must keep working if they ever are not, so every
+  // use of them is behind this flag and there is a hand-rolled path below for
+  // when it is false.
+  var gsap = window.gsap;
+  var ScrollTrigger = window.ScrollTrigger;
+  var useGsap = !reducedMotion && !!gsap && !!ScrollTrigger;
+
+  if (useGsap) {
+    gsap.registerPlugin(ScrollTrigger);
+
+    // On a phone the address bar sliding away fires a resize mid-scroll, and a
+    // ScrollTrigger refresh recalculates every start/end at exactly the moment
+    // the user is scrolling. Same stutter the hero canvas had to be taught to
+    // ignore; same answer.
+    ScrollTrigger.config({ ignoreMobileResize: true });
+
+    // .reveal carries a CSS transition for the no-GSAP path. Left on, it would
+    // ease every inline value GSAP writes per frame, so the reveal would run
+    // through two easings and land late.
+    document.documentElement.classList.add('gsap-on');
+  }
+
   /* ------------------------------------------------- nav shadow on scroll */
   var nav = document.getElementById('navbar');
   if (nav) {
@@ -147,7 +171,32 @@
   /* ----------------------------------------------------- reveal on scroll */
   var reveals = document.querySelectorAll('.reveal');
 
-  if (reducedMotion || !('IntersectionObserver' in window)) {
+  if (useGsap && reveals.length) {
+    // ScrollTrigger.batch is the reason this moved off IntersectionObserver.
+    // The observer fired one callback per element, so a row of four cards
+    // crossing the fold together animated as four independent 800ms fades that
+    // happened to start on the same frame. batch collects the elements that
+    // enter within the same window and hands them over as a group, which is
+    // what makes a stagger possible at all.
+    ScrollTrigger.batch(reveals, {
+      start: 'top 88%',
+      once: true,
+      onEnter: function (batch) {
+        gsap.set(batch, { willChange: 'transform, opacity' });
+        gsap.to(batch, {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: 'power3.out',
+          stagger: 0.08,
+          overwrite: 'auto',
+          // Only the hint is cleared. Clearing the rest would hand the
+          // elements back to .reveal's opacity:0 and blank them again.
+          clearProps: 'willChange',
+        });
+      },
+    });
+  } else if (reducedMotion || !('IntersectionObserver' in window)) {
     // No animation: show everything immediately.
     for (var i = 0; i < reveals.length; i++) reveals[i].classList.add('active');
   } else {
@@ -172,6 +221,119 @@
         }
       }
     });
+  }
+
+  /* --------------------------------------------- hero entrance (clean-up) */
+  // The entrance itself is CSS — see [data-hero] in the stylesheet. It has to
+  // be, because this file is deferred and the hero is painted long before it
+  // runs: anything that hid the headline from here would flash it first. All
+  // that is left to do is drop the compositor hint once the movement is over,
+  // so the hero does not hold a layer per child for the rest of the visit.
+  var heroKids = document.querySelectorAll('[data-hero] > *');
+  for (var h = 0; h < heroKids.length; h++) {
+    (function (el) {
+      el.addEventListener(
+        'animationend',
+        function (e) {
+          // Decorative children run their own looping keyframes (floating
+          // badges, drifting orbs) and those bubble up to here. Only the
+          // element's own entrance means the entrance is done.
+          if (e.target !== el || e.animationName.indexOf('hero-rise') < 0) return;
+          el.style.willChange = 'auto';
+        },
+        false
+      );
+    })(heroKids[h]);
+  }
+
+  /* ------------------------------------------------------- hero parallax */
+  // Decorative layers only — the bordered circles behind the home hero, the
+  // faint grid behind the inner pages. Nothing that carries meaning moves, so
+  // there is nothing to lose if this never runs.
+  if (useGsap) {
+    var heroSection = document.querySelector('[data-hero-section]');
+
+    if (heroSection) {
+      // Direct children that are out of flow and decorative. Matching on
+      // aria-hidden / pointer-events is what keeps this off real content: a
+      // layer the reader cannot reach is a layer that is safe to move.
+      var layers = [].slice
+        .call(heroSection.children)
+        .filter(function (el) {
+          if (el.tagName === 'CANVAS') return false; // the dot matrix drives itself
+          var cs = getComputedStyle(el);
+          if (cs.position !== 'absolute') return false;
+          if (el.getAttribute('aria-hidden') !== 'true' && cs.pointerEvents !== 'none') return false;
+
+          // A backdrop pinned to a section that turns out to be the whole page
+          // — /audits/ wraps 10,000px of content in the <section> that holds
+          // its <h1> — is a layer the compositor would have to keep at full
+          // page height in GPU memory for the sake of 60px of drift nobody
+          // reads as parallax. Two viewports is the cutoff.
+          return el.getBoundingClientRect().height <= window.innerHeight * 2;
+        });
+
+      if (layers.length) {
+        var TRAVEL = 60;
+
+        // Desktop and a real pointer only. This site already freezes its
+        // decorative motion on touch — the blurred orbs, the dot matrix —
+        // because re-rasterising a large blurred layer every frame is what
+        // costs a phone its scroll budget. Parallax is the same bargain.
+        //
+        // Everything the effect needs, including the compositor hint and the
+        // box it moves inside, is set up in here and torn down on the way out.
+        // Done outside, a phone would carry promoted layers and inflated
+        // backdrops for an animation it never runs.
+        gsap.matchMedia().add('(min-width: 768px) and (hover: hover) and (pointer: fine)', function () {
+          layers.forEach(function (el) {
+            el.setAttribute('data-parallax', '');
+
+            // A layer pinned to all four edges covers the section exactly, so
+            // sliding it 60px would drag a hard edge into view. Growing it by
+            // the travel first gives the movement somewhere to go. It is
+            // position:absolute, so inflating it shifts nothing in the
+            // document and cannot register as a layout shift.
+            var cs = getComputedStyle(el);
+            if (cs.top === '0px' && cs.bottom === '0px') {
+              el.style.top = -TRAVEL + 'px';
+              el.style.bottom = -TRAVEL + 'px';
+            }
+          });
+
+          gsap.to(layers, {
+            y: TRAVEL,
+            ease: 'none', // linear: a parallax layer tracks the scrollbar, it does not ease
+            scrollTrigger: {
+              trigger: heroSection,
+              start: 'top top',
+              // Not 'bottom top'. The <section> holding the <h1> is the hero on
+              // most pages but the entire article on some, and spreading 60px
+              // of drift over a 10,000px section makes it invisible. One
+              // viewport of scrolling is the window in which a hero backdrop
+              // is still on screen, whatever its section turns out to contain.
+              end: function () {
+                return '+=' + Math.min(heroSection.offsetHeight, window.innerHeight);
+              },
+              scrub: 0.4, // a touch of lag, so a trackpad flick does not snap the layer
+              invalidateOnRefresh: true,
+            },
+          });
+
+          // Ran when the query stops matching — a window dragged narrow, or a
+          // 2-in-1 folded into a tablet. GSAP reverts the tween itself; these
+          // are the things it does not know about. Without this the backdrop
+          // would keep an inflated box and a GPU layer it no longer uses.
+          return function () {
+            layers.forEach(function (el) {
+              el.removeAttribute('data-parallax');
+              el.style.top = '';
+              el.style.bottom = '';
+            });
+          };
+        });
+      }
+    }
   }
 
   /* ------------------------------------------------------- counting stats */

@@ -3,7 +3,17 @@ module.exports = {
   // assets/verify.js builds the certificate result card in the browser, so the
   // only place those class names appear is inside that generated file. Without
   // it in the content list Tailwind purges the card's styles.
-  content: ['./index.html', './404.html', './*/index.html', './*/*/index.html', './assets/verify.js'],
+  // ./assets/site.js for the same reason as verify.js: `gsap-on` is set on
+  // <html> from script and appears in no template, so without it here Tailwind
+  // purges the rule that stops .reveal's CSS transition fighting the tween.
+  content: [
+    './index.html',
+    './404.html',
+    './*/index.html',
+    './*/*/index.html',
+    './assets/verify.js',
+    './assets/site.js',
+  ],
   theme: {
     extend: {
       colors: {

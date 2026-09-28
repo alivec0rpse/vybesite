@@ -154,6 +154,13 @@
     opacity: 1;
     transform: translateY(0);
   }
+  /* site.js sets this on <html> when GSAP is driving the reveals instead.
+     GSAP writes opacity and transform inline every frame, and this transition
+     would ease each of those writes in turn — the reveal would run through two
+     easings stacked and land noticeably after the tween says it did. */
+  .gsap-on .reveal {
+    transition: none;
+  }
 
   /* Reading progress. Scaled to nothing until site.js drives it, so with JS
      off it is an invisible line rather than a bar that never moves. */
@@ -240,9 +247,55 @@
     font-size: 0.9em;
   }
 
-  /* A short fade in. Content is already painted, so this delays nothing. */
+  /* A short fade in. Content is already painted, so this delays nothing.
+     Opacity only: the hero below does the rising, and a second translate on
+     <main> underneath it read as the page moving twice. Dropping the transform
+     also stops `both` leaving a permanent transform on <main>, which would
+     make it the containing block for any position:fixed descendant. */
   .page-enter {
     animation: fadeInPage 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* ---------------------------------------------------------- hero entrance */
+  /* Load-time, and deliberately CSS rather than GSAP. The hero is painted
+     before any deferred script runs, so a script that hid it in order to
+     animate it in would flash the headline and snatch it back — and would
+     leave it invisible for good if site.js failed to arrive. Keyframes with
+     `both` hold the from-state from the first frame the element is painted,
+     which is the only way to get an entrance with no flash and no JS
+     dependency. `data-hero` is put on the block wrapping the <h1> at build
+     time; see tagHero() in build.js.
+
+     Opacity and transform only, so nothing here can shift layout: the hero
+     occupies its final box from the first paint and the text slides into it. */
+  [data-hero] > * {
+    animation: hero-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+    /* Dropped by site.js on animationend — a layer per hero child is worth it
+       for 700ms and waste for the rest of the visit. */
+    will-change: transform, opacity;
+  }
+  [data-hero] > *:nth-child(1) { animation-delay: 0.06s; }
+  [data-hero] > *:nth-child(2) { animation-delay: 0.14s; }
+  [data-hero] > *:nth-child(3) { animation-delay: 0.22s; }
+  [data-hero] > *:nth-child(4) { animation-delay: 0.3s; }
+  [data-hero] > *:nth-child(5) { animation-delay: 0.38s; }
+  /* Everything past the fifth lands together. A stagger long enough to notice
+     on the sixth item is a stagger the reader is waiting on. */
+  [data-hero] > *:nth-child(n + 6) { animation-delay: 0.44s; }
+
+  /* An absolutely positioned decorative layer is not part of the sequence —
+     it has no place in the reading order and sliding it exposes the edge of
+     whatever it is painted over. */
+  [data-hero] > .absolute,
+  [data-hero] > [aria-hidden='true'] {
+    animation: none;
+    will-change: auto;
+  }
+
+  /* Parallax targets. site.js moves these on scroll; declaring the hint here
+     keeps it off the elements on pages where there is nothing to move. */
+  [data-hero-section] [data-parallax] {
+    will-change: transform;
   }
 }
 
@@ -269,8 +322,13 @@ body {
 }
 
 @keyframes fadeInPage {
-  0% { opacity: 0; transform: translateY(12px); }
-  100% { opacity: 1; transform: translateY(0); }
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes hero-rise {
+  0% { opacity: 0; transform: translate3d(0, 20px, 0); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
 @keyframes orb-float {
@@ -318,6 +376,20 @@ body {
   .reveal {
     opacity: 1;
     transform: none;
+  }
+  /* The rule above collapses every animation to 0.01ms, which would land the
+     hero on its end state anyway — but only because `both` holds the last
+     keyframe. Stating the end state outright means the hero does not depend on
+     that, and drops the compositor layers with it. */
+  [data-hero] > * {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    will-change: auto;
+  }
+  [data-hero-section] [data-parallax] {
+    transform: none !important;
+    will-change: auto;
   }
 }
 

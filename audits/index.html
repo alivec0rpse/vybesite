@@ -12,7 +12,7 @@
 <link rel="preload" href="/assets/fonts/inter-var.woff2?v=3100e775" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/plus-jakarta-sans-var.woff2?v=153fc85b" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/material-symbols-subset.woff2?v=1de452e9" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=a2c89e95">
+<link rel="stylesheet" href="/assets/site.css?v=d711c7b8">
 
 <!-- Icons & PWA -->
 <link rel="icon" href="/favicon.ico" sizes="32x32">
@@ -418,9 +418,9 @@
             <ol class="flex items-center gap-2 text-slate-400 text-xs uppercase tracking-widest"><li><a href="/" class="hover:text-brand transition-colors font-bold">Home</a></li><li class="text-slate-400" aria-hidden="true">/</li><li class="text-slate-700 font-bold" aria-current="page">Audits</li></ol>
         </nav>
 
-        <section class="px-6 pt-12 pb-20 md:pb-28 relative overflow-hidden">
+        <section class="px-6 pt-12 pb-20 md:pb-28 relative overflow-hidden" data-hero-section>
             <div class="absolute inset-0 bg-grid-faint" aria-hidden="true"></div>
-            <div class="max-w-6xl mx-auto relative z-10">
+            <div class="max-w-6xl mx-auto relative z-10" data-hero>
                 <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-3">Compliance &amp; Safety</p>
                 <h1 class="text-5xl md:text-7xl font-black font-display tracking-tighter text-slate-900">Audits, before somebody official does one.</h1>
                 <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">14 Vybe audits for kitchens, campuses and offices: hygiene to the FSSAI Schedule 4 standard, fire to the National Building Code, child safety to POCSO, bus safety, a NAAC/NIRF-ready SDG audit, POSH, software licensing, data protection under the DPDP Act and labour law. We read your site against the standard, write down what would be found, and certify what passes.</p>
@@ -627,9 +627,9 @@
                         <p class="mt-auto pt-6 text-sm text-slate-500 leading-relaxed"><span class="font-bold uppercase tracking-[0.15em] text-xs text-slate-400 block mb-1">What it is not</span>We audit the pest control programme. We are not a pest control operator, we do not carry out treatment, and we have no arrangement with any vendor whose records we review.</p>
                     </li>
                     </ul>
-                    <a href="/audits/kitchen-food-safety/" class="mt-8 inline-flex items-center gap-2 text-sm font-bold text-brand hover:gap-3 transition-all">
+                    <a href="/audits/kitchen-food-safety/" class="group mt-8 inline-flex items-center gap-2 text-sm font-bold text-brand transition-all">
                         Kitchen &amp; food business audits in detail
-                        <span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_forward</span>
+                        <span class="material-symbols-outlined text-[18px] transition-transform duration-300 ease-out group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
                     </a>
                 </section>
                 <section class="mt-20" aria-labelledby="audit-group-institutions">
@@ -996,9 +996,9 @@
                         <p class="mt-auto pt-6 text-sm text-slate-500 leading-relaxed"><span class="font-bold uppercase tracking-[0.15em] text-xs text-slate-400 block mb-1">What it is not</span>"NAAC/NIRF-ready" means the audit is structured and evidenced the way those frameworks ask for. It does not mean either body has approved, endorsed or scored anything. <strong>We are not NAAC, not NIRF, not a Pollution Control Board and not an accredited environmental auditor, and we are not affiliated to any of them.</strong> This is also not the statutory Environmental Statement (Form V) filed under the Environment (Protection) Rules, 1986, not a Consent to Operate, and not an eco-label. The certificate is a Vybe certificate and contributes no marks to any accreditation of itself.</p>
                     </li>
                     </ul>
-                    <a href="/audits/schools-institutions/" class="mt-8 inline-flex items-center gap-2 text-sm font-bold text-brand hover:gap-3 transition-all">
+                    <a href="/audits/schools-institutions/" class="group mt-8 inline-flex items-center gap-2 text-sm font-bold text-brand transition-all">
                         School, college &amp; institute audits in detail
-                        <span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_forward</span>
+                        <span class="material-symbols-outlined text-[18px] transition-transform duration-300 ease-out group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
                     </a>
                 </section>
                 <section class="mt-20" aria-labelledby="audit-group-workplace">
@@ -1332,9 +1332,9 @@
                         <p class="mt-auto pt-6 text-sm text-slate-500 leading-relaxed"><span class="font-bold uppercase tracking-[0.15em] text-xs text-slate-400 block mb-1">What it is not</span>Preparation and assessment only. We are not the fire department and are not affiliated to it, and neither the audit nor the certificate produces or renews a fire NOC for you or for your building.</p>
                     </li>
                     </ul>
-                    <a href="/audits/workplace-compliance/" class="mt-8 inline-flex items-center gap-2 text-sm font-bold text-brand hover:gap-3 transition-all">
+                    <a href="/audits/workplace-compliance/" class="group mt-8 inline-flex items-center gap-2 text-sm font-bold text-brand transition-all">
                         Office &amp; workplace compliance audits in detail
-                        <span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_forward</span>
+                        <span class="material-symbols-outlined text-[18px] transition-transform duration-300 ease-out group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
                     </a>
                 </section>
 
@@ -1637,7 +1637,13 @@
         </div>
     </footer>
 
-<script src="/assets/site.js?v=6a827fe1" defer></script>
+<!-- GSAP drives the scroll work in site.js: the staggered section reveals and
+     the scrubbed parallax. Vendored first-party (the CSP is script-src 'self')
+     and deferred, so neither file blocks the parse or the first paint, and
+     both are in place before site.js runs — defer keeps document order. -->
+<script src="/assets/vendor/gsap.min.js?v=ab95a663" defer></script>
+<script src="/assets/vendor/scroll-trigger.min.js?v=8a70391f" defer></script>
+<script src="/assets/site.js?v=8c8270e5" defer></script>
 
 </body>
 </html>

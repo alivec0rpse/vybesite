@@ -377,6 +377,142 @@ function liftLeadingHeadings(html) {
   return out + html.slice(at);
 }
 
+/* Void elements never open a scope, so they must not go on the tag stack. */
+const VOID_TAGS = new Set([
+  'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
+  'link', 'meta', 'param', 'source', 'track', 'wbr',
+]);
+
+/**
+ * Marks the hero for the entrance animation, at build time rather than in
+ * site.js, and that timing is the whole point: the hero is already painted by
+ * the time a deferred script runs, so a script that hid it to animate it in
+ * would flash the text and then pull it away — and would leave the headline
+ * invisible for good if site.js ever failed to load. The initial state has to
+ * ship in the markup and the stylesheet, which means knowing here which block
+ * is the hero.
+ *
+ * The hero is defined as the element wrapping the page's first <h1>: across
+ * every page shape on this site that element is the content column — eyebrow,
+ * headline, lede, CTA row — and its direct children are exactly the things
+ * that should rise in sequence. `data-hero-section` goes on the enclosing
+ * <section> so site.js can find the decorative layers to parallax without
+ * hunting for them by class.
+ *
+ * A hero block that already carries `reveal` is left alone: it is animating on
+ * scroll already, and stacking a load-time rise on a scroll reveal reads as a
+ * stutter rather than as one movement.
+ */
+function tagHero(html) {
+  const h1 = html.search(/<h1\b/);
+  if (h1 < 0) return html;
+
+  // Walk the markup before the <h1>, keeping a stack of tags still open. What
+  // is left on top at the end is the <h1>'s parent; the <section> nearest the
+  // top of the stack is the hero section.
+  const stack = [];
+  const TAG = /<(\/?)([a-zA-Z][a-zA-Z0-9-]*)\b([^>]*)>/g;
+  TAG.lastIndex = 0;
+  for (let m; (m = TAG.exec(html)) && m.index < h1; ) {
+    const [full, closing, rawName, attrs] = m;
+    const name = rawName.toLowerCase();
+    if (closing) {
+      // Tolerate stray closers rather than corrupting the stack under them.
+      const at = stack.map((t) => t.name).lastIndexOf(name);
+      if (at >= 0) stack.length = at;
+    } else if (!VOID_TAGS.has(name) && !attrs.endsWith('/')) {
+      stack.push({ name, index: m.index, length: full.length });
+    }
+  }
+
+  const parent = stack[stack.length - 1];
+  if (!parent) return html;
+
+  const section = [...stack].reverse().find((t) => t.name === 'section');
+
+  // Right to left: marking the parent first would move the section's offset.
+  const marks = [
+    [parent, 'data-hero'],
+    ...(section && section !== parent ? [[section, 'data-hero-section']] : []),
+  ]
+    .filter(([tag]) => !/\breveal\b/.test(html.substr(tag.index, tag.length)))
+    .sort((a, b) => b[0].index - a[0].index);
+
+  let out = html;
+  for (const [tag, attr] of marks) {
+    const open = out.substr(tag.index, tag.length);
+    if (open.includes(attr)) continue;
+    out = out.slice(0, tag.index) + open.replace(/\s*\/?>$/, ` ${attr}>`) + out.slice(tag.index + tag.length);
+  }
+  return out;
+}
+
+/** Index just past the close tag matching the open tag at `start`. */
+function closeIndexOf(html, start) {
+  const name = /<([a-zA-Z][a-zA-Z0-9-]*)/.exec(html.slice(start))[1].toLowerCase();
+  const TAG = new RegExp(`<(/?)${name}\\b([^>]*)>`, 'gi');
+  TAG.lastIndex = start;
+  let depth = 0;
+  for (let m; (m = TAG.exec(html)); ) {
+    if (m[1]) {
+      if (--depth === 0) return m.index + m[0].length;
+    } else if (!m[2].endsWith('/')) {
+      depth++;
+    }
+  }
+  return html.length;
+}
+
+/**
+ * The "… in detail →" affordance nudged its arrow by growing the flex `gap` on
+ * hover. Gap is a layout property: every frame of that ease ran layout and
+ * paint for the card, and the label itself shifted left as the row grew. Same
+ * movement, done as a transform on the arrow alone — one compositor property,
+ * no layout, and the text stays put.
+ *
+ * Done here rather than in the 30-odd places the pattern is written, because
+ * it is the same pattern every time and a missed one is a hover that behaves
+ * differently from its neighbours.
+ */
+function slideArrowOnHover(html) {
+  const GAP = /<[a-zA-Z][^>]*\bclass="[^"]*\b(?:group-)?hover:gap-3\b[^"]*"[^>]*>/g;
+  const hits = [...html.matchAll(GAP)];
+  if (!hits.length) return html;
+
+  let out = html;
+  // Right to left: every edit below shifts the offsets of everything after it.
+  for (const hit of hits.reverse()) {
+    const end = closeIndexOf(out, hit.index);
+    const inner = out.slice(hit.index + hit[0].length, end);
+
+    // The arrow is the trailing icon. Anything else in there is the label.
+    const icon = /<span\b[^>]*\bmaterial-symbols-outlined\b[^>]*>\s*(?:arrow_forward|arrow_right_alt|east)\s*<\/span>/.exec(inner);
+    if (!icon) continue;
+
+    const nudged = icon[0].replace(
+      /\bclass="([^"]*)"/,
+      'class="$1 transition-transform duration-300 ease-out group-hover:translate-x-1"'
+    );
+
+    // `group` on the element the gap class sat on, so the arrow reacts to the
+    // whole affordance and not just to the pointer crossing the glyph. An
+    // outer `group` card still triggers it too: group-hover matches any
+    // hovered ancestor carrying the class, not only the nearest one.
+    const opener = hit[0]
+      .replace(/\s*\b(?:group-)?hover:gap-3\b/, '')
+      .replace(/\bclass="/, 'class="group ');
+
+    out =
+      out.slice(0, hit.index) +
+      opener +
+      inner.slice(0, icon.index) +
+      nudged +
+      inner.slice(icon.index + icon[0].length) +
+      out.slice(end);
+  }
+  return out;
+}
+
 function renderView(view, page) {
   const cls = [view.wrapperClass, 'w-full'].filter(Boolean).join(' ');
   return `<div class="${dedupe(cls)}">
@@ -1509,11 +1645,17 @@ ${ld({ '@context': 'https://schema.org', '@graph': graph })}
 ${navbar(page.nav)}
 
 <main id="main" class="flex-grow pt-[72px] page-enter">
-${page.body}
+${tagHero(slideArrowOnHover(page.body))}
 </main>
 
 ${footer()}
 
+<!-- GSAP drives the scroll work in site.js: the staggered section reveals and
+     the scrubbed parallax. Vendored first-party (the CSP is script-src 'self')
+     and deferred, so neither file blocks the parse or the first paint, and
+     both are in place before site.js runs — defer keeps document order. -->
+<script src="/assets/vendor/gsap.min.js" defer></script>
+<script src="/assets/vendor/scroll-trigger.min.js" defer></script>
 <script src="/assets/site.js" defer></script>
 ${(page.scripts || []).map((s) => `<script src="${s}" defer></script>`).join('\n')}
 </body>
@@ -2219,22 +2361,6 @@ ${breadcrumbs([CRUMB_HOME, { name: 'Contact Us', url: '/contact/' }], false)}
                         </div>
                     </dl>
                     <p class="mt-6 text-sm text-slate-400 leading-relaxed">All times IST (UTC+5:30). Email sent outside working hours is picked up the next working morning.</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="py-20 md:py-28 px-6 bg-surface-main">
-            <div class="max-w-7xl mx-auto">
-                <h2 class="text-3xl md:text-4xl font-black font-display tracking-tight mb-3 text-slate-900">Who you will be talking to.</h2>
-                <p class="text-lg text-slate-600 leading-relaxed mb-10 max-w-2xl">Each card carries a direct line and saves to your phone in one tap.</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    ${TEAM.map(
-                      (m) => `<a href="/${m.slug}/" class="block bg-white p-6 rounded-2xl border border-slate-200 hover:border-brand hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                        <span class="block font-black font-display tracking-tight text-slate-900 mb-1">${esc(m.name)}</span>
-                        <span class="block text-sm text-slate-600 leading-relaxed mb-3">${esc(m.role)}</span>
-                        <span class="block text-sm font-bold text-brand">View digital card</span>
-                    </a>`
-                    ).join('\n                    ')}
                 </div>
             </div>
         </section>
