@@ -844,6 +844,21 @@ function footer() {
             </div>
         </div>
 
+        <!--
+          The team's visiting cards. Deliberately quiet: they are of no use to a
+          visitor reading the site, but each card is a real page that needs one
+          internal link from somewhere indexable, and this is the least obtrusive
+          place to put it.
+        -->
+        <div class="max-w-7xl mx-auto text-xs text-slate-500 mb-4">
+            <p>Virtual Business Cards:
+                ${TEAM.map(
+                  (p) =>
+                    `<a href="/${p.slug}/" class="hover:text-slate-300 transition-colors">${esc(p.name)}</a>`
+                ).join('<span class="text-slate-700"> &middot; </span>')}
+            </p>
+        </div>
+
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-xs text-slate-500">
             <p>&copy; ${new Date().getFullYear()} Vybe Technologies. All rights reserved.</p>
             <p class="mt-2 md:mt-0">Designed and operated from our headquarters in Bengaluru, India.</p>

@@ -1,5 +1,6 @@
 node_modules/
 shots/
 dist/
+employee-ids/
 *.log
 .DS_Store
