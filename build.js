@@ -13,6 +13,14 @@ const ROOT = __dirname;
 const SITE = 'https://vybe.net.in';
 const BUILD_DATE = new Date().toISOString().slice(0, 10);
 
+/**
+ * Google's ProfilePage parser rejects a bare `YYYY-MM-DD` for datePublished and
+ * dateModified — it wants a full ISO 8601 datetime with an offset. Everything
+ * here is stamped in the office's timezone, so anchor the day at local midnight.
+ */
+const IST_OFFSET = '+05:30';
+const isoDateTime = (date) => `${date}T00:00:00${IST_OFFSET}`;
+
 const ORG = {
   name: 'Vybe Technologies',
   legalName: 'Vybe Technologies',
@@ -6533,6 +6541,9 @@ for (const m of TEAM) {
 
   const url = `/${m.slug}/`;
   const title = `${m.name} | ${m.titleRole || m.role}, ${ORG.name}`;
+  // Same content hash the sitemap uses, so the graph and the sitemap agree and
+  // neither moves on a build that changed nothing.
+  const lastmod = lastmodFor(url, [title, m.bio, m.role, m.linkedin].join('\n'));
   const image = `${SITE}${url}assets/og.png`;
   let s = read(file);
 
@@ -6588,8 +6599,8 @@ for (const m of TEAM) {
         mainEntity: { '@id': personId(m.slug) },
         isPartOf: { '@id': `${SITE}/#website` },
         inLanguage: 'en-IN',
-        datePublished: ORG.foundingDate,
-        dateModified: BUILD_DATE,
+        datePublished: isoDateTime(ORG.foundingDate),
+        dateModified: isoDateTime(lastmod),
       },
       person,
       {
@@ -6610,7 +6621,7 @@ for (const m of TEAM) {
     url,
     priority: '0.5',
     changefreq: 'yearly',
-    lastmod: lastmodFor(url, [title, m.bio, m.role, m.linkedin].join('\n')),
+    lastmod,
   });
 }
 
