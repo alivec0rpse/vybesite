@@ -187,8 +187,8 @@ or a search for the name has two things to choose between.
   matched to this entity.
 - `ORG.profiles` is `sameAs`. Every URL in it must link back to vybe.net.in.
   The Google Business Profile carries the most weight for a local brand query;
-  the `share.google` entry is a redirect and should be replaced with the
-  canonical `maps/place/?q=place_id:<id>` URL when the place ID is available.
+  it is listed by place ID (`ORG.corporate.placeId`), which also feeds the
+  corporate office's `hasMap` and its Maps link on the contact page.
 - `ORG.foundingDate` is also the `datePublished` on every page. A page that
   claims to predate the company is a contradiction inside one graph, so the two
   are deliberately the same value rather than two dates that can drift apart.

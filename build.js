@@ -55,8 +55,8 @@ const ORG = {
    * When that lands: delete the five `street`/`streetLines`/`postal` fields
    * above along with anything that reads them as "registered", change this
    * label to 'Headquarters & Registered Office', and promote these fields into
-   * the ORG top level so the schema graph picks them up. Nothing else on the
-   * site hardcodes either address.
+   * the ORG top level so #organization's `address` picks them up too. #office
+   * already carries this address. Nothing else on the site hardcodes either.
    */
   corporate: {
     label: 'Corporate Office',
@@ -72,6 +72,12 @@ const ORG = {
     region: 'Karnataka',
     postal: '560083',
     country: 'IN',
+    // The Google Business Profile listing is pinned here, not at the registered
+    // office. The place ID is what Maps links and `sameAs` key on; the
+    // coordinates are the listing's own pin, so the schema and Maps agree.
+    placeId: 'ChIJ3-UxeUQhf2sRivSq9ceBqaM',
+    lat: 12.834939,
+    lng: 77.6168055,
   },
   // schema.org accepts 24-hour times only.
   opens: '09:00',
@@ -79,13 +85,12 @@ const ORG = {
   openDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
   // Every profile here must link back to vybe.net.in, or the claim is weak.
   // The Google Business Profile is the strongest of these for a local brand
-  // query. The share.google link is a redirect; swap it for the canonical
-  // https://www.google.com/maps/place/?q=place_id:<id> form when the place ID
-  // is to hand, so Google is matching an ID rather than following a shortener.
+  // query, and it is given by place ID so Google matches an ID rather than
+  // following a shortener.
   profiles: [
     'https://www.linkedin.com/company/vybe-technologies',
     'https://www.instagram.com/vybe_technologies/',
-    'https://share.google/htg8JI6VwCntv1U3Y',
+    'https://www.google.com/maps/place/?q=place_id:ChIJ3-UxeUQhf2sRivSq9ceBqaM',
   ],
   founder: { name: 'Ankit Sabu', profile: 'https://www.linkedin.com/in/ankit-sabu-816769273/', card: 'ankit' },
   // ISO 8601, which is the only format schema.org reads.
@@ -890,8 +895,8 @@ const organization = {
   logo: { '@type': 'ImageObject', '@id': `${SITE}/#logo`, url: `${SITE}/assets/vybe-lockup.png`, width: 892, height: 118, caption: ORG.name },
   image: { '@type': 'ImageObject', '@id': `${SITE}/#image`, url: `${SITE}/assets/og-image.png`, width: 1200, height: 630, caption: `${ORG.name} | ${ORG.slogan}` },
   // `address` is the registered one, singular on purpose: it is what the
-  // company is registered at and what an invoice carries. The corporate office
-  // is a second premises, and `location` is where schema.org puts those.
+  // company is registered at and what an invoice carries. The premises people
+  // actually visit is #office, and `location` is where schema.org puts that.
   address: {
     '@type': 'PostalAddress',
     streetAddress: ORG.street,
@@ -900,7 +905,7 @@ const organization = {
     postalCode: ORG.postal,
     addressCountry: ORG.country,
   },
-  location: [{ '@id': `${SITE}/#office` }, { '@id': `${SITE}/#corporate-office` }],
+  location: { '@id': `${SITE}/#office` },
   contactPoint: [
     { '@type': 'ContactPoint', telephone: ORG.phone, contactType: 'sales', email: ORG.sales, areaServed: 'IN', availableLanguage: ['en', 'hi', 'kn'] },
     { '@type': 'ContactPoint', telephone: ORG.phoneSupport, contactType: 'customer support', email: ORG.support, areaServed: 'IN', availableLanguage: ['en', 'hi', 'kn'] },
@@ -941,7 +946,9 @@ const organization = {
 
 /**
  * The physical office, kept separate from #organization. Google reads hours,
- * phone and address off this type, not off a bare Organization.
+ * phone and address off this type, not off a bare Organization, and matches it
+ * against the Business Profile. So it carries the corporate office, where that
+ * listing is pinned, and not the registered address on #organization.
  */
 const localBusiness = {
   '@type': 'ProfessionalService',
@@ -954,7 +961,16 @@ const localBusiness = {
   email: ORG.sales,
   image: { '@id': `${SITE}/#image` },
   logo: { '@id': `${SITE}/#logo` },
-  address: { ...organization.address },
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: ORG.corporate.street,
+    addressLocality: ORG.corporate.locality,
+    addressRegion: ORG.corporate.region,
+    postalCode: ORG.corporate.postal,
+    addressCountry: ORG.corporate.country,
+  },
+  geo: { '@type': 'GeoCoordinates', latitude: ORG.corporate.lat, longitude: ORG.corporate.lng },
+  hasMap: `https://www.google.com/maps/place/?q=place_id:${ORG.corporate.placeId}`,
   areaServed: { '@type': 'Country', name: 'India' },
   sameAs: ORG.profiles,
   // Schema.org's band for mid-range. A band, not a quoted price.
@@ -967,27 +983,6 @@ const localBusiness = {
       closes: ORG.closes,
     },
   ],
-};
-
-/**
- * The corporate office. Deliberately a bare Place and not a second
- * ProfessionalService: two LocalBusiness nodes carrying the same name, the same
- * phone numbers and the same hours invite Google to treat them as rival
- * candidates for one local entity. A Place hung off #organization states the
- * second premises without competing with #office for that.
- */
-const corporateOffice = {
-  '@type': 'Place',
-  '@id': `${SITE}/#corporate-office`,
-  name: `${ORG.name} ${ORG.corporate.label}`,
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: ORG.corporate.street,
-    addressLocality: ORG.corporate.locality,
-    addressRegion: ORG.corporate.region,
-    postalCode: ORG.corporate.postal,
-    addressCountry: ORG.corporate.country,
-  },
 };
 
 const website = {
@@ -1642,7 +1637,7 @@ function faqSection(faqs, { dark = false } = {}) {
 
 function shell(page) {
   const url = SITE + page.url;
-  const graph = [organization, localBusiness, corporateOffice, website];
+  const graph = [organization, localBusiness, website];
 
   graph.push({
     // ContactPage / AboutPage where the page is a named subtype, else WebPage.
@@ -2320,7 +2315,7 @@ for (const doc of LEGAL) {
 const mapsUrl = (o) =>
   `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
     `${ORG.name}, ${o.street}, ${o.locality}, ${o.region} ${o.postal}`
-  )}`;
+  )}${o.placeId ? `&query_place_id=${o.placeId}` : ''}`;
 
 /**
  * One address on the dark office band. `o` is ORG itself for the registered
