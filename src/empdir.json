@@ -51,7 +51,7 @@
     "id": "VYB-2026-007",
     "active": true,
     "name": "Abhishek BS",
-    "designation": "Development",
+    "designation": "Developer Intern",
     "department": "Engineering / R&D (Research and Development)",
     "code": "khv8xysj"
   },
@@ -59,7 +59,7 @@
     "id": "VYB-2026-008",
     "active": true,
     "name": "Kethana K",
-    "designation": "Media & Developer",
+    "designation": "Media & Development Intern",
     "department": "Media, Marketing & Creative + Engineering / R&D",
     "code": "6s3tqsqh"
   },
@@ -118,5 +118,34 @@
     "designation": "Media",
     "department": "Media, Marketing & Creative",
     "code": "hnjqhkbq"
+  },
+  {
+    "id": "VYB-2026-016",
+    "active": true,
+    "name": "Dimple A",
+    "department": "Internet of Things (IoT)",
+    "code": "xqjfp7gm"
+  },
+  {
+    "id": "VYB-2026-017",
+    "active": true,
+    "name": "Sveat Velani",
+    "designation": "Lead IoT Developer",
+    "department": "Internet of Things (IoT)",
+    "code": "kqsfbtg6"
+  },
+  {
+    "id": "VYB-2026-018",
+    "active": true,
+    "name": "Akshay Bharati",
+    "department": "Internet of Things (IoT)",
+    "code": "nkv3nwcg"
+  },
+  {
+    "id": "VYB-2026-019",
+    "active": true,
+    "name": "C Kusuma",
+    "department": "Internet of Things (IoT)",
+    "code": "6yug6as5"
   }
 ]

@@ -6614,7 +6614,7 @@ write(
  *   - `active: false` keeps the URL alive but says the card is no longer
  *     valid. A card still in circulation is better answered than 404'd.
  *
- * Entry shape (only id, name and designation are required):
+ * Entry shape (only id and name are required):
  *
  *   { "id": "VYB-2026-007", "code": "(filled in by the build)", "active": true,
  *     "name": "", "designation": "", "department": "", "joined": "2026-04-27" }
@@ -6650,7 +6650,7 @@ function loadEmployees() {
     if (!/^[A-Z0-9]+(-[A-Z0-9]+)*$/.test(e.id || '')) throw new Error(`${where}: id must be capital letters and digits, optionally hyphenated`);
     if (seen.has(e.id)) throw new Error(`${where}: duplicate id`);
     seen.add(e.id);
-    if (!e.name || !e.designation) throw new Error(`${where}: name and designation are required`);
+    if (!e.name) throw new Error(`${where}: name is required`);
     if (e.code && !/^[a-z0-9]{8,}$/.test(e.code)) throw new Error(`${where}: code must be 8+ lowercase letters or digits`);
     if (!e.code) e.code = empdirCode();
   }
@@ -6692,7 +6692,7 @@ function empdirBody(e, photo) {
                     ${avatar}
                     <div class="min-w-0">
                         <h1 class="text-3xl md:text-4xl font-black font-display tracking-tight text-slate-900">${esc(e.name)}</h1>
-                        ${active ? `<p class="mt-1 text-lg text-slate-600">${esc(e.designation)}</p>` : ''}
+                        ${active && e.designation ? `<p class="mt-1 text-lg text-slate-600">${esc(e.designation)}</p>` : ''}
                         <dl class="mt-5 grid grid-cols-2 gap-x-6 gap-y-4">
                             ${empField('Employee ID', esc(e.id))}
                             ${active && e.department ? empField('Department', esc(e.department)) : ''}
