@@ -50,18 +50,18 @@
   {
     "id": "VYB-2026-007",
     "active": true,
-    "name": "Kethana K",
-    "designation": "Media & Developer",
-    "department": "Media, Marketing & Creative + Engineering / R&D",
-    "code": "6s3tqsqh"
-  },
-  {
-    "id": "VYB-2026-008",
-    "active": true,
     "name": "Abhishek BS",
     "designation": "Development",
     "department": "Engineering / R&D (Research and Development)",
     "code": "khv8xysj"
+  },
+  {
+    "id": "VYB-2026-008",
+    "active": true,
+    "name": "Kethana K",
+    "designation": "Media & Developer",
+    "department": "Media, Marketing & Creative + Engineering / R&D",
+    "code": "6s3tqsqh"
   },
   {
     "id": "VYB-2026-009",
