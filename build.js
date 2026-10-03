@@ -1699,7 +1699,7 @@ function shell(page) {
 
 <title>${esc(page.title)}</title>
 <meta name="description" content="${esc(page.description)}">
-${page.noindex ? '' : `<link rel="canonical" href="${url}">\n`}<meta name="robots" content="${page.noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'}">
+${page.noindex ? '' : `<link rel="canonical" href="${url}">\n`}<meta name="robots" content="${page.robots ? page.robots : page.noindex ? 'noindex, follow' :'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'}">
 
 <link rel="preload" href="/assets/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/plus-jakarta-sans-var.woff2" as="font" type="font/woff2" crossorigin>
@@ -6572,6 +6572,150 @@ write(
         </section>`,
   })
 );
+
+/* ------------------------------------------------------- employee directory */
+
+/*
+ * /empdir/<ID>-<code>/: the page behind the QR code on an employee ID card.
+ * Who the holder is and whether the card is still valid. Basic details only;
+ * no health or personal contact data, by decision, until there is a consent
+ * process for it.
+ *
+ *   - The URL carries a random code as well as the employee ID, so the staff
+ *     list cannot be read off by walking VYB-2026-001, -002 ... Codes are
+ *     generated here the first time an employee appears and written back to
+ *     src/empdir.json, so they hold steady across builds. To revoke a URL (a
+ *     lost card), delete the code and rebuild: a new one is issued and the old
+ *     address 404s. Reprint the card with the new QR.
+ *   - Nothing links to these pages: no /empdir/ index, no sitemap, no
+ *     llms.txt, no nav. They are noindex in the page and in the X-Robots-Tag
+ *     header, and served no-store (staticwebapp.config.json), so a
+ *     deactivation takes effect on the next scan.
+ *   - `active: false` keeps the URL alive but says the card is no longer
+ *     valid. A card still in circulation is better answered than 404'd.
+ *
+ * Entry shape (only id, name and designation are required):
+ *
+ *   { "id": "VYB-2026-007", "code": "(filled in by the build)", "active": true,
+ *     "name": "", "designation": "", "department": "", "joined": "2026-04-27" }
+ *
+ * A photo goes in src/empdir/photos/<ID>.jpg (or .png / .webp);
+ * tools/gen-empdir-photos.mjs crops it into the page directory.
+ */
+const EMPDIR_DATA = 'src/empdir.json';
+const EMPDIR_PHOTOS = 'src/empdir/photos';
+const EMPDIR_CODE_ALPHABET = 'abcdefghjkmnpqrstuvwxyz23456789'; // no 0/o, 1/l/i
+
+const empdirCode = () =>
+  Array.from(crypto.randomBytes(8), (b) => EMPDIR_CODE_ALPHABET[b % EMPDIR_CODE_ALPHABET.length]).join('');
+const empdirSlug = (e) => `${e.id.toLowerCase()}-${e.code}`;
+const empdirPhoto = (e) =>
+  ['jpg', 'jpeg', 'png', 'webp'].map((x) => `${EMPDIR_PHOTOS}/${e.id}.${x}`).find((p) => fs.existsSync(path.join(ROOT, p)));
+const initials = (name) =>
+  name
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+
+function loadEmployees() {
+  if (!fs.existsSync(path.join(ROOT, EMPDIR_DATA))) return [];
+  const raw = read(EMPDIR_DATA);
+  const list = JSON.parse(raw);
+  const seen = new Set();
+  for (const e of list) {
+    const where = `${EMPDIR_DATA}: ${e.id || '(no id)'}`;
+    if (!/^[A-Z0-9]+(-[A-Z0-9]+)*$/.test(e.id || '')) throw new Error(`${where}: id must be capital letters and digits, optionally hyphenated`);
+    if (seen.has(e.id)) throw new Error(`${where}: duplicate id`);
+    seen.add(e.id);
+    if (!e.name || !e.designation) throw new Error(`${where}: name and designation are required`);
+    if (e.code && !/^[a-z0-9]{8,}$/.test(e.code)) throw new Error(`${where}: code must be 8+ lowercase letters or digits`);
+    if (!e.code) e.code = empdirCode();
+  }
+  const next = `${JSON.stringify(list, null, 2)}\n`;
+  if (next !== raw) write(EMPDIR_DATA, next);
+  return list;
+}
+
+const empField = (label, value) =>
+  `<div>
+                            <dt class="text-xs font-bold uppercase tracking-[0.15em] text-slate-400">${label}</dt>
+                            <dd class="mt-1 font-bold text-slate-900">${value}</dd>
+                        </div>`;
+
+function empdirBody(e, photo) {
+  const avatar = photo
+    ? `<img src="/empdir/${empdirSlug(e)}/photo.webp" alt="Photograph of ${esc(e.name)}" width="120" height="150" class="w-[120px] h-[150px] rounded-2xl object-cover border border-slate-200 bg-slate-100">`
+    : `<span class="flex w-[120px] h-[150px] items-center justify-center rounded-2xl bg-slate-100 border border-slate-200 text-4xl font-black font-display text-slate-400" aria-hidden="true">${esc(initials(e.name))}</span>`;
+  const active = e.active !== false;
+
+  const status = active
+    ? `<p class="inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 px-4 py-2 text-sm font-bold text-emerald-800">
+                    <span class="material-symbols-outlined text-[20px]" aria-hidden="true">verified_user</span>
+                    Verified employee of ${ORG.name}
+                </p>`
+    : `<p class="inline-flex items-center gap-2 rounded-full bg-brand/10 border border-brand/30 px-4 py-2 text-sm font-bold text-brand-dark">
+                    <span class="material-symbols-outlined text-[20px]" aria-hidden="true">cancel</span>
+                    This ID card is no longer valid
+                </p>`;
+
+  const note = active
+    ? `Found this card? Please hand it in at our office, ${ORG.corporate.streetLines.join(', ')}, ${ORG.corporate.locality} ${ORG.corporate.postal}, or call ${telLink(ORG.phone)}.`
+    : `${esc(e.name)} no longer works at ${ORG.name}, and this card does not grant access to any of our premises or systems. If somebody is presenting it, please call us on ${telLink(ORG.phone)} or email <a class="text-brand font-bold" href="mailto:${ORG.support}">${ORG.support}</a>.`;
+
+  return `<section class="px-6 pt-10 pb-20 bg-surface-main">
+            <div class="max-w-2xl mx-auto">
+                ${status}
+                <div class="mt-6 flex flex-col sm:flex-row gap-6 rounded-3xl border border-slate-200 bg-white p-6 sm:p-8">
+                    ${avatar}
+                    <div class="min-w-0">
+                        <h1 class="text-3xl md:text-4xl font-black font-display tracking-tight text-slate-900">${esc(e.name)}</h1>
+                        ${active ? `<p class="mt-1 text-lg text-slate-600">${esc(e.designation)}</p>` : ''}
+                        <dl class="mt-5 grid grid-cols-2 gap-x-6 gap-y-4">
+                            ${empField('Employee ID', esc(e.id))}
+                            ${active && e.department ? empField('Department', esc(e.department)) : ''}
+                            ${active && e.joined ? empField('With Vybe since', esc(new Date(e.joined).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }))) : ''}
+                        </dl>
+                    </div>
+                </div>
+                <p class="mt-6 ${active ? 'text-sm text-slate-500' : 'text-slate-600'} leading-relaxed">${note}</p>
+            </div>
+        </section>`;
+}
+
+{
+  const employees = loadEmployees();
+  const live = new Set(employees.map(empdirSlug));
+
+  // A removed employee or a revoked code must stop resolving, so anything in
+  // empdir/ that is not a current slug goes.
+  const dir = path.join(ROOT, 'empdir');
+  if (fs.existsSync(dir))
+    for (const d of fs.readdirSync(dir)) if (!live.has(d)) fs.rmSync(path.join(dir, d), { recursive: true, force: true });
+
+  for (const e of employees) {
+    const slug = empdirSlug(e);
+    const photo = empdirPhoto(e);
+    if (!photo) fs.rmSync(path.join(dir, slug, 'photo.webp'), { force: true });
+    write(
+      `empdir/${slug}/index.html`,
+      shell({
+        url: `/empdir/${slug}/`,
+        nav: null,
+        title: `${e.name} | ${ORG.name} ID`,
+        description: `Employee ID verification for ${ORG.name}.`,
+        trail: [],
+        noindex: true,
+        robots: 'noindex, nofollow, noarchive, nosnippet',
+        schema: () => [],
+        body: empdirBody(e, photo),
+      })
+    );
+    console.log(`  empdir: ${e.id}${e.active === false ? ' (inactive)' : ''} -> ${SITE}/empdir/${slug}/`);
+  }
+}
 
 /* ------------------------------------------------------------ staff cards */
 

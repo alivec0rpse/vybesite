@@ -44,6 +44,11 @@ for (const m of readFileSync(join(ROOT, 'assets/verify.js'), 'utf8').matchAll(/m
   for (const n of m[1].split(/[,\s]+/).filter(Boolean)) icons.add(n);
 }
 
+/* The /empdir/ pages exist only for employees who are in src/empdir.json, so
+   a font built while that file is empty would miss their icons, and the first
+   ID card scanned afterwards would show ligature names. Always ship them. */
+for (const n of ['cancel', 'verified_user']) icons.add(n);
+
 const names = [...icons].sort();
 if (!names.length) throw new Error('no icons found — run `node build.js` first');
 

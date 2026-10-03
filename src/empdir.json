@@ -1,0 +1,122 @@
+[
+  {
+    "id": "VYB-2026-001",
+    "active": true,
+    "name": "Ankit Sabu",
+    "designation": "Chief Executive Officer (CEO)",
+    "department": "C-Suite",
+    "code": "42zefvsu"
+  },
+  {
+    "id": "VYB-2026-002",
+    "active": true,
+    "name": "Tejas C",
+    "designation": "Chief Technology Officer (CTO)",
+    "department": "C-Suite",
+    "code": "vchg8uc3"
+  },
+  {
+    "id": "VYB-2026-003",
+    "active": true,
+    "name": "Harsha R",
+    "designation": "Chief Operations Officer (COO)",
+    "department": "C-Suite",
+    "code": "99b3pegx"
+  },
+  {
+    "id": "VYB-2026-004",
+    "active": true,
+    "name": "Manjunath D",
+    "designation": "Enterprise Relations Officer (ERO)",
+    "department": "Sales & BD (Sales and Business Development)",
+    "code": "ebda367y"
+  },
+  {
+    "id": "VYB-2026-005",
+    "active": true,
+    "name": "Jai Sharan K",
+    "designation": "Senior Developer",
+    "department": "Engineering / R&D (Research and Development)",
+    "code": "g4hdmje8"
+  },
+  {
+    "id": "VYB-2026-006",
+    "active": true,
+    "name": "Josh Tom",
+    "designation": "Media Head & Director of Digital Marketing",
+    "department": "Media, Marketing & Creative",
+    "code": "brwu4krq"
+  },
+  {
+    "id": "VYB-2026-007",
+    "active": true,
+    "name": "Kethana K",
+    "designation": "Media & Developer",
+    "department": "Media, Marketing & Creative + Engineering / R&D",
+    "code": "6s3tqsqh"
+  },
+  {
+    "id": "VYB-2026-008",
+    "active": true,
+    "name": "Abhishek BS",
+    "designation": "Development",
+    "department": "Engineering / R&D (Research and Development)",
+    "code": "khv8xysj"
+  },
+  {
+    "id": "VYB-2026-009",
+    "active": true,
+    "name": "Lalith Kumar",
+    "designation": "Media",
+    "department": "Media, Marketing & Creative",
+    "code": "be89nkej"
+  },
+  {
+    "id": "VYB-2026-010",
+    "active": true,
+    "name": "Flemin J Muttath",
+    "designation": "Media",
+    "department": "Media, Marketing & Creative",
+    "code": "9r8x9dxm"
+  },
+  {
+    "id": "VYB-2026-011",
+    "active": true,
+    "name": "Justin Thomas Varghese",
+    "designation": "Forward Deployed Engineer (FDE)",
+    "department": "Engineering / R&D (Research and Development)",
+    "code": "zmzgp4nw"
+  },
+  {
+    "id": "VYB-2026-012",
+    "active": true,
+    "name": "Syed Zayad",
+    "designation": "Editing Head",
+    "department": "Media, Marketing & Creative",
+    "code": "gdbahjth"
+  },
+  {
+    "id": "VYB-2026-013",
+    "active": true,
+    "name": "Felix EJ",
+    "designation": "Developer",
+    "department": "Engineering / R&D (Research and Development)",
+    "code": "2b57d9uq"
+  },
+  {
+    "id": "VYB-2026-014",
+    "active": true,
+    "name": "Yogesh V",
+    "designation": "Media (Production)",
+    "department": "Media, Marketing & Creative",
+    "code": "wxex8ga4"
+  },
+  {
+    "id": "VYB-2026-015",
+    "active": true,
+    "name": "Hemanth SP",
+    "designation": "Media",
+    "department": "Media, Marketing & Creative",
+    "code": "hnjqhkbq"
+  }
+]

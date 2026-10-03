@@ -25,6 +25,14 @@
       }
     },
     {
+      "route": "/empdir/*",
+      "headers": {
+        "Cache-Control": "no-store",
+        "X-Robots-Tag": "noindex, nofollow, noarchive, nosnippet",
+        "Referrer-Policy": "no-referrer"
+      }
+    },
+    {
       "route": "/robots.txt",
       "headers": { "Cache-Control": "public, max-age=3600" }
     },
