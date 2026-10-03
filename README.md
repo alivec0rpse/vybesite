@@ -127,7 +127,8 @@ header, which `tools/gen-fonts.mjs` and `tools/audit-icons.js` both read.
 
 ## Staff visiting cards
 
-`/ankit/`, `/harsha/`, `/manjunath/` and `/tejas/` are digital visiting cards.
+`/ankit/`, `/harsha/`, `/manjunath/`, `/tejas/`, `/jaisharan/` and `/josh/` are
+digital visiting cards.
 The markup is imported, not written here: `tools/import-card.mjs` unpacks an
 export built for a standalone origin. The import cannot know how the page
 should behave on this site, so `build.js` owns that half, driven by the `TEAM`

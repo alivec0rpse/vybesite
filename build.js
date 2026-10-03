@@ -151,6 +151,26 @@ const TEAM = [
     linkedin: 'https://www.linkedin.com/in/tejasc02/',
     bio: 'Tejas C leads engineering at Vybe Technologies in Bengaluru, across Vybe ERP, Vybe CMS, cloud infrastructure and security.',
   },
+  {
+    slug: 'jaisharan',
+    name: 'Jai Sharan K',
+    role: 'Senior Developer',
+    email: 'jaisharan@vybe.net.in',
+    tel: '+91-90368-64134',
+    linkedin: 'https://www.linkedin.com/in/jai-sharan-k-51184037b/',
+    bio: 'Jai Sharan K is a Senior Developer in the engineering team at Vybe Technologies in Bengaluru.',
+  },
+  {
+    slug: 'josh',
+    name: 'Josh Tom',
+    role: 'Media Head & Director of Digital Marketing',
+    email: 'josh@vybe.net.in',
+    tel: '+91-88671-23202',
+    // The full role runs the title well past the 60 characters Google renders.
+    titleRole: 'Digital Marketing',
+    linkedin: 'https://www.linkedin.com/in/josh-tom-653b13320/',
+    bio: 'Josh Tom heads media and digital marketing at Vybe Technologies in Bengaluru.',
+  },
 ];
 
 /** One canonical node per person, so the founder is not also a second entity. */

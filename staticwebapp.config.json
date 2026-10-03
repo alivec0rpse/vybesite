@@ -189,6 +189,82 @@
       }
     },
 
+    { "route": "/jaisharan", "redirect": "/jaisharan/", "statusCode": 301 },
+    { "route": "/jai-sharan", "redirect": "/jaisharan/", "statusCode": 301 },
+    {
+      "route": "/jaisharan/contact.vcf",
+      "headers": {
+        "Content-Type": "text/vcard; charset=utf-8",
+        "Content-Disposition": "inline; filename=\"Jai-Sharan-K-Vybe-Technologies.vcf\"",
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "X-Robots-Tag": "noindex, nofollow, noarchive"
+      }
+    },
+    {
+      "route": "/jaisharan/sw.js",
+      "headers": {
+        "Cache-Control": "no-cache",
+        "X-Robots-Tag": "noindex, nofollow, noarchive"
+      }
+    },
+    {
+      "route": "/jaisharan/assets/*",
+      "headers": {
+        "Cache-Control": "public, max-age=604800"
+      }
+    },
+    {
+      "route": "/jaisharan/qr.html",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "X-Robots-Tag": "noindex, nofollow, noarchive"
+      }
+    },
+    {
+      "route": "/jaisharan/*",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
+    },
+
+    { "route": "/josh", "redirect": "/josh/", "statusCode": 301 },
+    { "route": "/josh-tom", "redirect": "/josh/", "statusCode": 301 },
+    {
+      "route": "/josh/contact.vcf",
+      "headers": {
+        "Content-Type": "text/vcard; charset=utf-8",
+        "Content-Disposition": "inline; filename=\"Josh-Tom-Vybe-Technologies.vcf\"",
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "X-Robots-Tag": "noindex, nofollow, noarchive"
+      }
+    },
+    {
+      "route": "/josh/sw.js",
+      "headers": {
+        "Cache-Control": "no-cache",
+        "X-Robots-Tag": "noindex, nofollow, noarchive"
+      }
+    },
+    {
+      "route": "/josh/assets/*",
+      "headers": {
+        "Cache-Control": "public, max-age=604800"
+      }
+    },
+    {
+      "route": "/josh/qr.html",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "X-Robots-Tag": "noindex, nofollow, noarchive"
+      }
+    },
+    {
+      "route": "/josh/*",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
+    },
+
     { "route": "/src/*", "statusCode": 404 },
     { "route": "/tools/*", "statusCode": 404 },
     { "route": "/node_modules/*", "statusCode": 404 },

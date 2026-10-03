@@ -259,4 +259,18 @@
     <priority>0.5</priority>
     <image:image><image:loc>https://vybe.net.in/tejas/assets/og.png</image:loc><image:caption>Tejas C, Chief Technology Officer, Vybe Technologies</image:caption></image:image>
   </url>
+  <url>
+    <loc>https://vybe.net.in/jaisharan/</loc>
+    <lastmod>2026-10-03</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+    <image:image><image:loc>https://vybe.net.in/jaisharan/assets/og.png</image:loc><image:caption>Jai Sharan K, Senior Developer, Vybe Technologies</image:caption></image:image>
+  </url>
+  <url>
+    <loc>https://vybe.net.in/josh/</loc>
+    <lastmod>2026-10-03</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+    <image:image><image:loc>https://vybe.net.in/josh/assets/og.png</image:loc><image:caption>Josh Tom, Media Head &amp; Director of Digital Marketing, Vybe Technologies</image:caption></image:image>
+  </url>
 </urlset>

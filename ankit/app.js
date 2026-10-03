@@ -11,13 +11,15 @@
   body.classList.remove("boot");
 
   /* ---------------- identity (assembled here, not written in the HTML) ---------------- */
-  var P = ["+91", "99641", "77677"], E = ["ankit", "vybe.net.in"];
-  var PHONE = P.join(""), PHONE_SHOW = P.join(" "), PHONE_WA = PHONE.slice(1), EMAIL = E.join("@");
+  var P = ["+91", "99641", "77677"], E = ["ankit", "vybe.net.in"]; var RE = ["ceo", "vybe.net.in"];   // role mailbox, shown above the personal one
+  var PHONE = P.join(""), PHONE_SHOW = P.join(" "), PHONE_WA = PHONE.slice(1), EMAIL = E.join("@"), ROLE_EMAIL = RE.join("@");
   var CARD_URL = /^https?:$/.test(location.protocol) ? new URL("./", document.baseURI).href : "https://vybe.net.in/ankit/";
   $("#aCall").href = "tel:" + PHONE;
   $("#aWa").href = "https://wa.me/" + PHONE_WA + "?text=" + encodeURIComponent("Dear Mr. Ankit, I received your digital visiting card and would like to connect with you regarding Vybe Technologies.");
+  $("#aRole").href = "mailto:" + ROLE_EMAIL + "?subject=" + encodeURIComponent("Enquiry regarding Vybe Technologies");
   $("#aMail").href = "mailto:" + EMAIL + "?subject=" + encodeURIComponent("Enquiry regarding Vybe Technologies");
   $("#vPhone").textContent = PHONE_SHOW;
+  $("#vRole").textContent = ROLE_EMAIL;
   $("#vMail").textContent = EMAIL;
 
   var tT;

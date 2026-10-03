@@ -11,13 +11,15 @@
   body.classList.remove("boot");
 
   /* ---------------- identity (assembled here, not written in the HTML) ---------------- */
-  var P = ["+91", "94565", "67283"], WA = ["91", "94581", "70983"], E = ["tejas", "vybe.net.in"];   // calls and WhatsApp use different numbers
-  var PHONE = P.join(""), PHONE_SHOW = P.join(" "), PHONE_WA = WA.join(""), EMAIL = E.join("@");
+  var P = ["+91", "94565", "67283"], WA = ["91", "94581", "70983"], E = ["tejas", "vybe.net.in"]; var RE = ["cto", "vybe.net.in"];   // role mailbox, shown above the personal one   // calls and WhatsApp use different numbers
+  var PHONE = P.join(""), PHONE_SHOW = P.join(" "), PHONE_WA = WA.join(""), EMAIL = E.join("@"), ROLE_EMAIL = RE.join("@");
   var CARD_URL = /^https?:$/.test(location.protocol) ? new URL("./", document.baseURI).href : "https://vybe.net.in/tejas/";
   $("#aCall").href = "tel:" + PHONE;
   $("#aWa").href = "https://wa.me/" + PHONE_WA + "?text=" + encodeURIComponent("Dear Mr. Tejas, I received your digital visiting card and would like to connect with you regarding Vybe Technologies.");
+  $("#aRole").href = "mailto:" + ROLE_EMAIL + "?subject=" + encodeURIComponent("Enquiry regarding Vybe Technologies");
   $("#aMail").href = "mailto:" + EMAIL + "?subject=" + encodeURIComponent("Enquiry regarding Vybe Technologies");
   $("#vPhone").textContent = PHONE_SHOW;
+  $("#vRole").textContent = ROLE_EMAIL;
   $("#vMail").textContent = EMAIL;
 
   var tT;
