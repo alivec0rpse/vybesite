@@ -1,19 +1,19 @@
 {
   "/": {
-    "hash": "73eb59cbc15b34d9",
-    "date": "2026-09-28"
+    "hash": "bd414bfadd1fe832",
+    "date": "2026-10-03"
   },
   "/erp/": {
-    "hash": "eeeae6db8b94ecd6",
-    "date": "2026-09-23"
+    "hash": "78e5e90c0499508e",
+    "date": "2026-10-03"
   },
   "/cms/": {
-    "hash": "d77c387434e447a2",
-    "date": "2026-09-23"
+    "hash": "8f47ae6cffd4ed8e",
+    "date": "2026-10-03"
   },
   "/it-solutions/": {
-    "hash": "446ce826eee0b97d",
-    "date": "2026-09-28"
+    "hash": "07f22487df189bdd",
+    "date": "2026-10-03"
   },
   "/cloud/": {
     "hash": "1b19066f41872902",
@@ -36,88 +36,88 @@
     "date": "2026-09-21"
   },
   "/workspace/": {
-    "hash": "53ddade8fc6092a3",
-    "date": "2026-09-28"
+    "hash": "8bb2ffd22ecd42e3",
+    "date": "2026-10-03"
   },
   "/smart-classroom/": {
-    "hash": "3c124cc2d8095f3f",
-    "date": "2026-09-23"
+    "hash": "a9bd36e448ee381f",
+    "date": "2026-10-03"
   },
   "/contact/": {
     "hash": "dc8a443625735021",
     "date": "2026-10-01"
   },
   "/printing/": {
-    "hash": "404f1bdb05ec6565",
-    "date": "2026-09-23"
+    "hash": "08bbed87d32bb572",
+    "date": "2026-10-03"
   },
   "/registrations/": {
-    "hash": "81c0897dfeed863d",
-    "date": "2026-09-23"
+    "hash": "f79cb176ee70e721",
+    "date": "2026-10-03"
   },
   "/printing/stationery/": {
-    "hash": "7548df53a1afb56b",
-    "date": "2026-09-23"
+    "hash": "24d5625dc52e2e1a",
+    "date": "2026-10-03"
   },
   "/printing/cards/": {
-    "hash": "dda8f9bf848db730",
-    "date": "2026-09-23"
+    "hash": "4a20be68b022ceb4",
+    "date": "2026-10-03"
   },
   "/printing/banners-standees/": {
-    "hash": "a88779a9e595b9d3",
-    "date": "2026-09-23"
+    "hash": "6d7a4f117e9fa071",
+    "date": "2026-10-03"
   },
   "/registrations/gst/": {
-    "hash": "dd409e4f7c2ee36d",
-    "date": "2026-09-23"
+    "hash": "3326a5b09c9e9c40",
+    "date": "2026-10-03"
   },
   "/registrations/msme/": {
-    "hash": "1c576b411240a47b",
-    "date": "2026-09-23"
+    "hash": "7e2e3b16772a9a30",
+    "date": "2026-10-03"
   },
   "/registrations/fssai/": {
-    "hash": "878899a5a8d345d9",
-    "date": "2026-09-23"
+    "hash": "89ec3c50a5e57f1c",
+    "date": "2026-10-03"
   },
   "/registrations/startup-india/": {
-    "hash": "193a92465d41d04e",
-    "date": "2026-09-23"
+    "hash": "d54509237dbd87bf",
+    "date": "2026-10-03"
   },
   "/registrations/iso-certification/": {
-    "hash": "d644aae6b2c6dba9",
-    "date": "2026-09-24"
+    "hash": "544f907f1dbc6405",
+    "date": "2026-10-03"
   },
   "/registrations/nsdc-skill-india/": {
-    "hash": "28b41d5abb0abefd",
-    "date": "2026-09-23"
+    "hash": "e81e121eaf94df9c",
+    "date": "2026-10-03"
   },
   "/registrations/digital-signature-certificate/": {
-    "hash": "fe95ca3237ffe6ec",
-    "date": "2026-09-23"
+    "hash": "bca0ca0b77b73c67",
+    "date": "2026-10-03"
   },
   "/audits/": {
-    "hash": "e712f1d07ae1a384",
-    "date": "2026-09-24"
+    "hash": "985bf8bd67e7d3fd",
+    "date": "2026-10-03"
   },
   "/audits/kitchen-food-safety/": {
-    "hash": "0ee95b9ad849ffe4",
-    "date": "2026-09-24"
+    "hash": "caf34f7bc4857741",
+    "date": "2026-10-03"
   },
   "/audits/schools-institutions/": {
-    "hash": "f4fc0470f572bc52",
-    "date": "2026-09-24"
+    "hash": "567ed1a215d94761",
+    "date": "2026-10-03"
   },
   "/audits/workplace-compliance/": {
-    "hash": "7feb7a35ecddc5c4",
-    "date": "2026-09-24"
+    "hash": "1ab8833941712d36",
+    "date": "2026-10-03"
   },
   "/manufacturing/": {
-    "hash": "ff3d9e67544fb7a1",
-    "date": "2026-09-23"
+    "hash": "63047d9e169a95cd",
+    "date": "2026-10-03"
   },
   "/manufacturing/rfid-cards/": {
-    "hash": "e8f4a20a3e123d0c",
-    "date": "2026-09-23"
+    "hash": "f893dd5805403558",
+    "date": "2026-10-03"
   },
   "/manufacturing/distribution/": {
     "hash": "3f7241e5b64f638e",
@@ -128,8 +128,8 @@
     "date": "2026-09-23"
   },
   "/verify/": {
-    "hash": "0e32f4959960e759",
-    "date": "2026-09-24"
+    "hash": "4c2905613fe95690",
+    "date": "2026-10-03"
   },
   "/ankit/": {
     "hash": "78a1625385f6bba0",

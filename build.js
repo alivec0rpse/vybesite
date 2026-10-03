@@ -572,6 +572,29 @@ ${page.nav === 'home' ? '' : relatedSection(page.nav, { dark: view.dark })}
 </div>`;
 }
 
+/**
+ * Card pricing. The one exception to "no prices in manufacturing": RFID and
+ * NFC cards are where we undercut the market by the most, so the number is
+ * the pitch. Starting prices per card, at the minimum run or above, GST
+ * extra. The RFID price is for a printed card. Change them here and the nav,
+ * home page, printing and manufacturing pages, and the Offer schema all
+ * follow.
+ *
+ * No competitor figures or names, and no "cheapest" or "best": a superlative is
+ * a claim ASCI can ask us to substantiate. "Bengaluru's lowest prices" is as
+ * far as the copy goes.
+ */
+const CARD_PRICING = {
+  rfid: 16.5,
+  nfc: 50,
+  minQty: 25,
+};
+const cardRupees = (n) =>
+  `&#8377;${n.toLocaleString('en-IN', { minimumFractionDigits: Number.isInteger(n) ? 0 : 2 })}`;
+// Plain-text forms, for meta descriptions, schema and anything else that is not HTML.
+const cardRupeesText = (n) => cardRupees(n).replace('&#8377;', '₹');
+const CARD_PRICE_LINE = `RFID cards from ${cardRupeesText(CARD_PRICING.rfid)}, NFC from ${cardRupeesText(CARD_PRICING.nfc)}, plus GST, minimum ${CARD_PRICING.minQty} cards`;
+
 /* --------------------------------------------------------------- the shell */
 
 function mobileItem(href, label, id, active) {
@@ -647,10 +670,10 @@ const NAV_GROUPS = [
   {
     id: 'manufacturing',
     label: 'Manufacturing',
-    blurb: 'Cards we make, and hardware we supply. Quoted per order, with no prices or stock counts on the site.',
+    blurb: `Cards we make, and hardware we supply. ${CARD_PRICE_LINE}; hardware quoted per order.`,
     items: [
       { nav: 'manufacturing', href: '/manufacturing/', label: 'All manufacturing &amp; supply', blurb: 'What we make and what we distribute.', icon: 'precision_manufacturing' },
-      { nav: 'mfg-rfid', href: '/manufacturing/rfid-cards/', label: 'RFID &amp; NFC cards', blurb: 'MIFARE, DESFire, NTAG and UHF, encoded to your readers.', icon: 'contactless' },
+      { nav: 'mfg-rfid', href: '/manufacturing/rfid-cards/', label: 'RFID &amp; NFC cards', blurb: `RFID from ${cardRupeesText(CARD_PRICING.rfid)}, NFC from ${cardRupeesText(CARD_PRICING.nfc)}. Minimum ${CARD_PRICING.minQty}.`, icon: 'contactless' },
       { nav: 'mfg-distribution', href: '/manufacturing/distribution/', label: 'IT hardware distribution', blurb: 'Dell, HP, Lenovo, Asus, Apple and Logitech.', icon: 'local_shipping' },
       { nav: 'mfg-iot', href: '/manufacturing/iot/', label: 'IoT solutions', blurb: 'Asset tracking, temperature, humidity and energy monitoring.', icon: 'sensors' },
       { href: '/manufacturing/distribution/#laptops', label: 'Laptops &amp; desktops', blurb: 'Contact us for stock, configuration and warranty.', icon: 'laptop_windows' },
@@ -1035,7 +1058,7 @@ const PRODUCTS = [
   { nav: 'printing', href: '/printing/', name: 'Printing', blurb: 'Everything from business cards to banners, standees and RFID cards.', icon: 'print' },
   { nav: 'registrations', href: '/registrations/', name: 'Business Registrations', blurb: 'GST, Udyam (MSME), FSSAI and Startup India recognition, from ₹199, plus ISO, NSDC consulting and digital signatures.', icon: 'receipt_long' },
   { nav: 'audits', href: '/audits/', name: 'Compliance Audits', blurb: 'Hygiene, fire, child safety, SDG, POSH and data protection audits for kitchens, campuses and offices. Report, certificate and badge.', icon: 'fact_check' },
-  { nav: 'manufacturing', href: '/manufacturing/', name: 'Manufacturing & Supply', blurb: 'RFID and NFC cards made and encoded to your system, IoT asset and energy monitoring, plus Dell, HP, Lenovo, Asus and Apple hardware. Contact us for stock and pricing.', icon: 'precision_manufacturing' },
+  { nav: 'manufacturing', href: '/manufacturing/', name: 'Manufacturing & Supply', blurb: `RFID cards from ${cardRupeesText(CARD_PRICING.rfid)} and NFC from ${cardRupeesText(CARD_PRICING.nfc)}, made and encoded to your system, IoT asset and energy monitoring, plus Dell, HP, Lenovo, Asus and Apple hardware.`, icon: 'precision_manufacturing' },
 ];
 
 /**
@@ -1114,13 +1137,13 @@ function beyondSoftwareSection() {
                       '/manufacturing/',
                       'precision_manufacturing',
                       'Manufacturing &amp; supply',
-                      'RFID and NFC cards made, encoded and personalised to your readers, and IT hardware supplied from Dell, HP, Lenovo, Asus, Apple and Logitech. No prices or stock counts here on purpose. Both move weekly, so ask and you get a current answer.',
+                      `RFID and NFC cards made, encoded and personalised to your readers, from ${cardRupeesText(CARD_PRICING.rfid)} a card with a minimum of just ${CARD_PRICING.minQty}. IT hardware supplied from Dell, HP, Lenovo, Asus, Apple and Logitech, quoted per order because hardware prices move weekly.`,
                       [
-                        'RFID and NFC cards, fobs, tags and wristbands',
+                        `RFID cards from ${cardRupeesText(CARD_PRICING.rfid)}, NFC from ${cardRupeesText(CARD_PRICING.nfc)}`,
                         'Desktops, all-in-ones, mini PCs, laptops and monitors',
                         'Keyboards, mice, headsets, adapters and spares',
                         'Imaged, domain-joined and asset-tagged before delivery',
-                        'Contact us for stock, lead time, warranty and pricing',
+                        'Contact us for hardware stock, lead time, warranty and pricing',
                       ]
                     )}
                 </div>
@@ -2701,7 +2724,7 @@ const PRINT_CATEGORIES = [
       'Visiting cards, PVC ID cards, and RFID and NFC cards, tags and key fobs. All printed to your artwork, and the ones that have to work with a reader confirmed against your system before a batch is run.',
     metaTitle: 'Business Card, PVC ID & RFID Printing in Bengaluru',
     metaDescription:
-      'Visiting cards in matt, gloss, velvet and spot UV. PVC ID cards with lanyards. RFID and NFC cards, tags and key fobs, printed in Bengaluru to your artwork.',
+      `Visiting cards in matt, gloss, velvet and spot UV. PVC ID cards with lanyards. RFID cards from ${cardRupeesText(CARD_PRICING.rfid)}, NFC from ${cardRupeesText(CARD_PRICING.nfc)}, printed in Bengaluru.`,
     sections: [
       {
         h: 'Visiting cards',
@@ -2713,7 +2736,7 @@ const PRINT_CATEGORIES = [
       },
       {
         h: 'RFID and NFC cards',
-        p: 'Cards, tags, key fobs and wristbands, printed with your branding. The part worth getting right first is the chip: 125 kHz and 13.56 MHz are different technologies, and a card of the wrong sort is a coaster no matter how well it is printed. Tell us the chip your readers expect, or, if you do not know, what access control, attendance or cafeteria system you run, and we will confirm the right card before anything is ordered in bulk. If the card has to open a door, mark attendance or pay for lunch rather than simply look right, the chip choice, encoding and keys are covered properly on <a class="text-brand font-bold" href="/manufacturing/rfid-cards/">RFID and NFC card manufacturing</a>.',
+        p: `Cards, tags, key fobs and wristbands, printed with your branding, at Bengaluru's lowest prices: RFID cards from ${cardRupees(CARD_PRICING.rfid)} and NFC cards from ${cardRupees(CARD_PRICING.nfc)} a card plus GST, and a minimum of just ${CARD_PRICING.minQty}. The part worth getting right first is the chip: 125 kHz and 13.56 MHz are different technologies, and a card of the wrong sort is a coaster no matter how well it is printed. Tell us the chip your readers expect, or, if you do not know, what access control, attendance or cafeteria system you run, and we will confirm the right card before anything is ordered in bulk. If the card has to open a door, mark attendance or pay for lunch rather than simply look right, the chip choice, encoding and keys are covered properly on <a class="text-brand font-bold" href="/manufacturing/rfid-cards/">RFID and NFC card manufacturing</a>.`,
       },
       {
         h: 'Cards that have to talk to your system',
@@ -2735,7 +2758,7 @@ const PRINT_CATEGORIES = [
       },
       {
         q: 'What is the minimum order for ID or RFID cards?',
-        a: 'Small batches are fine for PVC ID cards, which is what makes mid-year joiners and replacement cards practical. RFID and NFC cards depend on the chip, because some are only sold in fixed pack sizes. Ask with your quantity and we will tell you where you stand before you commit to anything.',
+        a: `Small batches are fine for PVC ID cards, which is what makes mid-year joiners and replacement cards practical. RFID and NFC cards start at just ${CARD_PRICING.minQty}, at Bengaluru's lowest prices: printed RFID cards from ${cardRupees(CARD_PRICING.rfid)} and NFC cards from ${cardRupees(CARD_PRICING.nfc)} a card, plus GST.`,
       },
     ],
   },
@@ -4953,10 +4976,12 @@ ${relatedSection('audits', { dark: false })}
  *   - What we distribute. Desktops, laptops, displays and peripherals from
  *     Dell, HP, Lenovo, Asus, Apple and Logitech.
  *
- * Deliberately no prices and no stock figures anywhere in this section. Both
- * move weekly, a stale number on a static site is worse than no number, and
- * the honest answer to "do you have twelve of these" is a conversation. Every
- * card therefore ends at contact rather than at a cart.
+ * Deliberately no hardware prices and no stock figures anywhere in this
+ * section. Both move weekly, a stale number on a static site is worse than no
+ * number, and the honest answer to "do you have twelve of these" is a
+ * conversation. Every hardware card therefore ends at contact rather than at a
+ * cart. RFID and NFC cards are the exception: their starting prices are stable,
+ * well under the local market, and published from CARD_PRICING.
  */
 
 const MFG_ENQUIRY = 'Hi Vybe, I would like to talk about hardware supply.';
@@ -5096,8 +5121,8 @@ const MFG_LINES = [
     href: '/manufacturing/rfid-cards/',
     icon: 'contactless',
     name: 'RFID & NFC cards',
-    blurb:
-      'Cards, fobs, tags and wristbands, with the chip chosen for the job, encoded to your system and personalised per person.',
+    blurb: `Cards, fobs, tags and wristbands, with the chip chosen for the job, encoded to your system and personalised per person. ${CARD_PRICE_LINE}.`,
+    price: CARD_PRICING.rfid,
   },
   {
     href: '/manufacturing/distribution/',
@@ -5117,8 +5142,8 @@ const MFG_LINES = [
 
 const mfgFaqs = [
   {
-    q: 'Why is there no price list on these pages?',
-    a: 'Because any figure we published would be wrong within the week. Hardware pricing moves with the distributor’s rate, the configuration, the quantity, the warranty term and what the rupee did on Tuesday. A card quantity moves with the chip, the finish and the run length. Rather than print a number we would have to caveat into meaninglessness, we quote against what you actually need. Tell us the configuration and the quantity and a figure comes back the same day in most cases.',
+    q: 'Why is there no price list for hardware?',
+    a: `Because any figure we published would be wrong within the week. Hardware pricing moves with the distributor’s rate, the configuration, the quantity, the warranty term and what the rupee did on Tuesday. Rather than print a number we would have to caveat into meaninglessness, we quote against what you actually need. Tell us the configuration and the quantity and a figure comes back the same day in most cases. Cards are different, because their price holds still: RFID cards start at ${cardRupees(CARD_PRICING.rfid)} and NFC cards at ${cardRupees(CARD_PRICING.nfc)}, plus GST, Bengaluru's lowest prices.`,
   },
   {
     q: 'Do you hold stock?',
@@ -5146,7 +5171,7 @@ const mfgFaqs = [
   },
   {
     q: 'What is the smallest order you will take?',
-    a: 'For hardware there is no formal minimum, though for a single mouse you are better off at a shop. Where we are worth talking to is anything from a handful of machines upward, or a standing arrangement where you come back each time you need something. RFID cards have a practical minimum that depends on the chip and the finish, so ask, and if the run is too small to make sense we will tell you rather than take it.',
+    a: `For hardware there is no formal minimum, though for a single mouse you are better off at a shop. Where we are worth talking to is anything from a handful of machines upward, or a standing arrangement where you come back each time you need something. RFID and NFC cards start at just ${CARD_PRICING.minQty}.`,
   },
 ];
 
@@ -5158,7 +5183,7 @@ ${breadcrumbs([CRUMB_HOME, { name: 'Manufacturing', url: '/manufacturing/' }], f
             <div class="max-w-6xl mx-auto relative z-10">
                 <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-3">Manufacturing &amp; Supply</p>
                 <h1 class="text-5xl md:text-7xl font-black font-display tracking-tighter text-slate-900">What we make, and what we supply.</h1>
-                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">RFID and NFC cards manufactured, encoded and personalised to your system. Desktops, laptops, displays and peripherals distributed from Dell, HP, Lenovo, Asus, Apple and Logitech. IoT that tracks what you own and monitors what it costs to run. All of it quoted against what you need rather than listed off a shelf.</p>
+                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">RFID and NFC cards manufactured, encoded and personalised to your system. Desktops, laptops, displays and peripherals distributed from Dell, HP, Lenovo, Asus, Apple and Logitech. IoT that tracks what you own and monitors what it costs to run. Cards from ${cardRupees(CARD_PRICING.rfid)}; hardware and IoT quoted against what you need rather than listed off a shelf.</p>
 
                 ${ctaRow({
                   waText: MFG_ENQUIRY,
@@ -5170,8 +5195,8 @@ ${breadcrumbs([CRUMB_HOME, { name: 'Manufacturing', url: '/manufacturing/' }], f
 
                 <div class="mt-12">
                     ${noticePanel(
-                      'No prices and no stock counts on this site, on purpose',
-                      `<p>Hardware pricing and availability move weekly, and card pricing moves with the chip, the finish and the run length. A number published here would be wrong by the time you read it, and being wrong in your favour is as unhelpful as being wrong the other way.</p>
+                      'No hardware prices or stock counts on this site, on purpose',
+                      `<p>Hardware pricing and availability move weekly. A number published here would be wrong by the time you read it, and being wrong in your favour is as unhelpful as being wrong the other way. RFID and NFC cards are the exception, with prices on <a class="text-brand font-bold" href="/manufacturing/rfid-cards/">their own page</a>.</p>
                         <p>So ask. Tell us the model or the specification and the quantity and you get a current figure, the real lead time, and the warranty term that actually applies, usually the same day. If something is a four-week wait, we will say four weeks rather than let you find out after the purchase order.</p>`
                     )}
                 </div>
@@ -5274,7 +5299,7 @@ ${relatedSection('manufacturing', { dark: false })}
       title: 'Manufacturing & IT Hardware Supply in Bengaluru | Vybe',
       ogTitle: 'Vybe manufacturing and supply: RFID cards and IT hardware',
       description:
-        'RFID and NFC cards made and encoded, IoT asset and energy monitoring, plus Dell, HP and Lenovo hardware in Bengaluru. Contact us for stock and pricing.',
+        `RFID cards from ${cardRupeesText(CARD_PRICING.rfid)}, NFC from ${cardRupeesText(CARD_PRICING.nfc)}, made and encoded in Bengaluru. IoT monitoring, plus Dell, HP and Lenovo hardware on quote.`,
       lastmod,
       trail: [CRUMB_HOME, { name: 'Manufacturing', url }],
       faqs: mfgFaqs,
@@ -5285,7 +5310,7 @@ ${relatedSection('manufacturing', { dark: false })}
         name: 'Vybe manufacturing and IT hardware supply',
         serviceType: 'RFID card manufacturing, IoT installations and IT hardware distribution',
         description:
-          'Manufacture of RFID and NFC cards, fobs, tags and wristbands with chip selection, encoding and personalisation, and distribution of IT hardware: desktops, all-in-one PCs, mini PCs, laptops, monitors, keyboards, mice, headsets, conferencing equipment, power adapters and spares from Dell, HP, Lenovo, Asus, Apple and Logitech, to businesses, schools and colleges in Bengaluru. Industrial IoT installations covering UHF asset and inventory tracking, temperature and humidity monitoring, energy metering, and edge gateways integrated with dashboards and Vybe ERP. Supplied against purchase orders and tenders, with manufacturer warranty, GST invoicing, optional imaging and asset tagging, and buy-back or authorised e-waste disposal. Pricing, stock availability and warranty terms are quoted per enquiry rather than listed.',
+          `Manufacture of RFID and NFC cards, fobs, tags and wristbands with chip selection, encoding and personalisation, and distribution of IT hardware: desktops, all-in-one PCs, mini PCs, laptops, monitors, keyboards, mice, headsets, conferencing equipment, power adapters and spares from Dell, HP, Lenovo, Asus, Apple and Logitech, to businesses, schools and colleges in Bengaluru. Industrial IoT installations covering UHF asset and inventory tracking, temperature and humidity monitoring, energy metering, and edge gateways integrated with dashboards and Vybe ERP. Supplied against purchase orders and tenders, with manufacturer warranty, GST invoicing, optional imaging and asset tagging, and buy-back or authorised e-waste disposal. ${CARD_PRICE_LINE}. Hardware pricing, stock availability and warranty terms are quoted per enquiry rather than listed.`,
         provider: { '@id': `${SITE}/#organization` },
         areaServed: { '@type': 'City', name: 'Bengaluru' },
         url: u,
@@ -5295,8 +5320,12 @@ ${relatedSection('manufacturing', { dark: false })}
           itemListElement: MFG_LINES.map((l) => ({
             '@type': 'Offer',
             name: l.name,
+            ...(l.price === undefined ? {} : { price: String(l.price) }),
             priceCurrency: 'INR',
-            description: `${l.blurb} Quoted per enquiry; contact us for current pricing, stock availability and warranty terms.`,
+            description:
+              l.price === undefined
+                ? `${l.blurb} Quoted per enquiry; contact us for current pricing, stock availability and warranty terms.`
+                : `Starting price per card, plus GST, minimum ${CARD_PRICING.minQty} cards.`,
             url: `${SITE}${l.href}`,
             itemOffered: { '@type': 'Service', name: l.name, provider: { '@id': `${SITE}/#organization` } },
           })),
@@ -5373,7 +5402,7 @@ const rfidFaqs = [
   },
   {
     q: 'What is the minimum quantity?',
-    a: 'It depends on the chip and the finish rather than being one fixed number, and blank stock cards run far smaller than fully personalised ones. Tell us what you are after and we will give you the practical minimum and the point at which the per-card price drops. If your run is too small to be worth doing properly, we will say so rather than take the order and disappoint you.',
+    a: `Just ${CARD_PRICING.minQty} cards. A small office, a clinic or a single hostel block should not have to buy four years of cards to get this year's, so a run of ${CARD_PRICING.minQty} is a normal order with us, and so is the top-up of ${CARD_PRICING.minQty} for the next batch of joiners.`,
   },
   {
     q: 'How long do they take?',
@@ -5381,7 +5410,7 @@ const rfidFaqs = [
   },
   {
     q: 'What does it cost?',
-    a: `Quoted, because the chip choice moves the per-card price more than anything else does. An EM4100 fob and a DESFire EV3 card are not in the same bracket. Quantity, finish, whether it is personalised and whether we encode it do the rest. Tell us the chip or the reader, the quantity and what has to go on the face of the card at <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a> and a figure comes back.`,
+    a: `RFID cards start at <strong>${cardRupees(CARD_PRICING.rfid)} a card</strong> and NFC cards at <strong>${cardRupees(CARD_PRICING.nfc)} a card</strong>, plus GST, from a minimum of ${CARD_PRICING.minQty}. The RFID price is for a card printed with your design, not a blank, and they are Bengaluru's lowest prices for premium cards. The chip moves the price more than anything else, so a DESFire EV3 card costs more than an entry-level one. Tell us the chip or the reader, the quantity and what has to go on the face of the card at <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a> and the exact figure comes back.`,
   },
 ];
 
@@ -5398,14 +5427,28 @@ ${breadcrumbs(
                 <h1 class="text-5xl md:text-7xl font-black font-display tracking-tighter text-slate-900">RFID and NFC cards, encoded to your system.</h1>
                 <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">Cards, fobs, tags and wristbands at 125 kHz, 13.56 MHz and UHF. Chip chosen against the readers you already own, personalised per person, encoded before delivery so they arrive working rather than blank.</p>
 
-                <p class="mt-8 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                    <span class="text-5xl font-black font-display tracking-tight text-slate-900">On quote</span>
-                    <span class="text-sm font-bold text-slate-500">the chip drives the price more than the quantity does</span>
-                </p>
-                <p class="mt-1 text-xs font-bold uppercase tracking-[0.15em] text-brand">Contact us for stock, minimum run, lead time and warranty</p>
+                <div class="mt-8 grid gap-4 sm:grid-cols-2 max-w-2xl">
+                    ${[
+                      { label: 'RFID cards', price: CARD_PRICING.rfid, note: 'Printed with your design, plus GST' },
+                      { label: 'NFC cards', price: CARD_PRICING.nfc, note: 'Plus GST' },
+                    ]
+                      .map(
+                        (c) => `<div class="rounded-2xl border border-slate-200 bg-white p-6">
+                        <p class="text-xs font-bold uppercase tracking-[0.15em] text-slate-500">${c.label}</p>
+                        <p class="mt-2 flex flex-wrap items-baseline gap-x-2">
+                            <span class="text-sm font-bold text-slate-500">from</span>
+                            <span class="text-5xl font-black font-display tracking-tight text-slate-900">${cardRupees(c.price)}</span>
+                            <span class="text-sm font-bold text-slate-500">a card</span>
+                        </p>
+                        <p class="mt-2 text-sm text-slate-600">${c.note}</p>
+                    </div>`
+                      )
+                      .join('\n                    ')}
+                </div>
+                <p class="mt-3 text-xs font-bold uppercase tracking-[0.15em] text-brand">Bengaluru's lowest prices. Minimum just ${CARD_PRICING.minQty}.</p>
 
                 ${ctaRow({
-                  waText: 'Hi Vybe, I would like a quote for RFID cards.',
+                  waText: 'Hi Vybe, I would like to order RFID / NFC cards.',
                   waLabel: 'WhatsApp us',
                   email: ORG.sales,
                   subject: 'RFID and NFC card enquiry',
@@ -5531,7 +5574,7 @@ ${relatedSection('manufacturing', { dark: false })}
       title: 'RFID & NFC Card Manufacturing in Bengaluru | Vybe',
       ogTitle: 'RFID and NFC cards, encoded to your system',
       description:
-        'RFID and NFC cards, fobs, tags and wristbands made in Bengaluru. MIFARE, DESFire, NTAG and UHF, personalised and encoded. Contact us for pricing and lead time.',
+        `Bengaluru's lowest prices: RFID cards from ${cardRupeesText(CARD_PRICING.rfid)}, NFC from ${cardRupeesText(CARD_PRICING.nfc)}, plus GST. Minimum ${CARD_PRICING.minQty}. Premium cards, printed and encoded.`,
       lastmod,
       trail: [
         CRUMB_HOME,
@@ -5546,11 +5589,29 @@ ${relatedSection('manufacturing', { dark: false })}
         name: 'RFID and NFC card manufacturing',
         serviceType: 'RFID and NFC card manufacturing, personalisation and encoding',
         description:
-          'Manufacture of RFID and NFC cards, key fobs, wristbands and asset tags in Bengaluru, at 125 kHz (EM4100, EM4200, T5577), 13.56 MHz (MIFARE Classic 1K and 4K, MIFARE DESFire EV1, EV2 and EV3, NTAG213, NTAG215, NTAG216) and UHF, including dual-frequency cards. Photo identity personalisation, sequential numbering, barcode and QR, magnetic stripe and signature panel, and encoding to Wiegand and custom access control formats with customer-set sector keys. Integrates with Vybe ERP attendance and Vybe CMS cashless cafeteria. Pricing, minimum run and lead time are quoted per enquiry.',
+          `Manufacture of RFID and NFC cards, key fobs, wristbands and asset tags in Bengaluru, at 125 kHz (EM4100, EM4200, T5577), 13.56 MHz (MIFARE Classic 1K and 4K, MIFARE DESFire EV1, EV2 and EV3, NTAG213, NTAG215, NTAG216) and UHF, including dual-frequency cards. Photo identity personalisation, sequential numbering, barcode and QR, magnetic stripe and signature panel, and encoding to Wiegand and custom access control formats with customer-set sector keys. Integrates with Vybe ERP attendance and Vybe CMS cashless cafeteria. ${CARD_PRICE_LINE}.`,
         provider: { '@id': `${SITE}/#organization` },
         areaServed: { '@type': 'City', name: 'Bengaluru' },
         url: u,
         isRelatedTo: { '@id': `${SITE}/manufacturing/#service` },
+        offers: [
+          { name: 'RFID cards', price: CARD_PRICING.rfid },
+          { name: 'NFC cards', price: CARD_PRICING.nfc },
+        ].map((o) => ({
+          '@type': 'Offer',
+          name: o.name,
+          price: String(o.price),
+          priceCurrency: 'INR',
+          description: `Starting price per card, plus GST, minimum ${CARD_PRICING.minQty} cards.`,
+          priceSpecification: {
+            '@type': 'UnitPriceSpecification',
+            price: String(o.price),
+            priceCurrency: 'INR',
+            valueAddedTaxIncluded: false,
+          },
+          eligibleQuantity: { '@type': 'QuantitativeValue', minValue: CARD_PRICING.minQty, unitCode: 'C62' },
+          url: u,
+        })),
       }),
     },
   });
