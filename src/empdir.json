@@ -67,7 +67,7 @@
     "id": "VYB-2026-009",
     "active": true,
     "name": "Lalith Kumar",
-    "designation": "Media",
+    "designation": "Media (Ideation)",
     "department": "Media, Marketing & Creative",
     "code": "be89nkej"
   },
@@ -75,7 +75,7 @@
     "id": "VYB-2026-010",
     "active": true,
     "name": "Flemin J Muttath",
-    "designation": "Media",
+    "designation": "Ideation Head",
     "department": "Media, Marketing & Creative",
     "code": "9r8x9dxm"
   },
@@ -99,7 +99,7 @@
     "id": "VYB-2026-013",
     "active": true,
     "name": "Felix EJ",
-    "designation": "Developer",
+    "designation": "Developer Intern",
     "department": "Engineering / R&D (Research and Development)",
     "code": "2b57d9uq"
   },
@@ -107,7 +107,7 @@
     "id": "VYB-2026-014",
     "active": true,
     "name": "Yogesh V",
-    "designation": "Media (Production)",
+    "designation": "Production Head",
     "department": "Media, Marketing & Creative",
     "code": "wxex8ga4"
   },
@@ -115,7 +115,7 @@
     "id": "VYB-2026-015",
     "active": true,
     "name": "Hemanth SP",
-    "designation": "Media",
+    "designation": "Media (Production)",
     "department": "Media, Marketing & Creative",
     "code": "hnjqhkbq"
   },
@@ -124,7 +124,8 @@
     "active": true,
     "name": "Dimple A",
     "department": "Internet of Things (IoT)",
-    "code": "xqjfp7gm"
+    "code": "xqjfp7gm",
+    "designation": "IoT Development Team"
   },
   {
     "id": "VYB-2026-017",
@@ -139,13 +140,23 @@
     "active": true,
     "name": "Akshay Bharati",
     "department": "Internet of Things (IoT)",
-    "code": "nkv3nwcg"
+    "code": "nkv3nwcg",
+    "designation": "IoT Development Team"
   },
   {
     "id": "VYB-2026-019",
     "active": true,
     "name": "C Kusuma",
     "department": "Internet of Things (IoT)",
-    "code": "6yug6as5"
+    "code": "6yug6as5",
+    "designation": "IoT Development Team"
+  },
+  {
+    "id": "VYB-2026-020",
+    "active": true,
+    "name": "Chandan Rao",
+    "designation": "Media (Editing) Intern",
+    "department": "Media, Marketing & Creative",
+    "code": "ewram25h"
   }
 ]
