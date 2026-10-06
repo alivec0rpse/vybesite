@@ -36,49 +36,29 @@ const ORG = {
   legal: 'legal@vybe.net.in',
   // Escalation of last resort. A person, not a role alias, on purpose.
   grievance: 'manjunath@vybe.net.in',
-  // The registered office, and the address every legal document carries. It is
-  // a temporary premises: once the NOC for the corporate office below comes
-  // through, that one becomes both headquarters and registered address, and
-  // this entry goes away. `streetLines` is the same address broken for display;
-  // `street` is the one-line form schema.org and prose want.
-  street: '#103, First Floor, 10th Main, Gaurav Nagar, J.P Nagar 7th Phase',
-  streetLines: ['#103, First Floor, 10th Main', 'Gaurav Nagar, J.P Nagar 7th Phase'],
+  // The corporate office, and the only address the site publishes. The
+  // registered office at J.P. Nagar was dropped from the site on purpose.
+  // `streetLines` is the same address broken for display; `street` is the
+  // one-line form schema.org and prose want.
+  officeLabel: 'Corporate Office',
+  street:
+    '4th Floor, IIIC, Christ Academy Institute of Advanced Studies, Christ Nagar, Hullahalli, Begur - Koppa Road, Sakkalwara Post',
+  streetLines: [
+    '4th Floor, IIIC, Christ Academy',
+    'Institute of Advanced Studies',
+    'Christ Nagar, Hullahalli',
+    'Begur &ndash; Koppa Road, Sakkalwara Post',
+  ],
   locality: 'Bengaluru',
   region: 'Karnataka',
-  postal: '560078',
+  postal: '560083',
   country: 'IN',
-  /*
-   * The corporate office, which is where the work actually happens. It is a
-   * second address today rather than a replacement, because the registered
-   * office is still the registered one until the NOC is issued.
-   *
-   * When that lands: delete the five `street`/`streetLines`/`postal` fields
-   * above along with anything that reads them as "registered", change this
-   * label to 'Headquarters & Registered Office', and promote these fields into
-   * the ORG top level so #organization's `address` picks them up too. #office
-   * already carries this address. Nothing else on the site hardcodes either.
-   */
-  corporate: {
-    label: 'Corporate Office',
-    street:
-      '4th Floor, IIIC, Christ Academy Institute of Advanced Studies, Christ Nagar, Hullahalli, Begur - Koppa Road, Sakkalwara Post',
-    streetLines: [
-      '4th Floor, IIIC, Christ Academy',
-      'Institute of Advanced Studies',
-      'Christ Nagar, Hullahalli',
-      'Begur &ndash; Koppa Road, Sakkalwara Post',
-    ],
-    locality: 'Bengaluru',
-    region: 'Karnataka',
-    postal: '560083',
-    country: 'IN',
-    // The Google Business Profile listing is pinned here, not at the registered
-    // office. The place ID is what Maps links and `sameAs` key on; the
-    // coordinates are the listing's own pin, so the schema and Maps agree.
-    placeId: 'ChIJ3-UxeUQhf2sRivSq9ceBqaM',
-    lat: 12.834939,
-    lng: 77.6168055,
-  },
+  // The Google Business Profile listing is pinned here. The place ID is what
+  // Maps links and `sameAs` key on; the coordinates are the listing's own pin,
+  // so the schema and Maps agree.
+  placeId: 'ChIJ3-UxeUQhf2sRivSq9ceBqaM',
+  lat: 12.834939,
+  lng: 77.6168055,
   // schema.org accepts 24-hour times only.
   opens: '09:00',
   closes: '18:30',
@@ -625,7 +605,7 @@ function mobileItem(href, label, id, active) {
 }
 
 /**
- * The primary nav, grouped into three lines of business. A group opens on
+ * The primary nav, grouped by line of business. A group opens on
  * hover and on keyboard focus (`group-focus-within`), so the panel is reachable
  * without a pointer and without a line of JavaScript; on small screens the same
  * data renders as nested <details>, which is what makes it tap-to-open.
@@ -659,6 +639,17 @@ const NAV_GROUPS = [
       { nav: 'print-cards', href: '/printing/cards/', label: 'Business &amp; RFID cards', blurb: 'Visiting cards, ID cards, RFID and NFC cards.', icon: 'badge' },
       { nav: 'print-large-format', href: '/printing/banners-standees/', label: 'Banners &amp; standees', blurb: 'Flex banners, roll-ups, backdrops, signage.', icon: 'flag' },
       { href: '/printing/#quote', label: 'Send artwork for a quote', blurb: 'Email or WhatsApp us the file and quantity.', icon: 'forum' },
+    ],
+  },
+  {
+    id: 'media',
+    label: 'Media',
+    blurb: 'Events run end to end, photography and video, and editing on contract.',
+    items: [
+      { nav: 'media', href: '/media/', label: 'All media &amp; events', blurb: 'Events, shoots and editing, and how to brief us.', icon: 'videocam' },
+      { nav: 'media-events', href: '/media/event-management/', label: 'Event management', blurb: 'Corporate events, college fests, launches, conferences.', icon: 'celebration' },
+      { nav: 'media-photo', href: '/media/photography-videography/', label: 'Photography &amp; video', blurb: 'Events, headshots, products, brand films and reels.', icon: 'photo_camera' },
+      { nav: 'media-editing', href: '/media/video-editing/', label: 'Video editing', blurb: 'Per project or on a monthly contract.', icon: 'movie_edit' },
     ],
   },
   {
@@ -770,7 +761,7 @@ function navbar(active) {
                 </span>
             </a>
 
-            <nav class="primary-nav hidden lg:flex items-center gap-6 xl:gap-8 text-sm font-medium text-slate-600" aria-label="Primary">
+            <nav class="primary-nav hidden xl:flex items-center gap-8 text-sm font-medium text-slate-600" aria-label="Primary">
                 ${item('/', 'Home', 'home')}
                 ${NAV_GROUPS.map(group).join('\n                ')}
                 ${item('/contact/', 'Contact', 'contact')}
@@ -781,7 +772,7 @@ function navbar(active) {
                     Talk to Sales
                 </a>
 
-                <details class="group lg:hidden relative" id="mobile-nav">
+                <details class="group xl:hidden relative" id="mobile-nav">
                     <summary class="list-none [&::-webkit-details-marker]:hidden cursor-pointer flex items-center justify-center w-12 h-12 rounded-full text-slate-700 hover:bg-slate-100 transition-colors" aria-label="Menu">
                         <span class="material-symbols-outlined text-[24px] group-open:hidden" aria-hidden="true">menu</span>
                         <span class="material-symbols-outlined text-[24px] hidden group-open:inline-block" aria-hidden="true">close</span>
@@ -860,6 +851,7 @@ function footer() {
                     ${link('/it-solutions/', 'Custom App Development')}
                     ${published('cloud') ? link('/cloud/', 'Cloud &amp; Infrastructure') : ''}
                     ${link('/printing/', 'Printing Services')}
+                    ${link('/media/', 'Events, Photography &amp; Editing')}
                     ${link('/registrations/', 'Business Registrations')}
                     ${link('/audits/', 'Compliance Audits')}
                     ${link('/manufacturing/', 'Manufacturing &amp; Supply')}
@@ -879,16 +871,11 @@ function footer() {
             </div>
 
             <div>
-                <h2 class="text-white font-bold mb-4 uppercase tracking-widest text-xs">Our Offices</h2>
-                <p class="text-[0.7rem] font-bold text-brand uppercase tracking-[0.2em] mb-2">Registered Office</p>
+                <h2 class="text-white font-bold mb-4 uppercase tracking-widest text-xs">Our Office</h2>
+                <p class="text-[0.7rem] font-bold text-brand uppercase tracking-[0.2em] mb-2">${ORG.officeLabel}</p>
                 <address class="text-sm not-italic leading-relaxed">
                     ${ORG.streetLines.join('<br>\n                    ')}<br>
                     ${ORG.locality}, ${ORG.region} - ${ORG.postal}
-                </address>
-                <p class="text-[0.7rem] font-bold text-brand uppercase tracking-[0.2em] mt-5 mb-2">${ORG.corporate.label}</p>
-                <address class="text-sm not-italic leading-relaxed">
-                    ${ORG.corporate.streetLines.join('<br>\n                    ')}<br>
-                    ${ORG.corporate.locality}, ${ORG.corporate.region} - ${ORG.corporate.postal}
                 </address>
                 <address class="text-sm not-italic leading-relaxed mt-5">
                     <a href="${telHref(ORG.phone)}" class="hover:text-brand transition-colors block">${telText(ORG.phone)}</a>
@@ -937,9 +924,8 @@ const organization = {
   // The full lockup, not the bare glyph: it spells the company name.
   logo: { '@type': 'ImageObject', '@id': `${SITE}/#logo`, url: `${SITE}/assets/vybe-lockup.png`, width: 892, height: 118, caption: ORG.name },
   image: { '@type': 'ImageObject', '@id': `${SITE}/#image`, url: `${SITE}/assets/og-image.png`, width: 1200, height: 630, caption: `${ORG.name} | ${ORG.slogan}` },
-  // `address` is the registered one, singular on purpose: it is what the
-  // company is registered at and what an invoice carries. The premises people
-  // actually visit is #office, and `location` is where schema.org puts that.
+  // The corporate office, the one address the site publishes. #office carries
+  // the same address plus hours and the map pin.
   address: {
     '@type': 'PostalAddress',
     streetAddress: ORG.street,
@@ -990,8 +976,7 @@ const organization = {
 /**
  * The physical office, kept separate from #organization. Google reads hours,
  * phone and address off this type, not off a bare Organization, and matches it
- * against the Business Profile. So it carries the corporate office, where that
- * listing is pinned, and not the registered address on #organization.
+ * against the Business Profile pinned at the corporate office.
  */
 const localBusiness = {
   '@type': 'ProfessionalService',
@@ -1006,14 +991,14 @@ const localBusiness = {
   logo: { '@id': `${SITE}/#logo` },
   address: {
     '@type': 'PostalAddress',
-    streetAddress: ORG.corporate.street,
-    addressLocality: ORG.corporate.locality,
-    addressRegion: ORG.corporate.region,
-    postalCode: ORG.corporate.postal,
-    addressCountry: ORG.corporate.country,
+    streetAddress: ORG.street,
+    addressLocality: ORG.locality,
+    addressRegion: ORG.region,
+    postalCode: ORG.postal,
+    addressCountry: ORG.country,
   },
-  geo: { '@type': 'GeoCoordinates', latitude: ORG.corporate.lat, longitude: ORG.corporate.lng },
-  hasMap: `https://www.google.com/maps/place/?q=place_id:${ORG.corporate.placeId}`,
+  geo: { '@type': 'GeoCoordinates', latitude: ORG.lat, longitude: ORG.lng },
+  hasMap: `https://www.google.com/maps/place/?q=place_id:${ORG.placeId}`,
   areaServed: { '@type': 'Country', name: 'India' },
   sameAs: ORG.profiles,
   // Schema.org's band for mid-range. A band, not a quoted price.
@@ -1076,13 +1061,14 @@ const PRODUCTS = [
   { nav: 'it', href: '/it-solutions/', name: 'IT & Cyber', blurb: 'Custom software, security and managed IT.', icon: 'code_blocks' },
   { nav: 'cloud', href: '/cloud/', name: 'Vybe Cloud', blurb: 'Scalable servers, hosting and DDoS protection.', icon: 'cloud' },
   { nav: 'printing', href: '/printing/', name: 'Printing', blurb: 'Everything from business cards to banners, standees and RFID cards.', icon: 'print' },
+  { nav: 'media', href: '/media/', name: 'Media & Events', blurb: 'Event management, photography, videography, and video editing per project or on monthly contract.', icon: 'videocam' },
   { nav: 'registrations', href: '/registrations/', name: 'Business Registrations', blurb: 'GST, Udyam (MSME), FSSAI and Startup India recognition, from ₹199, plus ISO, NSDC consulting and digital signatures.', icon: 'receipt_long' },
   { nav: 'audits', href: '/audits/', name: 'Compliance Audits', blurb: 'Hygiene, fire, child safety, SDG, POSH and data protection audits for kitchens, campuses and offices. Report, certificate and badge.', icon: 'fact_check' },
   { nav: 'manufacturing', href: '/manufacturing/', name: 'Manufacturing & Supply', blurb: `RFID cards from ${cardRupeesText(CARD_PRICING.rfid)} and NFC from ${cardRupeesText(CARD_PRICING.nfc)}, made and encoded to your system, IoT asset and energy monitoring, plus Dell, HP, Lenovo, Asus and Apple hardware.`, icon: 'precision_manufacturing' },
 ];
 
 /**
- * The three lines of business that are not software. The home page hero comes
+ * The lines of business that are not software. The home page hero comes
  * from src/app.html and only knows about the products, so without this they
  * would exist on the site but nowhere on its front door.
  */
@@ -1124,6 +1110,19 @@ function beyondSoftwareSection() {
                         'Business, ID, RFID and NFC cards',
                         'Letterheads, bill books, brochures and flyers',
                         'Flex banners, roll-up standees and signage',
+                      ]
+                    )}
+                    ${card(
+                      '/media/',
+                      'videocam',
+                      'Media &amp; events',
+                      'Corporate events, college fests and launches, planned and run on the day, with photography, video and editing from the same team. Editing also on monthly contract.',
+                      [
+                        'Event management, from venue to teardown',
+                        'Event, headshot and product photography',
+                        'Brand films, reels and same-day highlights',
+                        'Video editing per project or on monthly contract',
+                        'Quoted per brief, in a written contract',
                       ]
                     )}
                     ${card(
@@ -1826,9 +1825,7 @@ const PAGES = [
       },
       {
         q: 'Where is Vybe Technologies located?',
-        a: `We are based in Bengaluru, Karnataka. Our registered office is at ${esc(ORG.street)}, ${ORG.postal}, and our corporate office is at ${esc(
-          ORG.corporate.street
-        )}, ${ORG.corporate.postal}. You can reach sales on ${telLink(ORG.phone)} or <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a>.`,
+        a: `We are based in Bengaluru, Karnataka. Our office is at ${esc(ORG.street)}, ${ORG.postal}. You can reach sales on ${telLink(ORG.phone)} or <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a>.`,
       },
       {
         q: 'Can Vybe build software that is specific to our campus?',
@@ -1860,6 +1857,7 @@ const PAGES = [
         { nav: 'it', name: 'Vybe IT Solutions', url: `${SITE}/it-solutions/`, description: 'Custom app development, penetration testing and managed security operations.' },
         { nav: 'cloud', name: 'Vybe Cloud', url: `${SITE}/cloud/`, description: 'Scalable cloud architecture, game servers and DDoS protection.' },
         { nav: 'printing', name: 'Printing Services', url: `${SITE}/printing/`, description: 'Commercial printing: business and RFID cards, letterheads, bill books, brochures, flex banners, roll-up standees and signage, printed to your artwork.' },
+        { nav: 'media', name: 'Media & Events', url: `${SITE}/media/`, description: 'Event management for corporate events, college fests, launches and conferences; event, corporate and product photography and videography; and video editing per project or on monthly contract.' },
         { nav: 'registrations', name: 'Business Registrations', url: `${SITE}/registrations/`, description: 'GST, Udyam (MSME) and FSSAI registrations and DPIIT / Startup India recognition, prepared and filed at a flat professional fee with government charges separate, plus non-accredited ISO certification issued by Vybe, consulting on NSDC / Skill India and affiliation applications, and Class 3 digital signature certificates as a registered partner of eMudhra and Capricorn.' },
         { nav: 'audits', name: 'Compliance Audits', url: `${SITE}/audits/`, description: 'Advisory, non-statutory hygiene, safety and compliance audits: kitchen hygiene to the FSSAI Schedule 4 standard, kitchen layout and pest control records, fire and electrical safety to the National Building Code, canteen and mess hygiene, child safety to the POCSO standard, school transport safety, campus security, a NAAC/NIRF-ready SDG and sustainability audit, POSH Act Internal Committee compliance, software licensing and IT assets, DPDP Act data protection readiness and labour law records. Reports, certificates and badges are issued by Vybe Technologies alone and are not a licence, rating, accreditation or No Objection Certificate.' },
         { nav: 'manufacturing', name: 'Manufacturing & Supply', url: `${SITE}/manufacturing/`, description: 'Manufacture of RFID and NFC cards, fobs, tags and wristbands at 125 kHz, 13.56 MHz and UHF (MIFARE Classic, MIFARE DESFire, NTAG and EM4100), personalised and encoded to your access control, attendance and cafeteria systems, and distribution of IT hardware from Dell, HP, Lenovo, Asus, Apple, Logitech and Alienware, including desktops, all-in-one PCs, mini PCs, laptops, monitors, keyboards, mice, headsets, conferencing equipment and power adapters. Industrial IoT installations covering UHF asset and inventory tracking, temperature and humidity monitoring of cold rooms and server rooms, energy metering per panel or department, and edge gateways integrated with dashboards and Vybe ERP. Supplied against purchase orders and tenders with manufacturer warranty and GST invoicing. Pricing, stock availability and warranty terms are quoted per enquiry rather than listed.' },
@@ -2360,11 +2358,7 @@ const mapsUrl = (o) =>
     `${ORG.name}, ${o.street}, ${o.locality}, ${o.region} ${o.postal}`
   )}${o.placeId ? `&query_place_id=${o.placeId}` : ''}`;
 
-/**
- * One address on the dark office band. `o` is ORG itself for the registered
- * office and ORG.corporate for the other, which is the whole reason both carry
- * the same field names: dropping one office is then deleting one call.
- */
+/** One address on the dark office band. `o` carries ORG's address fields. */
 function officeBlock(label, o) {
   return `<div class="mt-8">
                         <p class="text-[0.7rem] font-bold uppercase tracking-[0.2em] text-slate-400">${label}</p>
@@ -2419,13 +2413,11 @@ const contactFaqs = [
   },
   {
     q: 'Where are you located, and can we visit?',
-    a: `We have two addresses in Bengaluru. Our registered office is at ${esc(ORG.street)}, ${esc(ORG.locality)}, ${esc(ORG.region)} ${
+    a: `Our office is at ${esc(ORG.street)}, ${esc(ORG.locality)}, ${esc(ORG.region)} ${
       ORG.postal
-    }, and our corporate office is at ${esc(ORG.corporate.street)}, ${esc(ORG.corporate.locality)}, ${esc(ORG.corporate.region)} ${
-      ORG.corporate.postal
-    }. You are welcome at either to come and see the products running. Call ahead on ${telLink(
+    }. You are welcome to come and see the products running. Call ahead on ${telLink(
       ORG.phone
-    )} so somebody who can answer your questions is there, and we will tell you which one to come to.`,
+    )} so somebody who can answer your questions is there.`,
   },
   {
     q: 'Do you work with institutions outside Bengaluru?',
@@ -2485,10 +2477,9 @@ ${breadcrumbs([CRUMB_HOME, { name: 'Contact Us', url: '/contact/' }], false)}
         <section class="bg-corporate dark-section text-slate-300 py-20 md:py-28 px-6 relative z-10" aria-labelledby="office-heading">
             <div class="max-w-6xl mx-auto grid gap-12 md:grid-cols-2">
                 <div>
-                    <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-2">Our offices</p>
+                    <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-2">Our office</p>
                     <h2 id="office-heading" class="text-3xl md:text-4xl font-black font-display tracking-tight text-white">Come and see it running.</h2>
-                    ${officeBlock('Registered office', ORG)}
-                    ${officeBlock(ORG.corporate.label, ORG.corporate)}
+                    ${officeBlock(ORG.officeLabel, ORG)}
                     <p class="mt-8 text-sm text-slate-400 leading-relaxed">Second office line: <a class="font-bold text-white hover:text-brand transition-colors" href="${telHref(
                       ORG.phoneOffice
                     )}">${telText(ORG.phoneOffice)}</a>. It reaches us either way, and is the number to try if the sales and support lines are both busy.</p>
@@ -2637,9 +2628,10 @@ function siblingSection({ eyebrow, heading, items }) {
         </section>`;
 }
 
-function printCategory(c) {
+/** A category card. `hrefOf` maps a category to its page; print by default, media reuses it. */
+function printCategory(c, hrefOf = printHref) {
   const { id, icon, title, blurb, items } = c;
-  const href = c.slug ? printHref(c) : null;
+  const href = c.slug ? hrefOf(c) : null;
   // Where a category has a page, the whole card is the link to it; the
   // "anything else" card has nowhere to go, so it stays a plain card.
   const head = href
@@ -2939,7 +2931,7 @@ ${breadcrumbs([CRUMB_HOME, { name: 'Printing', url: '/printing/' }], false)}
                 <p class="mt-4 text-sm text-slate-500">Mon&ndash;Sat, 9:00&nbsp;AM &ndash; 6:30&nbsp;PM IST. Files sent after hours are picked up the next working morning.</p>
 
                 <ul class="mt-16 grid gap-5 sm:grid-cols-2">
-                    ${PRINT_CATEGORIES.map(printCategory).join('\n                    ')}
+                    ${PRINT_CATEGORIES.map((c) => printCategory(c)).join('\n                    ')}
                 </ul>
             </div>
         </section>
@@ -3091,6 +3083,417 @@ ${relatedSection('printing', { dark: false })}
         areaServed: { '@type': 'Country', name: 'India' },
         url: u,
         isRelatedTo: { '@id': `${SITE}/printing/#service` },
+        hasOfferCatalog: {
+          '@type': 'OfferCatalog',
+          name: c.title,
+          itemListElement: c.items.map((i) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: i } })),
+        },
+      }),
+    },
+  });
+}
+
+/* ------------------------------------------------------------- media & events */
+
+/**
+ * Vybe Media: events run end to end, photography and video shot on the day,
+ * and editing taken on per project or on a monthly contract. Built the same
+ * way as printing: a hub, one page per category from MEDIA_CATEGORIES, and an
+ * enquiry that is a WhatsApp or an email rather than a form, because a brief
+ * says more than a form would.
+ *
+ * No prices. An event moves with headcount, venue and production; a shoot
+ * with hours, crew and deliverables; editing with volume and turnaround. A
+ * "from" figure would be wrong for most briefs, so every page quotes instead.
+ */
+const MEDIA_ENQUIRY = 'Hi Vybe, I would like to talk about an event / shoot / editing. Here is the brief:';
+
+const MEDIA_CATEGORIES = [
+  {
+    id: 'events',
+    slug: 'event-management',
+    nav: 'media-events',
+    icon: 'celebration',
+    title: 'Event management',
+    blurb: 'Corporate events, college fests, launches and conferences, planned and run on the day.',
+    items: [
+      'Corporate events, offsites, annual days and award nights',
+      'College fests, conclaves, orientations and convocations',
+      'Product launches, press meets and brand activations',
+      'Conferences, seminars and workshops',
+      'Stage, sound, lighting, LED walls and live streaming',
+      'Venue, vendors, branding and on-ground crew',
+    ],
+    h1: 'Events, planned and run on the day.',
+    lede:
+      'Corporate events, college fests, launches and conferences. We plan it with you, line up the venue, vendors, stage, sound and branding, and put a crew on the ground that runs it from setup to the last guest out.',
+    metaTitle: 'Event Management in Bengaluru | Corporate & College Events',
+    metaDescription:
+      'Corporate events, college fests, product launches and conferences in Bengaluru: planning, venue, vendors, stage, sound, branding and on-ground crew.',
+    sections: [
+      {
+        h: 'One team from the brief to the teardown',
+        p: 'Most events go wrong in the gaps between vendors: the stage company assumed the sound company was bringing the mixer, and nobody owned the run sheet. We take the whole thing, so there is one person you call and one plan everybody works to. Venue, decor, stage, sound and lighting, catering coordination, registrations, hosts and the crew on the day all sit under it.',
+      },
+      {
+        h: 'Corporate events',
+        p: 'Annual days, town halls, offsites, award nights, client meets and dealer conferences. These are judged on whether they ran to time and whether the leadership looked good, so the work is mostly unglamorous: a minute-by-minute run sheet, rehearsals with the people who will be on stage, a backup for every microphone, and somebody whose only job is the clock.',
+      },
+      {
+        h: 'College fests and campus events',
+        p: 'Fests, conclaves, orientations, convocations and alumni meets. Campus events have their own constraints, from student volunteers who need direction to approvals that need paperwork, and we work with the organising committee rather than around it. Branding, standees and passes come from our own <a class="text-brand font-bold" href="/printing/">printing</a>, and registration and entry can run on QR passes.',
+      },
+      {
+        h: 'Coverage built in',
+        p: 'Because photography, video and editing are ours too, an event does not need a second vendor to be remembered properly. Same-day highlight reels, photographs delivered in days rather than weeks, and a full edit afterwards can be part of the same plan and the same quote.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'How far ahead should we get in touch?',
+        a: 'As early as you can, because good venues and dates go first. A few weeks is workable for a smaller corporate event; a large fest or a conference is better planned over a couple of months. If it is short notice, ask anyway and we will tell you honestly what can still be done well.',
+      },
+      {
+        q: 'What does an event cost?',
+        a: 'It depends on headcount, venue, the production on stage and how much of the event we run. Tell us the date, the rough numbers, the city and what the day has to achieve, and we will come back with a plan and an itemised quote, so you can see where the money goes and cut what you do not need.',
+      },
+      {
+        q: 'Can you work with a venue or vendors we already have?',
+        a: 'Yes. If you have a venue booked or a caterer you trust, we plan around them and coordinate them on the day. We would rather fit into what already works than replace it for the sake of it.',
+      },
+    ],
+  },
+  {
+    id: 'photo-video',
+    slug: 'photography-videography',
+    nav: 'media-photo',
+    icon: 'photo_camera',
+    title: 'Photography & videography',
+    blurb: 'Events, people, products and places, shot properly and delivered on time.',
+    items: [
+      'Event photography and videography',
+      'Corporate headshots and team photographs',
+      'Product and catalogue photography',
+      'Brand films, interviews and testimonials',
+      'Reels and short-form video for social media',
+      'Same-day highlights and live streaming',
+    ],
+    h1: 'Photography and video, shot properly.',
+    lede:
+      'Events, headshots, products, brand films and reels. A crew sized to the job, a shot list agreed before the day, and photographs and footage delivered when we said they would be.',
+    metaTitle: 'Photography & Videography in Bengaluru | Events & Brands',
+    metaDescription:
+      'Event photography and videography, corporate headshots, product shoots, brand films and reels in Bengaluru. Shot to a brief, delivered on time.',
+    sections: [
+      {
+        h: 'A shot list before the shoot',
+        p: 'The difference between a good shoot and a lucky one is the conversation beforehand. Who has to be in the photographs, which moments cannot be missed, where the light will be at four in the afternoon, and what the pictures are for. We agree that in writing before anybody picks up a camera, so nothing important is left to chance on the day.',
+      },
+      {
+        h: 'Events',
+        p: 'Stage moments, candid coverage, the people who matter and the branding that paid for it. For a larger event we put more than one photographer and a video crew on it, and we can turn around a highlight reel for the same evening so it goes out while people are still talking about the event.',
+      },
+      {
+        h: 'People, products and brands',
+        p: 'Headshots for a team page or a LinkedIn refresh, shot at your office in an afternoon. Product photographs on white for a catalogue or a marketplace listing. Brand films, founder interviews and customer testimonials. Reels and short-form video made for the way people actually watch them: vertical, captioned and quick to the point.',
+      },
+      {
+        h: 'What you get, and when',
+        p: 'Edited, colour-corrected photographs in full resolution, and video in the formats each platform wants, delivered by a link you can share. The delivery date is agreed with the quote. The full set of files is yours to use, and we keep a backup for an agreed period in case a drive goes missing.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'How soon do we get the photographs?',
+        a: 'A first set from an event can be ready within a day or two, and same-day highlights are possible if you plan for them. The full edited set and longer videos take longer, depending on the volume. The date is agreed up front and written into the quote.',
+      },
+      {
+        q: 'Do you shoot outside Bengaluru?',
+        a: 'Yes. Travel and stay are quoted separately and at cost, so you can see what the shoot itself costs.',
+      },
+      {
+        q: 'Who owns the photographs and footage?',
+        a: 'You get full rights to use the delivered work for your business. If we would like to show a piece in our own portfolio, we ask first, and confidential work is never shown.',
+      },
+    ],
+  },
+  {
+    id: 'editing',
+    slug: 'video-editing',
+    nav: 'media-editing',
+    icon: 'movie_edit',
+    title: 'Video editing',
+    blurb: 'Per project, or on a monthly contract with an agreed volume and turnaround.',
+    items: [
+      'Reels, shorts and social media cuts',
+      'YouTube videos and podcasts',
+      'Event films, highlights and aftermovies',
+      'Corporate films, explainers and ads',
+      'Colour grading, sound clean-up and subtitles',
+      'Motion graphics, titles and thumbnails',
+    ],
+    h1: 'Editing, on contract or per project.',
+    lede:
+      'Send the footage, get back a finished cut. One video at a time, or a monthly editing contract with a fixed volume and turnaround, for creators, brands and teams that publish every week.',
+    metaTitle: 'Video Editing Services & Contracts in Bengaluru | Vybe',
+    metaDescription:
+      'Video editing per project or on a monthly contract: reels, shorts, YouTube, podcasts, event films and corporate videos, with colour, sound and subtitles.',
+    sections: [
+      {
+        h: 'Two ways to work with us',
+        p: 'Per project, for the one-off: an event film, a launch video, a single ad. Or on a monthly contract, for anyone who publishes regularly: an agreed number of videos a month, an agreed turnaround on each, and the same editor who learns your style rather than a new one every time. The contract sets out the volume, the turnaround, the number of revision rounds and the price, so both sides know what a month looks like before it starts.',
+      },
+      {
+        h: 'What goes into a cut',
+        p: 'The edit itself, the pacing and the story, and then the finishing that makes it look paid for: colour grading, sound clean-up and levels, music, subtitles, titles, lower thirds and motion graphics, and thumbnails for the platforms that need them. Each video is exported in the sizes and formats the place it is going to wants, from a vertical reel to a 4K master.',
+      },
+      {
+        h: 'Getting footage to us',
+        p: 'Upload it to a shared drive and send us the link, along with any references, the brand assets, and the one thing the video has to get across. For a contract we set up a shared folder once, and every month runs through it, so nothing gets lost in a chat thread.',
+      },
+      {
+        h: 'Revisions, plainly',
+        p: 'Every project includes rounds of revisions, and the number is stated in the quote or the contract. Feedback with timestamps gets turned around fastest. If a change goes beyond the brief, such as a different story or new footage, we tell you before doing the work rather than after.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'How does a monthly editing contract work?',
+        a: 'We agree how many videos a month, of what kind and length, the turnaround on each, and the revision rounds, and that becomes a fixed monthly price. The same editor works on your account, so your style and brand carry from one video to the next. It runs month to month on the notice period in the contract.',
+      },
+      {
+        q: 'How long does an edit take?',
+        a: 'A reel can come back within a day or two; a longer YouTube video or a corporate film takes longer, depending on the length and the finishing. On a contract the turnaround is fixed in writing, so you can plan a publishing calendar around it.',
+      },
+      {
+        q: 'Can you shoot it as well?',
+        a: 'Yes. Our <a class="text-brand font-bold" href="/media/photography-videography/">photography and videography</a> crew can shoot it, so one team handles it from the camera to the finished cut.',
+      },
+    ],
+  },
+  {
+    id: 'anything-else',
+    icon: 'palette',
+    title: 'Anything else creative',
+    blurb: 'If it is media and it is not listed, ask. It probably is something we do.',
+    items: [
+      'Social media content and calendars',
+      'Graphic design, posters and creatives',
+      'Podcast production',
+      'Event branding, printed by our print team',
+    ],
+  },
+];
+
+const MEDIA_PAGES = MEDIA_CATEGORIES.filter((c) => c.slug);
+const mediaHref = (c) => `/media/${c.slug}/`;
+
+const MEDIA_STEPS = [
+  {
+    h: 'Send us the brief',
+    p: `WhatsApp <a class="text-brand font-bold" href="${waLink(MEDIA_ENQUIRY)}" target="_blank" rel="noopener">${telText(
+      ORG.phone
+    )}</a> or email <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a>. The date, the place, roughly how many people, and what it has to achieve. References help more than adjectives.`,
+  },
+  {
+    h: 'We plan it and quote',
+    p: 'A plan and an itemised quote: crew, equipment, deliverables and dates. If something in the brief will not work on the budget or the timeline, you hear about it now, along with what would.',
+  },
+  {
+    h: 'We run it',
+    p: 'On the day, a crew that knows the plan and one person who answers for it. For editing, the first cut arrives on the agreed date.',
+  },
+  {
+    h: 'You get the files',
+    p: 'Photographs, video and edits delivered by a shareable link, on the date in the quote, with the revision rounds that were agreed.',
+  },
+];
+
+const mediaFaqs = [
+  {
+    q: 'What does Vybe Media do?',
+    a: 'Event management for corporate events, college fests, launches and conferences; photography and videography for events, people, products and brands; and video editing per project or on a monthly contract. Social media content, graphic design and podcast production on request.',
+  },
+  {
+    q: 'What does it cost?',
+    a: `It is quoted per brief, because an event moves with headcount, venue and production, a shoot with the hours and the crew, and editing with the volume and the turnaround. Send the brief to <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a> or call ${telLink(
+      ORG.phone
+    )} and you get an itemised quote.`,
+  },
+  {
+    q: 'Do you sign a contract?',
+    a: 'Yes, always. Every event, shoot and editing engagement is put in writing: what is delivered, by when, the revision rounds, the price and the payment terms. Monthly editing runs on a contract with an agreed volume and turnaround.',
+  },
+  {
+    q: 'Can one team do the event, the coverage and the edit?',
+    a: 'Yes, and it is usually simpler and cheaper that way. One plan, one quote and one point of contact, from the stage to the aftermovie, with banners, standees and passes from our own printing.',
+  },
+];
+
+const mediaBody = `<div class="w-full bg-surface-main">
+${breadcrumbs([CRUMB_HOME, { name: 'Media & Events', url: '/media/' }], false)}
+
+        <section class="px-6 pt-12 pb-20 md:pb-28 relative overflow-hidden">
+            <div class="absolute inset-0 bg-grid-faint" aria-hidden="true"></div>
+            <div class="max-w-6xl mx-auto relative z-10">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-3">Media &amp; Events</p>
+                <h1 class="text-5xl md:text-7xl font-black font-display tracking-tighter text-slate-900">Events, shot and edited by one team.</h1>
+                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">Corporate events, college fests and launches, planned and run on the day. Photography and video that do them justice. And editing, per project or on a monthly contract, for anyone who publishes every week.</p>
+
+                ${ctaRow({
+                  waText: MEDIA_ENQUIRY,
+                  waLabel: 'WhatsApp us the brief',
+                  email: ORG.sales,
+                  subject: 'Media and events enquiry',
+                  emailLabel: `Email ${ORG.sales}`,
+                })}
+
+                <ul class="mt-16 grid gap-5 sm:grid-cols-2">
+                    ${MEDIA_CATEGORIES.map((c) => printCategory(c, mediaHref)).join('\n                    ')}
+                </ul>
+            </div>
+        </section>
+
+        <section class="bg-corporate dark-section text-slate-300 py-20 md:py-28 px-6 relative z-10" aria-labelledby="media-process-heading">
+            <div class="max-w-4xl mx-auto">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-2">How it runs</p>
+                <h2 id="media-process-heading" class="text-3xl md:text-4xl font-black font-display tracking-tight text-white">From the brief to the files.</h2>
+                <ol class="mt-12 space-y-10">
+                    ${MEDIA_STEPS.map(
+                      (s, i) => `<li class="border-t border-white/10 pt-8 flex gap-6">
+                        <span class="text-3xl font-black font-display text-brand shrink-0 leading-none" aria-hidden="true">${i + 1}</span>
+                        <div>
+                            <h3 class="text-xl md:text-2xl font-bold font-display tracking-tight text-white">${esc(s.h)}</h3>
+                            <p class="mt-3 leading-relaxed text-slate-300">${s.p}</p>
+                        </div>
+                    </li>`
+                    ).join('\n                    ')}
+                </ol>
+            </div>
+        </section>
+
+${faqSection(mediaFaqs, { dark: false })}
+${relatedSection('media', { dark: false })}
+</div>`;
+
+{
+  const url = '/media/';
+  const lastmod = lastmodFor(url, mediaBody);
+  DOCS.push({
+    file: 'media/index.html',
+    priority: '0.8',
+    changefreq: 'monthly',
+    page: {
+      url,
+      nav: 'media',
+      title: 'Events, Photography & Video Editing in Bengaluru | Vybe',
+      ogTitle: 'Vybe Media: events, photography, video and editing',
+      description:
+        'Event management, photography, videography and video editing contracts in Bengaluru. Corporate events, college fests, launches, reels and brand films.',
+      lastmod,
+      trail: [CRUMB_HOME, { name: 'Media & Events', url }],
+      faqs: mediaFaqs,
+      body: mediaBody,
+      schema: (u) => ({
+        '@type': 'Service',
+        '@id': `${u}#service`,
+        name: 'Media and event services',
+        serviceType: 'Event management, photography, videography and video editing',
+        description:
+          'Event management for corporate events, college fests, product launches and conferences; event, corporate and product photography and videography; and video editing per project or on monthly contract, including reels, YouTube, podcasts and corporate films.',
+        provider: { '@id': `${SITE}/#organization` },
+        areaServed: { '@type': 'Country', name: 'India' },
+        url: u,
+        hasOfferCatalog: {
+          '@type': 'OfferCatalog',
+          name: 'Media & Events',
+          itemListElement: MEDIA_PAGES.map((c) => ({
+            '@type': 'OfferCatalog',
+            name: c.title,
+            itemListElement: c.items.map((i) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: i } })),
+          })),
+        },
+      }),
+    },
+  });
+}
+
+/* ------------------------------------------------- media, category pages */
+
+for (const c of MEDIA_PAGES) {
+  const url = mediaHref(c);
+  const enquiry = `Hi Vybe, I would like to talk about ${c.title.replace(/&/g, 'and').toLowerCase()}. Here is the brief:`;
+
+  const body = `<div class="w-full bg-surface-main">
+${breadcrumbs([CRUMB_HOME, { name: 'Media & Events', url: '/media/' }, { name: c.title, url }], false)}
+
+        <section class="px-6 pt-12 pb-20 md:pb-28 relative overflow-hidden">
+            <div class="absolute inset-0 bg-grid-faint" aria-hidden="true"></div>
+            <div class="max-w-6xl mx-auto relative z-10">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-3">Media &amp; Events &middot; ${esc(c.title)}</p>
+                <h1 class="text-5xl md:text-7xl font-black font-display tracking-tighter text-slate-900">${esc(c.h1)}</h1>
+                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">${esc(c.lede)}</p>
+
+                ${ctaRow({
+                  waText: enquiry,
+                  waLabel: 'WhatsApp us the brief',
+                  email: ORG.sales,
+                  subject: `${c.title} enquiry`,
+                  emailLabel: `Email ${ORG.sales}`,
+                })}
+                <p class="mt-4 text-sm text-slate-500">Quoted per brief, itemised, and put in a written contract before any work starts.</p>
+
+                ${checklistPanel(`What ${c.title.toLowerCase()} covers`, c.items)}
+            </div>
+        </section>
+
+${proseSections({
+  id: `${c.slug}-detail`,
+  eyebrow: 'In detail',
+  heading: c.title,
+  sections: c.sections,
+})}
+
+${faqSection(c.faqs, { dark: false })}
+
+${siblingSection({
+  eyebrow: 'More from Vybe Media',
+  heading: 'The rest of what we do.',
+  items: [
+    { href: '/media/', icon: 'videocam', name: 'All media & events', blurb: 'Events, photography, video and editing, and how to send us a brief.' },
+    ...MEDIA_PAGES.filter((o) => o.slug !== c.slug).map((o) => ({ href: mediaHref(o), icon: o.icon, name: o.title, blurb: o.blurb })),
+    { href: '/printing/banners-standees/', icon: 'print', name: 'Event branding', blurb: 'Banners, standees, backdrops and passes from our print team.' },
+  ],
+})}
+${relatedSection('media', { dark: false })}
+</div>`;
+
+  const lastmod = lastmodFor(url, [c.metaTitle, c.metaDescription, body].join('\n'));
+
+  DOCS.push({
+    file: `media/${c.slug}/index.html`,
+    priority: '0.7',
+    changefreq: 'monthly',
+    page: {
+      url,
+      nav: c.nav,
+      title: c.metaTitle,
+      ogTitle: c.title,
+      description: c.metaDescription,
+      lastmod,
+      trail: [CRUMB_HOME, { name: 'Media & Events', url: '/media/' }, { name: c.title, url }],
+      faqs: c.faqs,
+      body,
+      schema: (u) => ({
+        '@type': 'Service',
+        '@id': `${u}#service`,
+        name: c.title,
+        serviceType: c.title,
+        description: c.metaDescription,
+        provider: { '@id': `${SITE}/#organization` },
+        areaServed: { '@type': 'Country', name: 'India' },
+        url: u,
+        isRelatedTo: { '@id': `${SITE}/media/#service` },
         hasOfferCatalog: {
           '@type': 'OfferCatalog',
           name: c.title,
@@ -6583,6 +6986,7 @@ write(
                     ${notFoundLink('/it-solutions/', 'IT &amp; Cyber', 'Custom app development and security.')}
                     ${published('cloud') ? notFoundLink('/cloud/', 'Vybe Cloud', 'Scalable servers and DDoS protection.') : ''}
                     ${notFoundLink('/printing/', 'Printing', 'Cards, banners, standees, RFID and stationery.')}
+                    ${notFoundLink('/media/', 'Media &amp; Events', 'Event management, photography, video and editing.')}
                     ${notFoundLink('/registrations/', 'Registrations', 'GST, MSME, FSSAI and Startup India, filed for you, plus ISO, NSDC and DSC.')}
                     ${notFoundLink('/audits/', 'Audits', 'Hygiene, fire, child safety, SDG, POSH and data protection audits.')}
                     ${notFoundLink('/manufacturing/', 'Manufacturing', 'RFID and NFC cards, plus Dell, HP, Lenovo and Apple hardware.')}
@@ -6682,7 +7086,7 @@ function empdirBody(e, photo) {
                 </p>`;
 
   const note = active
-    ? `Found this card? Please hand it in at our office, ${ORG.corporate.streetLines.join(', ')}, ${ORG.corporate.locality} ${ORG.corporate.postal}, or call ${telLink(ORG.phone)}.`
+    ? `Found this card? Please hand it in at our office, ${ORG.streetLines.join(', ')}, ${ORG.locality} ${ORG.postal}, or call ${telLink(ORG.phone)}.`
     : `${esc(e.name)} no longer works at ${ORG.name}, and this card does not grant access to any of our premises or systems. If somebody is presenting it, please call us on ${telLink(ORG.phone)} or email <a class="text-brand font-bold" href="mailto:${ORG.support}">${ORG.support}</a>.`;
 
   return `<section class="px-6 pt-10 pb-20 bg-surface-main">
@@ -6920,7 +7324,7 @@ ${PRODUCTS.filter((p) => published(p.nav))
 
 ## Contact
 
-- [Contact Us](${SITE}/contact/): Phone, email, our registered and corporate offices, and opening hours.
+- [Contact Us](${SITE}/contact/): Phone, email, our office address and opening hours.
 - Sales: ${ORG.sales} / ${ORG.phone} for quotes, demos, new deployments, hardware, printing and registrations.
 - Support: ${ORG.support} / ${ORG.phoneSupport} for existing Vybe deployments.
 - Second office line: ${ORG.phoneOffice}, which reaches the same office.

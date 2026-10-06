@@ -1,135 +1,135 @@
 {
   "/": {
-    "hash": "bd414bfadd1fe832",
-    "date": "2026-10-03"
+    "hash": "372cf420c66df2ab",
+    "date": "2026-10-06"
   },
   "/erp/": {
-    "hash": "78e5e90c0499508e",
-    "date": "2026-10-03"
+    "hash": "e7605beb217d079d",
+    "date": "2026-10-06"
   },
   "/cms/": {
-    "hash": "8f47ae6cffd4ed8e",
-    "date": "2026-10-03"
+    "hash": "bf07dc4d34c9fbbb",
+    "date": "2026-10-06"
   },
   "/it-solutions/": {
-    "hash": "07f22487df189bdd",
-    "date": "2026-10-03"
+    "hash": "c18f0db204f0e62f",
+    "date": "2026-10-06"
   },
   "/cloud/": {
     "hash": "1b19066f41872902",
     "date": "2026-09-19"
   },
   "/privacy-policy/": {
-    "hash": "30bae9f2a55b4798",
-    "date": "2026-09-21"
+    "hash": "f426744ad56b793c",
+    "date": "2026-10-06"
   },
   "/terms/": {
-    "hash": "f2f81965fc780672",
-    "date": "2026-09-23"
+    "hash": "4159e752d8473f00",
+    "date": "2026-10-06"
   },
   "/refund-policy/": {
-    "hash": "937e522dc9a8e478",
-    "date": "2026-09-21"
+    "hash": "9f07a7b746705f19",
+    "date": "2026-10-06"
   },
   "/shipping-policy/": {
-    "hash": "9bb947001231619b",
-    "date": "2026-09-21"
+    "hash": "7160a3f50ce2d82d",
+    "date": "2026-10-06"
   },
   "/workspace/": {
-    "hash": "8bb2ffd22ecd42e3",
-    "date": "2026-10-03"
+    "hash": "fefa1e5d5e28fcf8",
+    "date": "2026-10-06"
   },
   "/smart-classroom/": {
-    "hash": "a9bd36e448ee381f",
-    "date": "2026-10-03"
+    "hash": "80826b5626e3975d",
+    "date": "2026-10-06"
   },
   "/contact/": {
-    "hash": "dc8a443625735021",
-    "date": "2026-10-01"
+    "hash": "52b6c1da05fdfe2d",
+    "date": "2026-10-06"
   },
   "/printing/": {
-    "hash": "08bbed87d32bb572",
-    "date": "2026-10-03"
+    "hash": "89d1cdceae92021e",
+    "date": "2026-10-06"
   },
   "/registrations/": {
-    "hash": "f79cb176ee70e721",
-    "date": "2026-10-03"
+    "hash": "5253e2e986aca9d4",
+    "date": "2026-10-06"
   },
   "/printing/stationery/": {
-    "hash": "24d5625dc52e2e1a",
-    "date": "2026-10-03"
+    "hash": "47522b95b47e3923",
+    "date": "2026-10-06"
   },
   "/printing/cards/": {
-    "hash": "4a20be68b022ceb4",
-    "date": "2026-10-03"
+    "hash": "3f46d8b39a10f973",
+    "date": "2026-10-06"
   },
   "/printing/banners-standees/": {
-    "hash": "6d7a4f117e9fa071",
-    "date": "2026-10-03"
+    "hash": "852be51a604357fd",
+    "date": "2026-10-06"
   },
   "/registrations/gst/": {
-    "hash": "3326a5b09c9e9c40",
-    "date": "2026-10-03"
+    "hash": "3651967df93e5ef2",
+    "date": "2026-10-06"
   },
   "/registrations/msme/": {
-    "hash": "7e2e3b16772a9a30",
-    "date": "2026-10-03"
+    "hash": "275a0057a2336786",
+    "date": "2026-10-06"
   },
   "/registrations/fssai/": {
-    "hash": "89ec3c50a5e57f1c",
-    "date": "2026-10-03"
+    "hash": "8e4ebdc4ae048869",
+    "date": "2026-10-06"
   },
   "/registrations/startup-india/": {
-    "hash": "d54509237dbd87bf",
-    "date": "2026-10-03"
+    "hash": "9c666e7fe8de7505",
+    "date": "2026-10-06"
   },
   "/registrations/iso-certification/": {
-    "hash": "544f907f1dbc6405",
-    "date": "2026-10-03"
+    "hash": "b879c568bbda6c0e",
+    "date": "2026-10-06"
   },
   "/registrations/nsdc-skill-india/": {
-    "hash": "e81e121eaf94df9c",
-    "date": "2026-10-03"
+    "hash": "7b353e2ae8abf05f",
+    "date": "2026-10-06"
   },
   "/registrations/digital-signature-certificate/": {
-    "hash": "bca0ca0b77b73c67",
-    "date": "2026-10-03"
+    "hash": "8ab0e073a79b570c",
+    "date": "2026-10-06"
   },
   "/audits/": {
-    "hash": "985bf8bd67e7d3fd",
-    "date": "2026-10-03"
+    "hash": "ccc24483e4cef459",
+    "date": "2026-10-06"
   },
   "/audits/kitchen-food-safety/": {
-    "hash": "caf34f7bc4857741",
-    "date": "2026-10-03"
+    "hash": "a4e8003fd51f22b7",
+    "date": "2026-10-06"
   },
   "/audits/schools-institutions/": {
-    "hash": "567ed1a215d94761",
-    "date": "2026-10-03"
+    "hash": "49685fee7f142642",
+    "date": "2026-10-06"
   },
   "/audits/workplace-compliance/": {
-    "hash": "1ab8833941712d36",
-    "date": "2026-10-03"
+    "hash": "e68f227735dc262c",
+    "date": "2026-10-06"
   },
   "/manufacturing/": {
-    "hash": "63047d9e169a95cd",
-    "date": "2026-10-03"
+    "hash": "9ffe73e72170169a",
+    "date": "2026-10-06"
   },
   "/manufacturing/rfid-cards/": {
-    "hash": "f893dd5805403558",
-    "date": "2026-10-03"
+    "hash": "131fdf394c47b413",
+    "date": "2026-10-06"
   },
   "/manufacturing/distribution/": {
-    "hash": "3f7241e5b64f638e",
-    "date": "2026-09-23"
+    "hash": "6be3e3061175fe6c",
+    "date": "2026-10-06"
   },
   "/manufacturing/iot/": {
-    "hash": "73544668d5ae4649",
-    "date": "2026-09-23"
+    "hash": "c352b978c0469f38",
+    "date": "2026-10-06"
   },
   "/verify/": {
-    "hash": "4c2905613fe95690",
-    "date": "2026-10-03"
+    "hash": "21bebfb81203d1bf",
+    "date": "2026-10-06"
   },
   "/ankit/": {
     "hash": "78a1625385f6bba0",
@@ -154,5 +154,21 @@
   "/josh/": {
     "hash": "8d5b6623bd72460e",
     "date": "2026-10-03"
+  },
+  "/media/": {
+    "hash": "fa9a67366e482708",
+    "date": "2026-10-06"
+  },
+  "/media/event-management/": {
+    "hash": "6ec9c24f039091ce",
+    "date": "2026-10-06"
+  },
+  "/media/photography-videography/": {
+    "hash": "bf846ff2cb62f65e",
+    "date": "2026-10-06"
+  },
+  "/media/video-editing/": {
+    "hash": "9e5c2f17027d0adf",
+    "date": "2026-10-06"
   }
 }

@@ -2,7 +2,7 @@
  * origin rather than per scope. The activate sweep below must therefore only
  * touch this card's own caches, or each card evicts the others' offline copy. */
 const PREFIX = "vybe-josh-";
-const V = PREFIX + "8d7cb4cbad";
+const V = PREFIX + "8d7cb4cbad-addr2";
 const CORE = ["./", "styles.css?v=8d7cb4cbad", "app.js?v=8d7cb4cbad", "manifest.webmanifest", "contact.vcf", "assets/vybe-lockup.svg", "assets/vybe-mark.svg", "assets/vybe-lockup.png", "qr.js?v=8d7cb4cbad", "assets/fonts/jakarta.woff2", "assets/icon-192.png", "assets/apple-touch-icon.png"];
 self.addEventListener("install", (e) => { e.waitUntil(caches.open(V).then((c) => c.addAll(CORE))); self.skipWaiting(); });
 self.addEventListener("activate", (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k.startsWith(PREFIX) && k !== V).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
