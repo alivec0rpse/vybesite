@@ -682,6 +682,7 @@ const NAV_GROUPS = [
       { nav: 'media-events', href: '/media/event-management/', label: 'Event management', blurb: 'Corporate events, college fests, launches, conferences.', icon: 'celebration' },
       { nav: 'media-photo', href: '/media/photography-videography/', label: 'Photography &amp; video', blurb: 'Events, headshots, products, brand films and reels.', icon: 'photo_camera' },
       { nav: 'media-editing', href: '/media/video-editing/', label: 'Video editing', blurb: 'Per project or on a monthly contract.', icon: 'movie_edit' },
+      { nav: 'media-photo-editing', href: '/media/photo-editing/', label: 'Photo editing', blurb: 'Retouching, product photos, colour and restoration.', icon: 'auto_fix_high' },
     ],
   },
   {
@@ -1099,7 +1100,7 @@ const PRODUCTS = [
   { nav: 'it', href: '/it-solutions/', name: 'IT & Cyber', blurb: 'Custom software, security and managed IT.', icon: 'code_blocks' },
   { nav: 'cloud', href: '/cloud/', name: 'Vybe Cloud', blurb: 'Scalable servers, hosting and DDoS protection.', icon: 'cloud' },
   { nav: 'printing', href: '/printing/', name: 'Printing', blurb: 'Everything from business cards to banners, standees and RFID cards.', icon: 'print' },
-  { nav: 'media', href: '/media/', name: 'Media & Events', blurb: 'Event management, photography, videography, and video editing per project or on monthly contract.', icon: 'videocam' },
+  { nav: 'media', href: '/media/', name: 'Media & Events', blurb: 'Event management, photography, videography, video editing per project or on monthly contract, and photo editing.', icon: 'videocam' },
   { nav: 'registrations', href: '/registrations/', name: 'Business Registrations', blurb: 'GST, Udyam (MSME), FSSAI and Startup India recognition, from ₹199, plus ISO, NSDC consulting and digital signatures.', icon: 'receipt_long' },
   { nav: 'audits', href: '/audits/', name: 'Compliance Audits', blurb: 'Hygiene, fire, child safety, SDG, POSH and data protection audits for kitchens, campuses and offices. Report, certificate and badge.', icon: 'fact_check' },
   { nav: 'manufacturing', href: '/manufacturing/', name: 'Manufacturing & Supply', blurb: `RFID cards from ${cardRupeesText(CARD_PRICING.rfid)} and NFC from ${cardRupeesText(CARD_PRICING.nfc)}, made and encoded to your system, IoT asset and energy monitoring, plus Dell, HP, Lenovo, Asus and Apple hardware.`, icon: 'precision_manufacturing' },
@@ -1895,7 +1896,7 @@ const PAGES = [
         { nav: 'it', name: 'Vybe IT Solutions', url: `${SITE}/it-solutions/`, description: 'Custom app development, penetration testing and managed security operations.' },
         { nav: 'cloud', name: 'Vybe Cloud', url: `${SITE}/cloud/`, description: 'Scalable cloud architecture, game servers and DDoS protection.' },
         { nav: 'printing', name: 'Printing Services', url: `${SITE}/printing/`, description: 'Commercial printing: business and RFID cards, letterheads, bill books, brochures, flex banners, roll-up standees and signage, printed to your artwork.' },
-        { nav: 'media', name: 'Media & Events', url: `${SITE}/media/`, description: 'Event management for corporate events, college fests, launches and conferences; event, corporate and product photography and videography; and video editing per project or on monthly contract.' },
+        { nav: 'media', name: 'Media & Events', url: `${SITE}/media/`, description: 'Event management for corporate events, college fests, launches and conferences; event, corporate and product photography and videography; video editing per project or on monthly contract; and photo editing and retouching.' },
         { nav: 'registrations', name: 'Business Registrations', url: `${SITE}/registrations/`, description: 'GST, Udyam (MSME) and FSSAI registrations and DPIIT / Startup India recognition, prepared and filed at a flat professional fee with government charges separate, plus non-accredited ISO certification issued by Vybe, consulting on NSDC / Skill India and affiliation applications, and Class 3 digital signature certificates as a registered partner of eMudhra and Capricorn.' },
         { nav: 'audits', name: 'Compliance Audits', url: `${SITE}/audits/`, description: 'Advisory, non-statutory hygiene, safety and compliance audits: kitchen hygiene to the FSSAI Schedule 4 standard, kitchen layout and pest control records, fire and electrical safety to the National Building Code, canteen and mess hygiene, child safety to the POCSO standard, school transport safety, campus security, a NAAC/NIRF-ready SDG and sustainability audit, POSH Act Internal Committee compliance, software licensing and IT assets, DPDP Act data protection readiness and labour law records. Reports, certificates and badges are issued by Vybe Technologies alone and are not a licence, rating, accreditation or No Objection Certificate.' },
         { nav: 'manufacturing', name: 'Manufacturing & Supply', url: `${SITE}/manufacturing/`, description: 'Manufacture of RFID and NFC cards, fobs, tags and wristbands at 125 kHz, 13.56 MHz and UHF (MIFARE Classic, MIFARE DESFire, NTAG and EM4100), personalised and encoded to your access control, attendance and cafeteria systems, and distribution of IT hardware from Dell, HP, Lenovo, Asus, Apple, Logitech and Alienware, including desktops, all-in-one PCs, mini PCs, laptops, monitors, keyboards, mice, headsets, conferencing equipment and power adapters. Industrial IoT installations covering UHF asset and inventory tracking, temperature and humidity monitoring of cold rooms and server rooms, energy metering per panel or department, and edge gateways integrated with dashboards and Vybe ERP. Supplied against purchase orders and tenders with manufacturer warranty and GST invoicing. Pricing, stock availability and warranty terms are quoted per enquiry rather than listed.' },
@@ -3308,6 +3309,60 @@ const MEDIA_CATEGORIES = [
     ],
   },
   {
+    id: 'photo-editing',
+    slug: 'photo-editing',
+    nav: 'media-photo-editing',
+    icon: 'auto_fix_high',
+    title: 'Photo editing',
+    blurb: 'Retouching, colour and clean-up, for photographs you already have or ones we shoot.',
+    items: [
+      'Portrait, headshot and team photo retouching',
+      'Product photos on white and marketplace-ready images',
+      'Colour correction for event and brand shoots',
+      'Background removal and replacement',
+      'Restoring old and damaged photographs',
+      'Resizing and exporting for web, social media and print',
+    ],
+    h1: 'Photo editing, done by hand.',
+    lede:
+      'Send the photographs, get them back finished. Retouched portraits, clean product shots, event galleries with consistent colour, and old prints brought back, one job at a time or as a regular arrangement.',
+    metaTitle: 'Photo Editing & Retouching Services in Bengaluru | Vybe',
+    metaDescription:
+      'Photo editing and retouching in Bengaluru: portraits and headshots, product photos on white, background removal, colour correction and photo restoration.',
+    sections: [
+      {
+        h: 'What gets edited',
+        p: 'Portraits and headshots retouched so they still look like the person: skin, stray hairs, glare on glasses and distractions in the background, without the plastic look. Product photographs cut out onto white or a clean background, straightened, colour-matched and sized to what the marketplace asks for. Event galleries corrected so the hall looks the same colour in the first photograph and the five hundredth. And old or damaged prints scanned, repaired and brought back.',
+      },
+      {
+        h: 'Two ways to work with us',
+        p: 'Per project, for the one-off: a set of headshots, a product catalogue, an event gallery. Or as a regular arrangement, for anyone who has photographs coming in every week, with the volume, the turnaround and the price agreed up front, and the same editor who learns how you like things to look. Either way the terms are written down before the work starts.',
+      },
+      {
+        h: 'Getting photographs to us',
+        p: 'Upload them to a shared drive and send us the link, with a note on what each set is for and any examples of the look you want. Send the originals, straight from the camera or the phone, rather than copies forwarded through a chat app: those have been compressed, and detail that has been thrown away cannot be edited back in.',
+      },
+      {
+        h: 'Revisions, plainly',
+        p: 'Every job includes rounds of revisions, and the number is stated in the quote. Notes against the file name get turned around fastest. If a change goes beyond the brief, such as a different look across a whole set, we tell you before doing the work rather than after.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'What do you need from us?',
+        a: 'The original files, a line on where the photographs are going to be used, and an example or two of the look you want, if you have one. For product photographs, tell us the marketplace or the size and background it needs.',
+      },
+      {
+        q: 'Can you edit photographs we took ourselves?',
+        a: 'Yes. Most of what we edit was shot by someone else, often on a phone. The better the original, the better the result, so send the full-size files rather than screenshots or forwarded copies.',
+      },
+      {
+        q: 'Can you shoot them as well?',
+        a: 'Yes. Our <a class="text-brand font-bold" href="/media/photography-videography/">photography and videography</a> crew can shoot them, so one team handles it from the camera to the finished files.',
+      },
+    ],
+  },
+  {
     id: 'anything-else',
     icon: 'palette',
     title: 'Anything else creative',
@@ -3348,7 +3403,7 @@ const MEDIA_STEPS = [
 const mediaFaqs = [
   {
     q: 'What does Vybe Media do?',
-    a: 'Event management for corporate events, college fests, launches and conferences; photography and videography for events, people, products and brands; and video editing per project or on a monthly contract. Social media content, graphic design and podcast production on request.',
+    a: 'Event management for corporate events, college fests, launches and conferences; photography and videography for events, people, products and brands; video editing per project or on a monthly contract; and photo editing, from retouching and product photos to restoration. Social media content, graphic design and podcast production on request.',
   },
   {
     q: 'What does it cost?',
@@ -3385,7 +3440,10 @@ ${breadcrumbs([CRUMB_HOME, { name: 'Media & Events', url: '/media/' }], false)}
                 })}
 
                 <ul class="mt-16 grid gap-5 sm:grid-cols-2">
-                    ${MEDIA_CATEGORIES.map((c) => printCategory(c, mediaHref)).join('\n                    ')}
+                    ${MEDIA_CATEGORIES.map((c) =>
+                      // Five cards in two columns: the open-ended one takes the last row whole.
+                      printCategory(c, mediaHref).replace('<li id="anything-else" class="', '<li id="anything-else" class="sm:col-span-2 ')
+                    ).join('\n                    ')}
                 </ul>
             </div>
         </section>
@@ -3425,7 +3483,7 @@ ${relatedSection('media', { dark: false })}
       title: 'Events, Photography & Video Editing in Bengaluru | Vybe',
       ogTitle: 'Vybe Media: events, photography, video and editing',
       description:
-        'Event management, photography, videography and video editing contracts in Bengaluru. Corporate events, college fests, launches, reels and brand films.',
+        'Event management, photography, video and photo editing in Bengaluru. Corporate events, college fests, launches, reels, brand films and retouching.',
       lastmod,
       trail: [CRUMB_HOME, { name: 'Media & Events', url }],
       faqs: mediaFaqs,
@@ -3434,9 +3492,9 @@ ${relatedSection('media', { dark: false })}
         '@type': 'Service',
         '@id': `${u}#service`,
         name: 'Media and event services',
-        serviceType: 'Event management, photography, videography and video editing',
+        serviceType: 'Event management, photography, videography, video editing and photo editing',
         description:
-          'Event management for corporate events, college fests, product launches and conferences; event, corporate and product photography and videography; and video editing per project or on monthly contract, including reels, YouTube, podcasts and corporate films.',
+          'Event management for corporate events, college fests, product launches and conferences; event, corporate and product photography and videography; video editing per project or on monthly contract, including reels, YouTube, podcasts and corporate films; and photo editing and retouching.',
         provider: { '@id': `${SITE}/#organization` },
         areaServed: { '@type': 'Country', name: 'India' },
         url: u,
