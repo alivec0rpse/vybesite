@@ -42,10 +42,10 @@ const ORG = {
   // one-line form schema.org and prose want.
   officeLabel: 'Corporate Office',
   street:
-    '4th Floor, IIIC, Christ Academy Institute of Advanced Studies, Christ Nagar, Hullahalli, Begur - Koppa Road, Sakkalwara Post',
+    '4th Floor, IIIC, Christ Academy Institute for Advanced Studies, Christ Nagar, Hullahalli, Begur - Koppa Road, Sakkalwara Post',
   streetLines: [
     '4th Floor, IIIC, Christ Academy',
-    'Institute of Advanced Studies',
+    'Institute for Advanced Studies',
     'Christ Nagar, Hullahalli',
     'Begur &ndash; Koppa Road, Sakkalwara Post',
   ],
@@ -793,9 +793,10 @@ function navbar(active) {
                 </span>
             </a>
 
-            <nav class="primary-nav hidden xl:flex items-center gap-8 text-sm font-medium text-slate-600" aria-label="Primary">
+            <nav class="primary-nav hidden xl:flex items-center gap-6 text-sm font-medium text-slate-600" aria-label="Primary">
                 ${item('/', 'Home', 'home')}
                 ${NAV_GROUPS.map(group).join('\n                ')}
+                ${item('/careers/', 'Careers', 'careers')}
                 ${item('/contact/', 'Contact', 'contact')}
             </nav>
 
@@ -812,6 +813,7 @@ function navbar(active) {
                     <nav class="absolute right-0 top-full mt-3 w-72 max-h-[75vh] overflow-y-auto overscroll-contain rounded-2xl border border-slate-200 bg-white shadow-xl p-2 flex flex-col text-base font-medium text-slate-700" aria-label="Mobile">
                         ${mobileItem('/', 'Home', 'home', active)}
                         ${NAV_GROUPS.map(mobileGroup).join('\n                        ')}
+                        ${mobileItem('/careers/', 'Careers', 'careers', active)}
                         ${mobileItem('/contact/', 'Contact Us', 'contact', active)}
                     </nav>
                 </details>
@@ -898,6 +900,7 @@ function footer() {
                     ${link('/refund-policy/', 'Cancellation &amp; Refund')}
                     ${link('/shipping-policy/', 'Shipping &amp; Exchange')}
                     ${link('/verify/', 'Verify a Certificate')}
+                    ${link('/careers/', 'Careers')}
                     ${link('/contact/', 'Contact Us')}
                 </ul>
             </div>
@@ -6974,6 +6977,437 @@ ${relatedSection('verify', { dark: false })}
   });
 }
 
+/* ------------------------------------------------------------------ careers */
+
+/**
+ * /careers/ while there are no open roles. The page must not list a job, imply
+ * one, or carry JobPosting data: Google treats a JobPosting for a role that
+ * does not exist as spam, and so would an applicant. What it offers instead is
+ * the talent pool, and a fraud notice, because fake offers in a company's name
+ * are most likely exactly when the company is not hiring.
+ *
+ * The form has no backend. assets/careers.js validates it and then opens the
+ * visitor's own email app with a message to CAREERS already written, subject
+ * and all, so the applicant sends it from their own address and HR can reply
+ * to it directly. Nothing is stored or sent by this site.
+ *
+ * It cannot work without JavaScript: the CSP's `form-action 'self'` blocks a
+ * form posting to a mailto: URL, and a plain GET would put the applicant's
+ * details in the address bar and the server logs. So the button ships
+ * disabled, careers.js enables it, and <noscript> gives the address instead.
+ */
+const CAREERS = 'hr@vybe.net.in';
+
+/*
+ * The "Life at Vybe" grid: two wide tiles over three narrow ones. Every image
+ * is a 1200x900 WebP and JPEG pair in assets/careers/, cropped to 4:3 so the
+ * rows line up. `null` renders a marked placeholder, for a slot waiting on a
+ * photo. No stock photographs of people: these are the real office and team.
+ */
+const LIFE_PHOTOS = [
+  {
+    base: 'careers/workstations',
+    alt: 'Rows of orange workstation desks with monitors and keyboards, beneath a wall mural of Ratan Tata and his words on businesses serving their communities',
+    caption: 'Workstations at IIIC',
+  },
+  {
+    base: 'careers/fourth-floor-lobby',
+    alt: 'The fourth-floor lobby, with a granite floor, a large window and a wall mural of hanging light bulbs and two figures climbing together',
+    caption: 'The fourth-floor lobby',
+  },
+  {
+    base: 'careers/open-floor',
+    alt: 'The open-plan floor seen along its length, with partitioned desks, strip lighting in the ceiling and the Ratan Tata mural on the far wall',
+    caption: 'The open-plan floor',
+  },
+  {
+    base: 'careers/iiic-entrance',
+    alt: 'The entrance to the Ideation, Innovation and Incubation Centre, with the Vybe Technologies notice on the wall beside the door',
+    caption: 'Our door at IIIC',
+  },
+  {
+    base: 'careers/front-desk',
+    alt: 'The front desk, with three red chairs in front of it, a person working at a laptop behind it, and a wall mural with the words: It is better to light a small lamp',
+    caption: 'The front desk',
+  },
+];
+
+/* Six columns from md up, so two wide tiles share the first row and three
+   share the second. On a phone the first tile runs full width and the other
+   four pair off. */
+const lifeSpan = (i) => (i === 0 ? 'col-span-2 md:col-span-3' : i === 1 ? 'md:col-span-3' : 'md:col-span-2');
+
+function lifePhoto(p, i) {
+  if (!p) {
+    return `<li class="${lifeSpan(i)} aspect-[4/3] rounded-2xl border-2 border-dashed border-slate-300 bg-surface-main flex flex-col items-center justify-center gap-2 p-4 text-center" data-photo-placeholder>
+                        <!-- PHOTO PLACEHOLDER: fill this slot from LIFE_PHOTOS in build.js -->
+                        <span class="material-symbols-outlined text-[28px] text-slate-400" aria-hidden="true">photo_camera</span>
+                        <span class="text-sm font-bold text-slate-500">Photo coming soon</span>
+                    </li>`;
+  }
+  return `<li class="${lifeSpan(i)}">
+                        <figure class="relative aspect-[4/3] overflow-hidden rounded-2xl bg-slate-200 shadow-sm">
+                            <picture><source srcset="/assets/${p.base}.webp" type="image/webp"><img src="/assets/${p.base}.jpg" alt="${esc(p.alt)}" class="h-full w-full object-cover" width="1200" height="900" loading="lazy" decoding="async"></picture>
+                            <figcaption class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-900/80 to-transparent px-3 pb-2 pt-6 text-xs sm:px-4 sm:pb-3 sm:pt-10 sm:text-sm font-bold text-white">${esc(p.caption)}</figcaption>
+                        </figure>
+                    </li>`;
+}
+
+/** An icon card, used by both the "why" and the "teams" grids. */
+function careersCard({ icon, title, text }) {
+  return `<li class="flex flex-col h-full rounded-2xl border border-slate-200 bg-white p-7 shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-brand/40">
+                        <span class="flex h-12 w-12 items-center justify-center rounded-xl bg-brand/10 text-brand">
+                            <span class="material-symbols-outlined text-[26px]" aria-hidden="true">${icon}</span>
+                        </span>
+                        <h3 class="mt-5 text-lg font-bold font-display tracking-tight text-slate-900">${esc(title)}</h3>
+                        <p class="mt-2 text-sm text-slate-600 leading-relaxed">${esc(text)}</p>
+                    </li>`;
+}
+
+const CAREERS_WHY = [
+  {
+    icon: 'devices',
+    title: 'Real products, real users',
+    text: 'Work on systems that campuses actually use every day: ERP, cashless cafeterias, smart classrooms and IoT.',
+  },
+  { icon: 'rocket_launch', title: 'Ownership from day one', text: 'Small team, so your work ships and is seen.' },
+  { icon: 'school', title: 'Learn by building', text: 'Mentorship and hands-on experience at an incubation centre.' },
+  { icon: 'schedule', title: 'Built around students', text: 'Flexible evening hours that fit around college.' },
+];
+
+const CAREERS_TEAMS = [
+  {
+    icon: 'code_blocks',
+    title: 'Engineering / R&D',
+    text: 'Build and maintain our software products, from ERP to cafeteria systems.',
+  },
+  {
+    icon: 'sensors',
+    title: 'Internet of Things (IoT)',
+    text: 'Design and deploy RFID/NFC systems, sensors and connected campus devices.',
+  },
+  {
+    icon: 'movie_edit',
+    title: 'Media, Marketing & Creative',
+    text: 'Ideation, video, editing and production for our brand.',
+  },
+  {
+    icon: 'handshake',
+    title: 'Sales & Business Development',
+    text: 'Build relationships with schools, colleges and enterprises.',
+  },
+];
+
+const CAREERS_STEPS = [
+  'Apply or join the talent pool',
+  'Short introductory call',
+  'Task or interview',
+  'Background verification',
+  'Offer letter digitally signed by Vybe Technologies',
+];
+
+/* `value` is what the email carries; the label is what the visitor reads. */
+const CAREERS_INTERESTS = [
+  { value: 'Engineering / R&D', label: 'Engineering / R&amp;D' },
+  { value: 'IoT', label: 'IoT' },
+  { value: 'Media & Creative', label: 'Media &amp; Creative' },
+  { value: 'Sales & BD', label: 'Sales &amp; BD' },
+  { value: 'Other', label: 'Other' },
+];
+
+const CAREERS_SAFETY = [
+  'Vybe Technologies never charges any fee for jobs, internships, training or onboarding.',
+  'All official communication comes only from @vybe.net.in email addresses.',
+  `Our offer letters are digitally signed by Vybe Technologies. If you are unsure whether an offer or message is genuine, write to <a class="font-bold text-brand hover:underline" href="mailto:${ORG.support}">${ORG.support}</a> before responding.`,
+  'Verify a Vybe team member: every Vybe ID card carries a QR code that opens that person&rsquo;s verification page on vybe.net.in.',
+];
+
+const careersFaqs = [
+  {
+    q: 'Are you hiring right now?',
+    a: 'Not at the moment. <a class="text-brand font-bold" href="#talent-pool">Join the talent pool</a> and we&rsquo;ll contact you when a role opens.',
+  },
+  {
+    q: 'Do you take interns or first-year students?',
+    a: 'Yes, when roles open we consider students from all years.',
+  },
+  {
+    q: 'Can I work from home?',
+    a: 'It depends on the role; some roles are hybrid or remote, as agreed with the team lead.',
+  },
+  {
+    q: 'How long will it take to hear back?',
+    a: 'We contact talent-pool members only when a suitable role opens.',
+  },
+  {
+    q: 'Is there an application fee?',
+    a: 'Never. Vybe does not charge any fee at any stage.',
+  },
+];
+
+const inputCls =
+  'mt-2 block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 placeholder:text-slate-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30 aria-[invalid=true]:border-brand';
+
+/**
+ * One labelled form field with its error line. `control` is the input itself;
+ * every control is wired to its error by aria-describedby, which careers.js
+ * fills and unhides.
+ */
+function poolField({ id, label, optional = false, hint = '', control }) {
+  return `<div>
+                            <label for="${id}" class="block text-sm font-bold text-slate-900">${label}${
+    optional
+      ? ' <span class="font-normal text-slate-500">(optional)</span>'
+      : ' <span class="text-brand" aria-hidden="true">*</span>'
+  }</label>
+                            ${control}
+                            ${hint}
+                            <p id="${id}-error" class="mt-2 text-sm font-medium text-brand-dark" hidden></p>
+                        </div>`;
+}
+
+const careersBody = `<div class="w-full bg-surface-main">
+        <section class="bg-gradient-to-br from-brand via-[#ef4444] to-orange-500 dark-section text-white pb-20 md:pb-28 relative overflow-hidden" aria-labelledby="careers-heading">
+            <div class="absolute -bottom-[50%] -right-[10%] w-[800px] h-[800px] border-[1.5px] border-white/20 rounded-full pointer-events-none" aria-hidden="true"></div>
+            <div class="absolute -bottom-[40%] -right-[5%] w-[600px] h-[600px] border-[1.5px] border-white/20 rounded-full pointer-events-none" aria-hidden="true"></div>
+${
+  // The dark trail is muted for navy; on the red gradient that is under 3:1.
+  breadcrumbs([CRUMB_HOME, { name: 'Careers', url: '/careers/' }], true).replaceAll('text-white/50', 'text-white/85')
+}
+            <div class="max-w-6xl mx-auto px-6 pt-12 md:pt-16 relative z-10">
+                <p class="text-sm font-bold uppercase tracking-[0.25em] text-white mb-4">Careers at Vybe</p>
+                <h1 id="careers-heading" class="text-4xl sm:text-5xl md:text-7xl font-black font-display tracking-tighter leading-[1.05] max-w-4xl">Build the future of campus technology with us.</h1>
+                <p class="mt-6 text-lg md:text-xl text-white font-medium leading-relaxed max-w-2xl">We&rsquo;re a young team building real products for schools, colleges and campuses across India.</p>
+                <div class="mt-10 max-w-2xl rounded-2xl bg-white text-slate-900 p-5 md:p-6 shadow-xl flex gap-4 items-start">
+                    <span class="material-symbols-outlined text-brand text-[28px] shrink-0" aria-hidden="true">info</span>
+                    <p class="text-base leading-relaxed"><strong class="font-bold font-display">We&rsquo;re not hiring right now.</strong> We open roles from time to time. Leave your details and we&rsquo;ll reach out when something fits.</p>
+                </div>
+                <div class="mt-8">
+                    <a href="#talent-pool" class="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-8 py-4 bg-white text-brand rounded-full font-bold shadow-lg hover:bg-slate-50 active:scale-95 transition-all">
+                        Join our talent pool
+                        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">arrow_downward</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white py-20 md:py-28 px-6 relative z-10" aria-labelledby="careers-why-heading">
+            <div class="max-w-6xl mx-auto">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-2">Why Vybe</p>
+                <h2 id="careers-why-heading" class="text-3xl md:text-4xl font-black font-display tracking-tight text-slate-900">Why work with us.</h2>
+                <ul class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                    ${CAREERS_WHY.map(careersCard).join('\n                    ')}
+                </ul>
+            </div>
+        </section>
+
+        <section class="bg-surface-main border-t border-slate-200 py-20 md:py-24 px-6 relative z-10" aria-labelledby="careers-work-heading">
+            <div class="max-w-6xl mx-auto grid gap-10 md:grid-cols-[1fr_1.4fr] md:items-start">
+                <div>
+                    <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-2">How we work</p>
+                    <h2 id="careers-work-heading" class="text-3xl md:text-4xl font-black font-display tracking-tight text-slate-900">Hybrid, and built around college.</h2>
+                </div>
+                <div class="rounded-2xl border border-slate-200 bg-white p-7 md:p-8 shadow-sm flex gap-5 items-start">
+                    <span class="material-symbols-outlined text-brand text-[28px] shrink-0" aria-hidden="true">location_on</span>
+                    <p class="text-lg text-slate-600 leading-relaxed">We&rsquo;re a hybrid team based at IIIC, Christ Academy Institute for Advanced Studies, Bengaluru. Most of the team works on campus in flexible evening hours that fit around college, and some roles split their week between campus and home, as agreed with their team lead.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white border-t border-slate-200 py-20 md:py-28 px-6 relative z-10" aria-labelledby="careers-teams-heading">
+            <div class="max-w-6xl mx-auto">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-2">Our teams</p>
+                <h2 id="careers-teams-heading" class="text-3xl md:text-4xl font-black font-display tracking-tight text-slate-900">Where you could fit.</h2>
+                <ul class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                    ${CAREERS_TEAMS.map(careersCard).join('\n                    ')}
+                </ul>
+            </div>
+        </section>
+
+        <section class="bg-surface-main border-t border-slate-200 py-20 md:py-28 px-6 relative z-10" aria-labelledby="careers-life-heading">
+            <div class="max-w-6xl mx-auto">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-2">Life at Vybe</p>
+                <h2 id="careers-life-heading" class="text-3xl md:text-4xl font-black font-display tracking-tight text-slate-900">Where the work happens.</h2>
+                <ul class="mt-12 grid gap-4 sm:gap-5 grid-cols-2 md:grid-cols-6">
+                    ${LIFE_PHOTOS.map(lifePhoto).join('\n                    ')}
+                </ul>
+            </div>
+        </section>
+
+        <section class="bg-white border-t border-slate-200 py-20 md:py-28 px-6 relative z-10" aria-labelledby="careers-steps-heading">
+            <div class="max-w-6xl mx-auto">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-2">When roles open</p>
+                <h2 id="careers-steps-heading" class="text-3xl md:text-4xl font-black font-display tracking-tight text-slate-900">How hiring works.</h2>
+                <ol class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+                    ${CAREERS_STEPS.map(
+                      (s, i) => `<li class="flex flex-col h-full rounded-2xl border border-slate-200 bg-surface-main p-6">
+                        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-brand text-white font-black font-display" aria-hidden="true">${i + 1}</span>
+                        <p class="mt-4 font-bold font-display tracking-tight text-slate-900 leading-snug"><span class="sr-only">Step ${i + 1}: </span>${esc(s)}</p>
+                    </li>`
+                    ).join('\n                    ')}
+                </ol>
+            </div>
+        </section>
+
+        <section id="talent-pool" class="bg-surface-main border-t border-slate-200 py-20 md:py-28 px-6 relative z-10 scroll-mt-[72px]" aria-labelledby="careers-pool-heading">
+            <div class="max-w-6xl mx-auto grid gap-12 lg:grid-cols-[1fr_1.5fr] lg:items-start">
+                <div>
+                    <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-2">Talent pool</p>
+                    <h2 id="careers-pool-heading" class="text-3xl md:text-4xl font-black font-display tracking-tight text-slate-900">Leave your details.</h2>
+                    <p class="mt-5 text-lg text-slate-600 leading-relaxed">We&rsquo;re not hiring right now. Tell us who you are and what you&rsquo;re interested in, and we&rsquo;ll reach out when a suitable role opens.</p>
+                    <p class="mt-6 text-sm text-slate-600 leading-relaxed">Fields marked <span class="text-brand font-bold" aria-hidden="true">*</span><span class="sr-only">with an asterisk</span> are required.</p>
+                </div>
+
+                <div class="rounded-2xl border border-slate-200 bg-white p-6 md:p-10 shadow-sm">
+                    <noscript>
+                        <p class="mb-6 rounded-xl border border-brand/30 bg-brand/5 p-4 text-sm text-slate-700 leading-relaxed">This form needs JavaScript to open your email app. Instead, email your name, phone number, area of interest and anything else below to <a class="font-bold text-brand hover:underline" href="mailto:${CAREERS}">${CAREERS}</a>.</p>
+                    </noscript>
+                    <form id="pool-form" class="space-y-6" novalidate>
+                        ${poolField({
+                          id: 'pool-name',
+                          label: 'Full name',
+                          control: `<input id="pool-name" name="name" type="text" autocomplete="name" required maxlength="100" aria-describedby="pool-name-error" class="${inputCls}">`,
+                        })}
+                        <div class="grid gap-6 sm:grid-cols-2">
+                        ${poolField({
+                          id: 'pool-email',
+                          label: 'Email',
+                          control: `<input id="pool-email" name="email" type="email" autocomplete="email" required maxlength="200" aria-describedby="pool-email-error" class="${inputCls}">`,
+                        })}
+                        ${poolField({
+                          id: 'pool-phone',
+                          label: 'Phone',
+                          hint: '<p id="pool-phone-hint" class="mt-2 text-xs text-slate-500">10-digit Indian mobile number.</p>',
+                          control: `<input id="pool-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required maxlength="16" pattern="(\\+?91|0)?[\\s\\-]?[6-9][0-9]{4}[\\s\\-]?[0-9]{5}" aria-describedby="pool-phone-hint pool-phone-error" class="${inputCls}">`,
+                        })}
+                        </div>
+                        ${poolField({
+                          id: 'pool-interest',
+                          label: 'Area of interest',
+                          control: `<select id="pool-interest" name="interest" required aria-describedby="pool-interest-error" class="${inputCls}">
+                                <option value="">Choose one</option>
+                                ${CAREERS_INTERESTS.map((o) => `<option value="${esc(o.value)}">${o.label}</option>`).join('\n                                ')}
+                            </select>`,
+                        })}
+                        ${poolField({
+                          id: 'pool-college',
+                          label: 'College &amp; year of study',
+                          optional: true,
+                          control: `<input id="pool-college" name="college" type="text" autocomplete="organization" maxlength="150" aria-describedby="pool-college-error" class="${inputCls}">`,
+                        })}
+                        ${poolField({
+                          id: 'pool-link',
+                          label: 'LinkedIn or portfolio URL',
+                          optional: true,
+                          control: `<input id="pool-link" name="link" type="url" inputmode="url" autocomplete="url" maxlength="300" placeholder="https://" aria-describedby="pool-link-error" class="${inputCls}">`,
+                        })}
+                        ${poolField({
+                          id: 'pool-note',
+                          label: 'Short note',
+                          optional: true,
+                          hint: '<p id="pool-note-count" class="mt-2 text-xs text-slate-500">Up to 500 characters.</p>',
+                          control: `<textarea id="pool-note" name="note" rows="4" maxlength="500" aria-describedby="pool-note-count pool-note-error" class="${inputCls}"></textarea>`,
+                        })}
+
+                        <div>
+                            <div class="flex gap-3 items-start">
+                                <input id="pool-consent" name="consent" type="checkbox" value="yes" required aria-describedby="pool-consent-error" class="mt-1 h-5 w-5 shrink-0 rounded border-slate-300 accent-brand">
+                                <label for="pool-consent" class="text-sm text-slate-600 leading-relaxed">I agree that Vybe Technologies may store my details for up to 12 months to contact me about roles, in line with the Digital Personal Data Protection Act, 2023. I can ask for them to be deleted at any time by writing to ${ORG.support}. <span class="text-brand" aria-hidden="true">*</span></label>
+                            </div>
+                            <p id="pool-consent-error" class="mt-2 text-sm font-medium text-brand-dark" hidden></p>
+                        </div>
+
+                        <div>
+                            <button type="submit" id="pool-submit" disabled class="inline-flex w-full sm:w-auto items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white px-8 py-4 rounded-full text-sm font-bold transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <span class="material-symbols-outlined text-[20px]" aria-hidden="true">send</span>
+                                Send by email
+                            </button>
+                            <p class="mt-3 text-xs text-slate-500 leading-relaxed">This opens your email app with everything filled in, addressed to ${CAREERS}. You just press Send.</p>
+                        </div>
+                    </form>
+
+                    <div id="pool-opened" class="mt-6 rounded-2xl border border-brand/30 bg-brand/5 p-6 scroll-mt-28" tabindex="-1" hidden>
+                        <div class="flex gap-4 items-start">
+                            <span class="material-symbols-outlined text-brand text-[28px] shrink-0" aria-hidden="true">mail</span>
+                            <div class="text-sm text-slate-700 leading-relaxed space-y-3">
+                                <p class="text-base font-bold text-slate-900">Your email app should have opened with everything filled in. Just press Send.</p>
+                                <p>Nothing opened? If you use Gmail or another webmail in your browser, copy your details and email them to <a class="font-bold text-brand hover:underline" href="mailto:${CAREERS}">${CAREERS}</a>.</p>
+                                <div class="flex flex-col sm:flex-row gap-3 pt-1">
+                                    <button type="button" id="pool-copy" class="inline-flex items-center justify-center gap-2 rounded-full bg-corporate hover:bg-slate-800 text-white px-5 py-3 text-sm font-bold transition-all active:scale-95">
+                                        <span class="material-symbols-outlined text-[18px]" aria-hidden="true">content_copy</span>
+                                        <span id="pool-copy-label">Copy my details</span>
+                                    </button>
+                                    <a id="pool-mailto" href="mailto:${CAREERS}" class="inline-flex items-center justify-center gap-2 rounded-full border border-slate-300 bg-white hover:border-brand hover:text-brand px-5 py-3 text-sm font-bold text-slate-900 transition-colors">
+                                        <span class="material-symbols-outlined text-[18px]" aria-hidden="true">open_in_new</span>
+                                        Open email again
+                                    </a>
+                                </div>
+                                <p id="pool-copy-status" class="sr-only" role="status" aria-live="polite"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="mt-8 pt-6 border-t border-slate-100 text-sm text-slate-600">Prefer email? Write to <a class="font-bold text-brand hover:underline" href="mailto:${CAREERS}">${CAREERS}</a>.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white border-t border-slate-200 py-20 md:py-24 px-6 relative z-10" aria-labelledby="careers-safety-heading">
+            <div class="max-w-4xl mx-auto rounded-2xl border-2 border-brand/40 bg-brand/5 p-7 md:p-10">
+                <div class="flex gap-4 items-center">
+                    <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand text-white">
+                        <span class="material-symbols-outlined text-[26px]" aria-hidden="true">verified_user</span>
+                    </span>
+                    <h2 id="careers-safety-heading" class="text-2xl md:text-3xl font-black font-display tracking-tight text-slate-900">Stay safe from fake job offers</h2>
+                </div>
+                <ul class="mt-8 space-y-4">
+                    ${CAREERS_SAFETY.map(
+                      (s) => `<li class="flex gap-3 items-start text-slate-700 leading-relaxed">
+                        <span class="material-symbols-outlined text-brand text-[20px] shrink-0 mt-0.5" aria-hidden="true">check_circle</span>
+                        <span>${s}</span>
+                    </li>`
+                    ).join('\n                    ')}
+                </ul>
+            </div>
+        </section>
+
+        <section class="bg-surface-main border-t border-slate-200 py-20 md:py-24 px-6 relative z-10" aria-labelledby="careers-eo-heading">
+            <div class="max-w-4xl mx-auto flex flex-col sm:flex-row gap-5 sm:items-start">
+                <span class="material-symbols-outlined text-brand text-[32px] shrink-0" aria-hidden="true">diversity_3</span>
+                <div>
+                    <h2 id="careers-eo-heading" class="text-2xl md:text-3xl font-black font-display tracking-tight text-slate-900">Equal opportunity &amp; safe workplace</h2>
+                    <p class="mt-4 text-lg text-slate-600 leading-relaxed">Vybe Technologies welcomes people of every background. We do not tolerate harassment or discrimination of any kind, and we follow the Sexual Harassment of Women at Workplace (POSH) Act, 2013.</p>
+                </div>
+            </div>
+        </section>
+
+${faqSection(careersFaqs, { dark: false })}
+</div>`;
+
+{
+  const url = '/careers/';
+  const lastmod = lastmodFor(url, careersBody);
+  DOCS.push({
+    file: 'careers/index.html',
+    priority: '0.5',
+    changefreq: 'monthly',
+    page: {
+      url,
+      nav: 'careers',
+      title: 'Careers | Vybe Technologies',
+      description:
+        "Join Vybe Technologies, a Bengaluru team building campus technology. We're not hiring right now, but you can join our talent pool.",
+      lastmod,
+      trail: [CRUMB_HOME, { name: 'Careers', url }],
+      faqs: careersFaqs,
+      body: careersBody,
+      scripts: ['/assets/careers.js'],
+      // Deliberately no JobPosting: there are no open roles to describe.
+      schema: () => [],
+    },
+  });
+}
+
 /* ------------------------------------------------------------------ 404 page */
 
 const notFoundLink = (href, label, desc) =>
@@ -7358,6 +7792,7 @@ ${PRODUCTS.filter((p) => published(p.nav))
 ## Contact
 
 - [Contact Us](${SITE}/contact/): Phone, email, our office address and opening hours.
+- [Careers](${SITE}/careers/): Not hiring right now. Talent pool sign-up, how hiring works when roles open, and how to spot fake job offers. Vybe never charges a fee at any stage.
 - Sales: ${ORG.sales} / ${ORG.phone} for quotes, demos, new deployments, hardware, printing and registrations.
 - Support: ${ORG.support} / ${ORG.phoneSupport} for existing Vybe deployments.
 - Second office line: ${ORG.phoneOffice}, which reaches the same office.

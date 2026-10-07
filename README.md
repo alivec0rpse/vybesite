@@ -165,6 +165,21 @@ A person's `@id` is `/<slug>/#person`, and `ORG.founder.card` points the
 founder node at that same id. One human must not be two entities in one graph,
 or a search for the name has two things to choose between.
 
+## Careers talent pool
+
+`/careers/` is built in `build.js` (search `CAREERS`). The site has no open
+roles, so the page carries no JobPosting data and must not grow any until a
+real role exists. "Life at Vybe" photos come from `LIFE_PHOTOS`; a `null`
+renders a marked placeholder.
+
+The talent-pool form has no backend. `assets/careers.js` validates it, then
+opens the visitor's own email app with a message to hr@vybe.net.in already
+written, subject and body included, so they only press Send. Nothing is stored
+or sent by the site. The send button ships disabled and the script enables it:
+the CSP's `form-action 'self'` blocks posting a form to a mailto: URL, and a
+plain GET would put the applicant's details in the URL. A "Copy my details"
+button covers people whose browser has no email app set up.
+
 ## SEO notes
 
 - One canonical URL, title, description and JSON-LD graph per page.

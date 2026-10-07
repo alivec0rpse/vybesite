@@ -1,7 +1,7 @@
 {
   "/": {
-    "hash": "372cf420c66df2ab",
-    "date": "2026-10-06"
+    "hash": "ac64cce1ec9614e1",
+    "date": "2026-10-07"
   },
   "/erp/": {
     "hash": "e7605beb217d079d",
@@ -20,20 +20,20 @@
     "date": "2026-09-19"
   },
   "/privacy-policy/": {
-    "hash": "f917d9d2f8b746f6",
+    "hash": "26de1db37044e8e7",
     "date": "2026-10-07"
   },
   "/terms/": {
-    "hash": "4159e752d8473f00",
-    "date": "2026-10-06"
+    "hash": "daa2e3abe43eba8f",
+    "date": "2026-10-07"
   },
   "/refund-policy/": {
-    "hash": "9f07a7b746705f19",
-    "date": "2026-10-06"
+    "hash": "56b6deeb9011a99e",
+    "date": "2026-10-07"
   },
   "/shipping-policy/": {
-    "hash": "7160a3f50ce2d82d",
-    "date": "2026-10-06"
+    "hash": "2dce5b35dec949f1",
+    "date": "2026-10-07"
   },
   "/workspace/": {
     "hash": "fefa1e5d5e28fcf8",
@@ -44,7 +44,7 @@
     "date": "2026-10-06"
   },
   "/contact/": {
-    "hash": "2677903685d45edf",
+    "hash": "d6186fccb29221fc",
     "date": "2026-10-07"
   },
   "/printing/": {
@@ -170,5 +170,9 @@
   "/media/video-editing/": {
     "hash": "9e5c2f17027d0adf",
     "date": "2026-10-06"
+  },
+  "/careers/": {
+    "hash": "59a8c6e01a4ea29d",
+    "date": "2026-10-07"
   }
 }

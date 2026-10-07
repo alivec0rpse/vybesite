@@ -372,6 +372,9 @@
     { "route": "/peripherals", "redirect": "/manufacturing/distribution/", "statusCode": 301 },
     { "route": "/refurbished", "redirect": "/manufacturing/distribution/", "statusCode": 301 },
 
+    { "route": "/careers", "redirect": "/careers/", "statusCode": 301 },
+    { "route": "/career", "redirect": "/careers/", "statusCode": 301 },
+    { "route": "/jobs", "redirect": "/careers/", "statusCode": 301 },
     { "route": "/contact", "redirect": "/contact/", "statusCode": 301 },
     { "route": "/contact-us", "redirect": "/contact/", "statusCode": 301 },
     { "route": "/contact.html", "redirect": "/contact/", "statusCode": 301 },
