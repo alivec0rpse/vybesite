@@ -620,12 +620,17 @@ const CARD_PRICING = {
   rfid: 16.5,
   nfc: 50,
   minQty: 25,
+  // Business days from payment: delivered by then in Bengaluru, dispatched by
+  // then anywhere else, with courier transit on top. Every delivery promise on
+  // the site reads this.
+  deliveryDays: 5,
 };
 const cardRupees = (n) =>
   `&#8377;${n.toLocaleString('en-IN', { minimumFractionDigits: Number.isInteger(n) ? 0 : 2 })}`;
 // Plain-text forms, for meta descriptions, schema and anything else that is not HTML.
 const cardRupeesText = (n) => cardRupees(n).replace('&#8377;', '₹');
-const CARD_PRICE_LINE = `RFID cards from ${cardRupeesText(CARD_PRICING.rfid)}, NFC from ${cardRupeesText(CARD_PRICING.nfc)}, plus GST, minimum ${CARD_PRICING.minQty} cards`;
+const CARD_DELIVERY = `delivered in Bengaluru within ${CARD_PRICING.deliveryDays} business days of payment`;
+const CARD_PRICE_LINE = `RFID cards from ${cardRupeesText(CARD_PRICING.rfid)}, NFC from ${cardRupeesText(CARD_PRICING.nfc)}, plus GST, minimum ${CARD_PRICING.minQty} cards, ${CARD_DELIVERY}`;
 
 /* --------------------------------------------------------------- the shell */
 
@@ -717,7 +722,7 @@ const NAV_GROUPS = [
     blurb: `Cards we make, and hardware we supply. ${CARD_PRICE_LINE}; hardware quoted per order.`,
     items: [
       { nav: 'manufacturing', href: '/manufacturing/', label: 'All manufacturing &amp; supply', blurb: 'What we make and what we distribute.', icon: 'precision_manufacturing' },
-      { nav: 'mfg-rfid', href: '/manufacturing/rfid-cards/', label: 'RFID &amp; NFC cards', blurb: `RFID from ${cardRupeesText(CARD_PRICING.rfid)}, NFC from ${cardRupeesText(CARD_PRICING.nfc)}. Minimum ${CARD_PRICING.minQty}.`, icon: 'contactless' },
+      { nav: 'mfg-rfid', href: '/manufacturing/rfid-cards/', label: 'RFID &amp; NFC cards', blurb: `RFID from ${cardRupeesText(CARD_PRICING.rfid)}, NFC from ${cardRupeesText(CARD_PRICING.nfc)}. Minimum ${CARD_PRICING.minQty}. ${CARD_PRICING.deliveryDays} business days in Bengaluru.`, icon: 'contactless' },
       { nav: 'mfg-distribution', href: '/manufacturing/distribution/', label: 'IT hardware distribution', blurb: 'Dell, HP, Lenovo, Asus, Apple and Logitech.', icon: 'local_shipping' },
       { nav: 'mfg-iot', href: '/manufacturing/iot/', label: 'IoT solutions', blurb: 'Asset tracking, temperature, humidity and energy monitoring.', icon: 'sensors' },
       { href: '/manufacturing/distribution/#laptops', label: 'Laptops &amp; desktops', blurb: 'Contact us for stock, configuration and warranty.', icon: 'laptop_windows' },
@@ -2785,7 +2790,7 @@ const PRINT_CATEGORIES = [
       },
       {
         h: 'RFID and NFC cards',
-        p: `Cards, tags, key fobs and wristbands, printed with your branding, at Bengaluru's lowest prices: RFID cards from ${cardRupees(CARD_PRICING.rfid)} and NFC cards from ${cardRupees(CARD_PRICING.nfc)} a card plus GST, and a minimum of just ${CARD_PRICING.minQty}. The part worth getting right first is the chip: 125 kHz and 13.56 MHz are different technologies, and a card of the wrong sort is a coaster no matter how well it is printed. Tell us the chip your readers expect, or, if you do not know, what access control, attendance or cafeteria system you run, and we will confirm the right card before anything is ordered in bulk. If the card has to open a door, mark attendance or pay for lunch rather than simply look right, the chip choice, encoding and keys are covered properly on <a class="text-brand font-bold" href="/manufacturing/rfid-cards/">RFID and NFC card manufacturing</a>.`,
+        p: `Cards, tags, key fobs and wristbands, printed with your branding, at Bengaluru's lowest prices: RFID cards from ${cardRupees(CARD_PRICING.rfid)} and NFC cards from ${cardRupees(CARD_PRICING.nfc)} a card plus GST, and a minimum of just ${CARD_PRICING.minQty}, ${CARD_DELIVERY}. The part worth getting right first is the chip: 125 kHz and 13.56 MHz are different technologies, and a card of the wrong sort is a coaster no matter how well it is printed. Tell us the chip your readers expect, or, if you do not know, what access control, attendance or cafeteria system you run, and we will confirm the right card before anything is ordered in bulk. If the card has to open a door, mark attendance or pay for lunch rather than simply look right, the chip choice, encoding and keys are covered properly on <a class="text-brand font-bold" href="/manufacturing/rfid-cards/">RFID and NFC card manufacturing</a>.`,
       },
       {
         h: 'Cards that have to talk to your system',
@@ -5923,7 +5928,7 @@ const rfidFaqs = [
   },
   {
     q: 'How long do they take?',
-    a: 'Plain encoded cards from stock are quick. Fully personalised cards, with photo, name, number, encoded and verified, depend on how fast the data and the photographs reach us, and that is almost always the slow part rather than the printing. Send a clean spreadsheet and named photograph files and you will have a realistic date; send four hundred photographs called IMG_0423.jpg and it will take longer, for reasons nobody can fix at our end.',
+    a: `In Bengaluru, cards are delivered within <strong>${CARD_PRICING.deliveryDays} business days of payment</strong>, printed, encoded and checked. Outside Bengaluru, they are dispatched within the same ${CARD_PRICING.deliveryDays} business days, and the courier's transit time is on top of that. To keep the run moving, send the approved design, a clean spreadsheet and photograph files named to match it along with the payment; four hundred photographs called IMG_0423.jpg take sorting out before anything can be printed.`,
   },
   {
     q: 'What does it cost?',
@@ -5962,7 +5967,7 @@ ${breadcrumbs(
                       )
                       .join('\n                    ')}
                 </div>
-                <p class="mt-3 text-xs font-bold uppercase tracking-[0.15em] text-brand">Bengaluru's lowest prices. Minimum just ${CARD_PRICING.minQty}.</p>
+                <p class="mt-3 text-xs font-bold uppercase tracking-[0.15em] text-brand">Bengaluru's lowest prices. Minimum just ${CARD_PRICING.minQty}. Delivered in Bengaluru within ${CARD_PRICING.deliveryDays} business days of payment.</p>
 
                 ${ctaRow({
                   waText: 'Hi Vybe, I would like to order RFID / NFC cards.',
@@ -6091,7 +6096,7 @@ ${relatedSection('manufacturing', { dark: false })}
       title: 'RFID & NFC Card Manufacturing in Bengaluru | Vybe',
       ogTitle: 'RFID and NFC cards, encoded to your system',
       description:
-        `Bengaluru's lowest prices: RFID cards from ${cardRupeesText(CARD_PRICING.rfid)}, NFC from ${cardRupeesText(CARD_PRICING.nfc)}, plus GST. Minimum ${CARD_PRICING.minQty}. Premium cards, printed and encoded.`,
+        `Bengaluru's lowest prices: RFID cards from ${cardRupeesText(CARD_PRICING.rfid)}, NFC from ${cardRupeesText(CARD_PRICING.nfc)}, plus GST. Minimum ${CARD_PRICING.minQty}. Delivered in Bengaluru within ${CARD_PRICING.deliveryDays} business days of payment.`,
       lastmod,
       trail: [
         CRUMB_HOME,
