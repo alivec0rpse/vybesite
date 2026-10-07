@@ -401,7 +401,7 @@
     "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
     "Permissions-Policy": "geolocation=(), microphone=(), camera=(), interest-cohort=()",
     "X-Frame-Options": "SAMEORIGIN",
-    "Content-Security-Policy": "default-src 'self'; script-src 'self' https://cdn.vybe.net.in; style-src 'self' https://cdn.vybe.net.in; img-src 'self' data: https://cdn.vybe.net.in; font-src 'self' https://cdn.vybe.net.in; connect-src 'self'; form-action 'self'; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests"
+    "Content-Security-Policy": "default-src 'self'; script-src 'self' https://cdn.vybe.net.in; style-src 'self' https://cdn.vybe.net.in; img-src 'self' data: https://cdn.vybe.net.in; font-src 'self' https://cdn.vybe.net.in; connect-src 'self'; frame-src https://www.google.com; form-action 'self'; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests"
   },
 
   "mimeTypes": {

@@ -179,6 +179,38 @@ const telText = (n) => n.replace(/-/g, '\u00a0').replace('\u00a0', ' ');
 /** A `tel:` link, ready to drop into copy. */
 const telLink = (n, cls = 'text-brand font-bold') => `<a class="${cls}" href="${telHref(n)}">${telText(n)}</a>`;
 
+const mapsUrl = (o) =>
+  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    `${ORG.name}, ${o.street}, ${o.locality}, ${o.region} ${o.postal}`
+  )}${o.placeId ? `&query_place_id=${o.placeId}` : ''}`;
+
+/*
+ * The office on a Google map, from the Business Profile's place ID, through
+ * the Maps Embed API (an iframe, no script on our side, no charge).
+ *
+ * The key is public by design: it ships in every page. What stops anyone else
+ * spending it is the restriction on the key in Google Cloud Console, which
+ * must stay "HTTP referrers: vybe.net.in/*" and "Maps Embed API" only.
+ *
+ * Lazy, not click-to-load: `loading="lazy"` has the browser fetch the frame
+ * only as the visitor scrolls near it, so a page view that never reaches the
+ * footer never touches Google. Once it loads, Google may set cookies inside
+ * the frame, which the privacy policy discloses.
+ */
+const MAPS_EMBED_KEY = 'AIzaSyBVbsldzWC2dlEFexYMwg2lU2BLZur3-L0';
+const mapEmbedUrl = (o) =>
+  `https://www.google.com/maps/embed/v1/place?key=${MAPS_EMBED_KEY}&q=place_id:${o.placeId}&zoom=16`;
+
+/** `height` is a Tailwind height class for the frame's box. */
+function mapPanel(o, height) {
+  // strict-origin: the key's referrer restriction only needs the origin, and
+  // an /empdir/ address, which is the only thing protecting those pages, must
+  // not end up in Google's logs.
+  return `<div class="relative ${height} w-full overflow-hidden rounded-2xl border border-white/10 bg-white/5">
+                    <iframe src="${esc(mapEmbedUrl(o))}" title="Map: ${esc(ORG.name)}, ${esc(o.locality)}" loading="lazy" referrerpolicy="strict-origin" allowfullscreen class="absolute inset-0 h-full w-full border-0"></iframe>
+                </div>`;
+}
+
 // English only. Named once so lang, og:locale and inLanguage cannot disagree.
 const LOC = { tag: 'en-IN', og: 'en_IN' };
 
@@ -877,6 +909,9 @@ function footer() {
                     ${ORG.streetLines.join('<br>\n                    ')}<br>
                     ${ORG.locality}, ${ORG.region} - ${ORG.postal}
                 </address>
+                <div class="mt-4">
+                    ${mapPanel(ORG, 'h-40')}
+                </div>
                 <address class="text-sm not-italic leading-relaxed mt-5">
                     <a href="${telHref(ORG.phone)}" class="hover:text-brand transition-colors block">${telText(ORG.phone)}</a>
                     <a href="${telHref(ORG.phoneSupport)}" class="hover:text-brand transition-colors block mt-1">${telText(ORG.phoneSupport)}</a>
@@ -2353,11 +2388,6 @@ for (const doc of LEGAL) {
  * form would have nowhere to POST. Every number and address comes from ORG, so
  * this page, the footer and the schema cannot disagree.
  */
-const mapsUrl = (o) =>
-  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    `${ORG.name}, ${o.street}, ${o.locality}, ${o.region} ${o.postal}`
-  )}${o.placeId ? `&query_place_id=${o.placeId}` : ''}`;
-
 /** One address on the dark office band. `o` carries ORG's address fields. */
 function officeBlock(label, o) {
   return `<div class="mt-8">
@@ -2499,6 +2529,9 @@ ${breadcrumbs([CRUMB_HOME, { name: 'Contact Us', url: '/contact/' }], false)}
                     </dl>
                     <p class="mt-6 text-sm text-slate-400 leading-relaxed">All times IST (UTC+5:30). Email sent outside working hours is picked up the next working morning.</p>
                 </div>
+            </div>
+            <div class="max-w-6xl mx-auto mt-12">
+                ${mapPanel(ORG, 'h-80 md:h-96')}
             </div>
         </section>
 
