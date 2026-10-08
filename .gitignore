@@ -7,3 +7,6 @@ employee-ids/
 
 api/node_modules/
 api/local.settings.json
+blogs/
+src/blog-data/
+assets/blog/

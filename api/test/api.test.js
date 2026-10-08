@@ -5,80 +5,15 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-process.env.VYB_SESSION_SECRET = 'x'.repeat(64);
-process.env.VYB_ADMIN_EMAIL = 'Owner@Vybe.net.in';
-process.env.VYB_ADMIN_PASSWORD = 'bootstrap-password';
-
-const store = require('../src/lib/store');
+const { install, call } = require('./helpers');
 const orders = require('../src/lib/orders');
 
-/* ------------------------------------------------------------- the fake */
-
-function fakeTable() {
-  const rows = new Map();
-  let n = 0;
-  const key = (pk, rk) => `${pk}\u0000${rk}`;
-  const err = (statusCode) => Object.assign(new Error(`HTTP ${statusCode}`), { statusCode });
-  const out = (e) => structuredClone(e);
-  return {
-    rows,
-    async createTable() {},
-    async getEntity(pk, rk) {
-      const e = rows.get(key(pk, rk));
-      if (!e) throw err(404);
-      return out(e);
-    },
-    async createEntity(e) {
-      const k = key(e.partitionKey, e.rowKey);
-      if (rows.has(k)) throw err(409);
-      rows.set(k, { ...out(e), etag: `W/"${++n}"` });
-    },
-    async updateEntity(e, mode = 'Merge', opts = {}) {
-      const k = key(e.partitionKey, e.rowKey);
-      const cur = rows.get(k);
-      if (!cur) throw err(404);
-      if (opts.etag && opts.etag !== cur.etag) throw err(412);
-      const { etag, ...clean } = out(e);
-      rows.set(k, { ...(mode === 'Merge' ? cur : {}), ...clean, etag: `W/"${++n}"` });
-    },
-    async deleteEntity(pk, rk) {
-      if (!rows.delete(key(pk, rk))) throw err(404);
-    },
-    async *listEntities({ queryOptions: { filter } }) {
-      const pk = /PartitionKey eq '([^']+)'/.exec(filter)[1];
-      for (const e of rows.values()) if (e.partitionKey === pk) yield out(e);
-    },
-  };
-}
-
-const db = { orders: fakeTable(), users: fakeTable() };
-store.useClients(db);
+const { db } = install();
 
 const authFns = require('../src/functions/auth');
 const orderFns = require('../src/functions/orders');
 const userFns = require('../src/functions/users');
 const { track } = require('../src/functions/track');
-const { route } = require('../src/lib/http');
-
-/* ------------------------------------------------------------ requests */
-
-const ctx = { log() {}, error(e) { throw e; } };
-
-/** Call a handler the way the Functions host would, through route(). */
-async function call(fn, { cookie, body, params = {}, query = {}, type = 'application/json' } = {}) {
-  const headers = new Headers();
-  if (cookie) headers.set('cookie', cookie);
-  if (body !== undefined) headers.set('content-type', type);
-  const req = {
-    headers,
-    params,
-    query: new URLSearchParams(query),
-    json: async () => (typeof body === 'string' ? JSON.parse(body) : body),
-  };
-  const res = await route(fn)(req, ctx);
-  const set = res.headers && res.headers['Set-Cookie'];
-  return { status: res.status, body: res.jsonBody, cookie: set ? set.split(';')[0] : null, headers: res.headers };
-}
 
 async function signIn(email, password) {
   const r = await call(authFns.login, { body: { email, password } });

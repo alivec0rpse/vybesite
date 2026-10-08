@@ -15,6 +15,7 @@
 # Required secrets (Settings -> Actions -> Secrets):
 #   AZURE_STATIC_WEB_APPS_API_TOKEN
 #   AZURE_CLIENT_ID / AZURE_CLIENT_SECRET / AZURE_TENANT_ID
+#   VYB_BUILD_TOKEN   same value as the Static Web App setting of that name
 #
 # The order-tracking API in api/ ships in the same deploy, as the site's
 # managed functions. Its own settings (VYB_TABLES_CONNECTION,
@@ -33,9 +34,38 @@ on:
       - 'shots/**'
       - 'employee-ids/**'
   workflow_dispatch:
+  # Blog posts are published from /vyb-admin/ without a push. Every 15
+  # minutes, blog-check compares what the API has published with what the live
+  # site was built from, and only a difference goes on to a real deploy. A
+  # check that finds nothing costs one container start and two small requests.
+  schedule:
+    - cron: '*/15 * * * *'
 
 jobs:
+  blog-check:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.compare.outputs.changed }}
+    steps:
+      - name: Compare published blog with the live site
+        id: compare
+        run: |
+          stamp() { sed -nE 's/.*"stamp" *: *"([^"]+)".*/\1/p'; }
+          api=$(curl -fsS --max-time 30 https://vybe.net.in/api/blog/stamp | stamp)
+          live=$(curl -fsS --max-time 30 https://vybe.net.in/blogs/stamp.json | stamp || true)
+          echo "published: ${api:-?}  live: ${live:-none}"
+          if [ -n "$api" ] && [ "$api" != "$live" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
   build-and-deploy:
+    needs: blog-check
+    # always(): on a push blog-check is skipped, and a skipped need would
+    # otherwise skip this job too.
+    if: always() && (github.event_name != 'schedule' || needs.blog-check.outputs.changed == 'true')
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repository
@@ -70,6 +100,11 @@ jobs:
         run: npm test --prefix api
 
       - name: Build
+        # The build starts by pulling published blog posts from the live API
+        # (tools/fetch-blog.mjs), which needs the same token the Static Web App
+        # holds as VYB_BUILD_TOKEN.
+        env:
+          VYB_BUILD_TOKEN: ${{ secrets.VYB_BUILD_TOKEN }}
         run: npm run build
 
       - name: Validate HTML

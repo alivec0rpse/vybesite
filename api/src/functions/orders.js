@@ -44,8 +44,6 @@ async function mutate(req, change) {
   }
 }
 
-const strip = ({ etag, timestamp, 'odata.etag': _, ...rest }) => rest;
-
 async function list(req) {
   await auth.requireStaff(req);
   const q = String(req.query.get('q') || '').trim().toLowerCase();
@@ -111,7 +109,7 @@ async function getOne(req) {
 async function edit(req) {
   await auth.requireStaff(req);
   const fields = orders.details(await body(req), { partial: true });
-  const saved = await mutate(req, (e) => ({ ...strip(e), ...fields, updatedAt: new Date().toISOString() }));
+  const saved = await mutate(req, (e) => ({ ...store.strip(e), ...fields, updatedAt: new Date().toISOString() }));
   return json(200, { order: orders.staffView(saved) });
 }
 
@@ -125,7 +123,7 @@ async function setStatus(req) {
     const evs = orders.events(e);
     evs.push({ status: next, at: now, note, by: user.rowKey });
     if (evs.length > 300) throw new HttpError(400, 'This order has reached its limit of updates.');
-    return { ...strip(e), status: next, events: JSON.stringify(evs), updatedAt: now };
+    return { ...store.strip(e), status: next, events: JSON.stringify(evs), updatedAt: now };
   });
   return json(200, { order: orders.staffView(saved) });
 }
@@ -136,7 +134,7 @@ async function undoStatus(req) {
     const evs = orders.events(e);
     if (evs.length < 2) throw new HttpError(400, 'The first update cannot be undone. Delete the order instead.');
     evs.pop();
-    return { ...strip(e), status: evs[evs.length - 1].status, events: JSON.stringify(evs), updatedAt: new Date().toISOString() };
+    return { ...store.strip(e), status: evs[evs.length - 1].status, events: JSON.stringify(evs), updatedAt: new Date().toISOString() };
   });
   return json(200, { order: orders.staffView(saved) });
 }

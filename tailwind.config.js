@@ -13,10 +13,15 @@ module.exports = {
     './404.html',
     './*/index.html',
     './*/*/index.html',
+    // Blog author pages sit one level deeper: /blogs/authors/<slug>/.
+    './*/*/*/index.html',
     './assets/verify.js',
     './assets/site.js',
     './assets/track.js',
     './assets/admin.js',
+    // The blog renderer emits .blog-table; .blog-prose rules that mention it
+    // are purged unless Tailwind can see the name somewhere.
+    './api/src/lib/markdown.js',
   ],
   theme: {
     extend: {

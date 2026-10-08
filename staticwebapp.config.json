@@ -276,6 +276,14 @@
         "Referrer-Policy": "no-referrer"
       }
     },
+    { "route": "/blogs", "redirect": "/blogs/", "statusCode": 301 },
+    { "route": "/blog", "redirect": "/blogs/", "statusCode": 301 },
+    { "route": "/blog/*", "redirect": "/blogs/", "statusCode": 301 },
+    {
+      "route": "/blogs/feed.xml",
+      "headers": { "Content-Type": "application/rss+xml; charset=utf-8", "Cache-Control": "public, max-age=900" }
+    },
+    { "route": "/blogs/stamp.json", "headers": { "Cache-Control": "no-cache", "X-Robots-Tag": "noindex" } },
     { "route": "/vyb-admin", "redirect": "/vyb-admin/", "statusCode": 301 },
     {
       "route": "/vyb-admin/*",

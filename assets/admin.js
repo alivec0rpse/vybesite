@@ -7,7 +7,7 @@
  * The session is an HttpOnly cookie scoped to /api, so this script never sees
  * it and nothing it renders could leak it. Markup goes in via textContent.
  *
- * material-symbols-outlined: add, delete, content_copy, open_in_new, chat, undo, arrow_back, refresh, logout, key, person_add, close
+ * material-symbols-outlined: add, delete, content_copy, open_in_new, chat, undo, arrow_back, refresh, logout, key, person_add, close, check_circle, cancel, warning, upload, image, visibility, rocket_launch
  */
 (function () {
   'use strict';
@@ -184,15 +184,19 @@
   }
 
   function tab(name) {
-    ['orders', 'staff'].forEach(function (t) {
+    ['orders', 'certs', 'blog', 'staff'].forEach(function (t) {
       $('panel-' + t).hidden = t !== name;
       $('tab-' + t).setAttribute('aria-selected', String(t === name));
       $('tab-' + t).className = 'px-5 py-2.5 rounded-full text-sm font-bold transition-colors ' + (t === name ? 'bg-corporate text-white' : 'text-slate-600 hover:text-brand');
     });
     if (name === 'orders') listView();
     if (name === 'staff') loadUsers();
+    if (name === 'certs') certListView();
+    if (name === 'blog') blogTab('posts');
   }
   $('tab-orders').addEventListener('click', function () { tab('orders'); });
+  $('tab-certs').addEventListener('click', function () { tab('certs'); });
+  $('tab-blog').addEventListener('click', function () { tab('blog'); });
   $('tab-staff').addEventListener('click', function () { tab('staff'); });
 
   function fillSelects() {
@@ -532,6 +536,533 @@
       $('users-list').replaceChildren(h('div', 'overflow-x-auto', h('table', 'w-full text-sm', [head, tbody])));
     });
   }
+
+  /* ------------------------------------------------------------ uploads */
+
+  /** Upload a picked file to /api/media and resolve with its URL. */
+  function upload(file) {
+    if (!file) return Promise.reject(new Error('No file chosen.'));
+    if (file.size > 6 * 1024 * 1024) return Promise.reject(new Error('Files can be 6 MB at most.'));
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function () { resolve(reader.result); };
+      reader.onerror = function () { reject(new Error('Could not read that file.')); };
+      reader.readAsDataURL(file);
+    }).then(function (data) {
+      toast('Uploading ' + file.name + '…');
+      return api('POST', 'media', { name: file.name, data: data }).then(function (r) {
+        if (!r.ok) throw new Error(r.body.error || 'Upload failed.');
+        return r.body.url;
+      });
+    });
+  }
+
+  function onFile(input, done) {
+    input.addEventListener('change', function () {
+      var file = input.files[0];
+      input.value = '';
+      upload(file).then(done, function (e) { toast(e.message, true); });
+    });
+  }
+
+  function thumb(url, cls) {
+    if (!url) return null;
+    var img = h('img', cls || 'max-h-40 rounded-xl border border-slate-200');
+    img.src = url;
+    img.alt = '';
+    return img;
+  }
+
+  /* ------------------------------------------------------- certificates */
+
+  var certs = [];
+
+  function today() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  function certPill(c) {
+    var label = c.status === 'withdrawn' ? 'Withdrawn' : c.expires < today() ? 'Expired' : 'Valid';
+    var tone = label === 'Valid' ? 'bg-emerald-100 text-emerald-900' : label === 'Expired' ? 'bg-rose-100 text-rose-900' : 'bg-amber-100 text-amber-900';
+    var wrap = h('span', 'flex flex-wrap gap-1', [h('span', 'rounded-full px-3 py-1 text-xs font-bold ' + tone, label)]);
+    if (c.specimen) wrap.appendChild(h('span', 'rounded-full px-3 py-1 text-xs font-bold bg-slate-200 text-slate-700', 'Specimen'));
+    return wrap;
+  }
+
+  function certListView() {
+    $('certs-list-view').hidden = false;
+    $('cert-form').hidden = true;
+    api('GET', 'certs').then(function (r) {
+      if (!r.ok) return;
+      certs = r.body.certificates;
+      renderCerts();
+    });
+  }
+
+  function renderCerts() {
+    var q = $('certs-q').value.trim().toLowerCase();
+    var rows = certs.filter(function (c) {
+      return !q || [c.number, c.holder, c.standard, c.scheme].join(' ').toLowerCase().indexOf(q) >= 0;
+    });
+    if (!rows.length) {
+      $('certs-list').replaceChildren(h('p', 'p-8 text-center text-sm text-slate-500', q ? 'No certificates match.' : 'The register is empty.'));
+      return;
+    }
+    var tbody = h('tbody', 'divide-y divide-slate-100');
+    rows.forEach(function (c) {
+      var tr = h('tr', 'hover:bg-slate-50 cursor-pointer', [
+        h('td', 'px-4 py-3 font-bold text-slate-900 whitespace-nowrap', c.number),
+        h('td', 'px-4 py-3 text-slate-700', c.holder),
+        h('td', 'px-4 py-3 text-slate-600 whitespace-nowrap', c.standard),
+        h('td', 'px-4 py-3 text-slate-600 whitespace-nowrap', c.expires),
+        h('td', 'px-4 py-3', certPill(c)),
+      ]);
+      tr.tabIndex = 0;
+      tr.addEventListener('click', function () { certView(c); });
+      tr.addEventListener('keydown', function (e) { if (e.key === 'Enter') certView(c); });
+      tbody.appendChild(tr);
+    });
+    var head = h('thead', 'bg-slate-50 text-left text-xs uppercase tracking-[0.12em] text-slate-500', h('tr', '', ['Number', 'Holder', 'Standard', 'Expires', 'Status'].map(function (t) { return h('th', 'px-4 py-3 font-bold', t); })));
+    $('certs-list').replaceChildren(h('div', 'overflow-x-auto', h('table', 'w-full text-sm', [head, tbody])));
+  }
+  $('certs-q').addEventListener('input', renderCerts);
+
+  var CERT_FIELDS = ['number', 'holder', 'address', 'scheme', 'standard', 'scope', 'initial', 'issued', 'expires', 'status', 'pdf', 'internalNote'];
+  var editingCert = null;
+
+  function certView(c) {
+    editingCert = c;
+    $('certs-list-view').hidden = true;
+    $('cert-form').hidden = false;
+    $('cert-error').textContent = '';
+    CERT_FIELDS.forEach(function (f) { $('c-' + f).value = c ? c[f] || '' : ''; });
+    $('c-specimen').checked = !!(c && c.specimen);
+    if (!c) {
+      $('c-status').value = 'active';
+      $('c-issued').value = today();
+    }
+    $('c-number').readOnly = !!c;
+    $('cert-title').textContent = c ? c.number : 'Issue a certificate';
+    $('cert-open').hidden = !c;
+    if (c) $('cert-open').href = '/verify/?cert=' + encodeURIComponent(c.number);
+    $('cert-delete').hidden = !c || state.user.role !== 'admin';
+    $(c ? 'c-holder' : 'c-number').focus();
+  }
+
+  $('btn-new-cert').addEventListener('click', function () { certView(null); });
+  $('cert-back').addEventListener('click', certListView);
+  onFile($('c-pdf-file'), function (url) {
+    $('c-pdf').value = url;
+    toast('PDF uploaded. Save to attach it.');
+  });
+
+  $('cert-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var data = {};
+    CERT_FIELDS.forEach(function (f) { data[f] = $('c-' + f).value; });
+    data.specimen = $('c-specimen').checked;
+    $('cert-error').textContent = '';
+    var req = editingCert
+      ? api('PATCH', 'certs?number=' + encodeURIComponent(editingCert.number), data)
+      : api('POST', 'certs', data);
+    req.then(function (r) {
+      if (!r.ok) {
+        $('cert-error').textContent = r.body.error || 'Could not save.';
+        return;
+      }
+      toast(editingCert ? 'Saved. /verify/ shows the change now.' : 'Issued. ' + r.body.certificate.number + ' verifies now.');
+      certView(r.body.certificate);
+    });
+  });
+
+  $('cert-delete').addEventListener('click', function () {
+    var n = editingCert.number;
+    if (prompt('Deleting removes ' + n + ' from the register for good, and the number will verify as unknown.\nTo revoke it instead, set the status to Withdrawn.\n\nType the number to delete it anyway:') !== n) return;
+    api('DELETE', 'certs?number=' + encodeURIComponent(n)).then(function (r) {
+      if (!r.ok) return toast(r.body.error || 'Could not delete.', true);
+      toast('Deleted.');
+      certListView();
+    });
+  });
+
+  /* --------------------------------------------------------------- blog */
+
+  var authors = [];
+  var editingPost = null;
+
+  function blogTab(which) {
+    $('posts-list-view').hidden = which !== 'posts';
+    $('post-form').hidden = true;
+    $('authors-view').hidden = which !== 'authors';
+    ['posts', 'authors'].forEach(function (t) {
+      $('blog-tab-' + t).classList.toggle('!bg-corporate', t === which);
+      $('blog-tab-' + t).classList.toggle('!text-white', t === which);
+    });
+    loadAuthors().then(function () {
+      if (which === 'posts') loadPosts();
+      else renderAuthors();
+    });
+  }
+  $('blog-tab-posts').addEventListener('click', function () { blogTab('posts'); });
+  $('blog-tab-authors').addEventListener('click', function () { blogTab('authors'); });
+
+  $('blog-deploy').addEventListener('click', function () {
+    var btn = $('blog-deploy');
+    btn.disabled = true;
+    api('POST', 'blog/deploy', {}).then(function (r) {
+      btn.disabled = false;
+      toast(r.ok ? r.body.message : r.body.error || 'Could not start a rebuild.', !r.ok || !r.body.dispatched);
+    });
+  });
+
+  function loadAuthors() {
+    return api('GET', 'blog/authors').then(function (r) {
+      if (r.ok) authors = r.body.authors;
+    });
+  }
+  function authorName(slug) {
+    for (var i = 0; i < authors.length; i++) if (authors[i].slug === slug) return authors[i].name;
+    return '';
+  }
+
+  function postState(p) {
+    if (p.status !== 'published') return { label: 'Draft', tone: 'bg-slate-200 text-slate-700' };
+    if (Date.parse(p.publishedAt) > Date.now()) return { label: 'Scheduled ' + when(p.publishedAt), tone: 'bg-amber-100 text-amber-900' };
+    return { label: 'Published', tone: 'bg-emerald-100 text-emerald-900' };
+  }
+  function statePill(p) {
+    var s = postState(p);
+    return h('span', 'inline-block whitespace-nowrap rounded-full px-3 py-1 text-xs font-bold ' + s.tone, s.label);
+  }
+
+  function loadPosts() {
+    api('GET', 'blog/posts').then(function (r) {
+      if (!r.ok) return;
+      if (!r.body.posts.length) {
+        $('posts-list').replaceChildren(h('p', 'p-8 text-center text-sm text-slate-500', 'No posts yet. Add an author first, then write the first post.'));
+        return;
+      }
+      var tbody = h('tbody', 'divide-y divide-slate-100');
+      r.body.posts.forEach(function (p) {
+        var tr = h('tr', 'hover:bg-slate-50 cursor-pointer', [
+          h('td', 'px-4 py-3', [h('span', 'block font-bold text-slate-900', p.title || '(untitled)'), h('span', 'block text-xs text-slate-500', '/blogs/' + p.slug + '/')]),
+          h('td', 'px-4 py-3', statePill(p)),
+          h('td', 'px-4 py-3 text-slate-600 whitespace-nowrap', authorName(p.author) || '—'),
+          h('td', 'px-4 py-3 text-slate-600 tabular-nums', String(p.words)),
+          h('td', 'px-4 py-3 text-xs text-slate-500 whitespace-nowrap', when(p.editedAt || p.createdAt)),
+        ]);
+        tr.tabIndex = 0;
+        var open = function () { openPost(p.slug); };
+        tr.addEventListener('click', open);
+        tr.addEventListener('keydown', function (e) { if (e.key === 'Enter') open(); });
+        tbody.appendChild(tr);
+      });
+      var head = h('thead', 'bg-slate-50 text-left text-xs uppercase tracking-[0.12em] text-slate-500', h('tr', '', ['Post', 'Status', 'Author', 'Words', 'Edited'].map(function (t) { return h('th', 'px-4 py-3 font-bold', t); })));
+      $('posts-list').replaceChildren(h('div', 'overflow-x-auto', h('table', 'w-full text-sm', [head, tbody])));
+    });
+  }
+
+  function openPost(slug) {
+    api('GET', 'blog/posts/' + encodeURIComponent(slug)).then(function (r) {
+      if (r.ok) postView(r.body.post);
+      else toast(r.body.error || 'Could not open that post.', true);
+    });
+  }
+
+  function slugify(s) {
+    var out = String(s).toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    if (out.length > 60) out = out.slice(0, 60).replace(/-[^-]*$/, '');
+    return out;
+  }
+
+  // datetime-local speaks the browser's local time; the API speaks ISO.
+  function toLocalInput(iso) {
+    if (!iso) return '';
+    var d = new Date(iso);
+    var p = function (n) { return String(n).padStart(2, '0'); };
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + 'T' + p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+  function fromLocalInput(v) {
+    return v ? new Date(v).toISOString() : '';
+  }
+
+  var POST_FIELDS = ['title', 'slug', 'seoTitle', 'description', 'author', 'tags', 'cover', 'coverAlt', 'body'];
+  var slugTouched = false;
+
+  function postView(p) {
+    editingPost = p;
+    $('posts-list-view').hidden = true;
+    $('authors-view').hidden = true;
+    $('post-form').hidden = false;
+    $('post-error').textContent = '';
+
+    var sel = $('p-author');
+    sel.replaceChildren(option('', 'Choose an author'));
+    authors.forEach(function (a) { sel.appendChild(option(a.slug, a.name)); });
+
+    POST_FIELDS.forEach(function (f) {
+      var v = p ? p[f] : '';
+      $('p-' + f).value = f === 'tags' && p ? p.tags.join(', ') : v || '';
+    });
+    $('p-publishedAt').value = p ? toLocalInput(p.publishedAt) : '';
+    $('p-slug').readOnly = !!p;
+    slugTouched = !!p;
+    $('p-preview').hidden = true;
+
+    var published = p && p.status === 'published';
+    $('post-heading').textContent = p ? p.title || p.slug : 'New post';
+    $('post-state').replaceChildren(p ? statePill(p) : statePill({ status: 'draft' }));
+    $('post-save').textContent = published ? 'Save changes' : 'Save draft';
+    $('post-publish').hidden = published;
+    $('post-unpublish').hidden = !published;
+    $('post-view').hidden = !published || Date.parse(p.publishedAt) > Date.now();
+    if (p) $('post-view').href = '/blogs/' + p.slug + '/';
+    $('post-delete').hidden = !p || state.user.role !== 'admin';
+    coverPreview();
+    seo();
+    window.scrollTo({ top: 0 });
+    $('p-title').focus();
+  }
+
+  $('btn-new-post').addEventListener('click', function () {
+    if (!authors.length) toast('Tip: add an author under Authors first. Posts need one to publish.');
+    postView(null);
+  });
+  $('post-back').addEventListener('click', function () { blogTab('posts'); });
+
+  $('p-title').addEventListener('input', function () {
+    if (!slugTouched) $('p-slug').value = slugify($('p-title').value);
+    seo();
+  });
+  $('p-slug').addEventListener('input', function () { slugTouched = true; seo(); });
+  ['p-seoTitle', 'p-description', 'p-author', 'p-coverAlt', 'p-tags'].forEach(function (id) {
+    $(id).addEventListener('input', seo);
+  });
+
+  function coverPreview() {
+    $('p-cover-preview').replaceChildren(thumb($('p-cover').value) || h('p', 'text-xs text-slate-400', 'No cover image.'));
+  }
+  onFile($('p-cover-file'), function (url) {
+    $('p-cover').value = url;
+    coverPreview();
+    seo();
+    $('p-coverAlt').focus();
+    toast('Cover uploaded. Describe it in the alt text, then save.');
+  });
+  $('p-cover-clear').addEventListener('click', function () {
+    $('p-cover').value = '';
+    $('p-coverAlt').value = '';
+    coverPreview();
+    seo();
+  });
+
+  onFile($('p-body-image'), function (url) {
+    var ta = $('p-body');
+    var at = ta.selectionStart;
+    var alt = 'describe the image';
+    var snippet = '\n\n![' + alt + '](' + url + ')\n\n';
+    ta.value = ta.value.slice(0, at) + snippet + ta.value.slice(ta.selectionEnd);
+    ta.focus();
+    // Select the placeholder so typing replaces it.
+    ta.setSelectionRange(at + 4, at + 4 + alt.length);
+    bodyChanged();
+  });
+
+  /* Live preview: the API renders it with the same code the build uses. */
+  var previewTimer;
+  function refreshPreview() {
+    if ($('p-preview').hidden) return;
+    api('POST', 'blog/preview', { body: $('p-body').value }).then(function (r) {
+      // Server-rendered from markdown with every character escaped; no raw HTML gets through.
+      if (r.ok) $('p-preview').innerHTML = r.body.html || '<p>Nothing to preview yet.</p>';
+    });
+  }
+  function bodyChanged() {
+    seo();
+    clearTimeout(previewTimer);
+    previewTimer = setTimeout(refreshPreview, 500);
+  }
+  $('p-body').addEventListener('input', bodyChanged);
+  $('p-preview-toggle').addEventListener('click', function () {
+    $('p-preview').hidden = !$('p-preview').hidden;
+    refreshPreview();
+  });
+
+  function words(s) {
+    var m = String(s).replace(/!\[[^\]]*\]\([^)]*\)/g, ' ').replace(/\]\([^)]*\)/g, ' ').match(/[\p{L}\p{N}]+/gu);
+    return m ? m.length : 0;
+  }
+
+  /** The checklist beside the editor. Red blocks publishing on the server too; amber is advice. */
+  function seo() {
+    var title = $('p-seoTitle').value.trim() || $('p-title').value.trim();
+    var desc = $('p-description').value.trim();
+    var body = $('p-body').value;
+    var n = words(body);
+    var h2 = (body.match(/^#{1,2}\s+\S/gm) || []).length;
+    var imgs = body.match(/!\[[^\]]*\]\([^)]+\)/g) || [];
+    var noAlt = imgs.filter(function (i) { return /^!\[\s*(describe the image)?\s*\]/.test(i); }).length;
+    var internal = /\]\((\/(?!api\/)|https:\/\/vybe\.net\.in)/.test(body);
+    var slug = $('p-slug').value;
+
+    $('p-description-count').textContent = '(' + desc.length + '/160)';
+    $('p-words').textContent = '(' + n + ' words, ~' + Math.max(1, Math.round(n / 200)) + ' min read)';
+    $('serp-slug').textContent = slug;
+    $('serp-title').textContent = (title || 'Post title') + (title.length + 22 <= 70 ? ' | Vybe Technologies' : '');
+    $('serp-desc').textContent = desc || 'Write a meta description: this is the text people read before deciding to click.';
+
+    var checks = [
+      [title.length >= 20 && title.length <= 60 ? 'ok' : title ? 'warn' : 'bad', 'Title of 20–60 characters (now ' + title.length + ')'],
+      [desc.length >= 120 && desc.length <= 160 ? 'ok' : desc.length >= 50 ? 'warn' : 'bad', 'Meta description of 120–160 characters'],
+      [$('p-author').value ? 'ok' : 'bad', 'Author chosen'],
+      [n >= 600 ? 'ok' : n >= 150 ? 'warn' : 'bad', 'Substantial body: 600+ words is ideal, 150 is the minimum'],
+      [h2 >= 2 ? 'ok' : 'warn', 'Two or more ## section headings'],
+      [!$('p-cover').value ? 'warn' : $('p-coverAlt').value.trim() ? 'ok' : 'bad', 'Cover image, with alt text'],
+      [noAlt ? 'bad' : 'ok', 'Every image in the body is described (' + imgs.length + ' image' + (imgs.length === 1 ? '' : 's') + ')'],
+      [internal ? 'ok' : 'warn', 'Links to at least one other page on vybe.net.in'],
+      [slug && slug.length <= 60 ? 'ok' : 'warn', 'Short, readable URL'],
+    ];
+    var ICON = { ok: ['check_circle', 'text-emerald-600'], warn: ['warning', 'text-amber-500'], bad: ['cancel', 'text-red-600'] };
+    $('seo-checks').replaceChildren.apply(
+      $('seo-checks'),
+      checks.map(function (c) {
+        return h('li', 'flex gap-2 items-start', [icon(ICON[c[0]][0], 'text-[18px] shrink-0 ' + ICON[c[0]][1]), h('span', 'text-slate-700', c[1])]);
+      })
+    );
+  }
+
+  function collectPost() {
+    var d = {};
+    POST_FIELDS.forEach(function (f) { d[f] = $('p-' + f).value; });
+    if (editingPost && editingPost.status === 'published') d.publishedAt = fromLocalInput($('p-publishedAt').value);
+    return d;
+  }
+
+  function savePost() {
+    $('post-error').textContent = '';
+    var data = collectPost();
+    if (editingPost) delete data.slug; // fixed at creation
+    var req = editingPost ? api('PATCH', 'blog/posts/' + encodeURIComponent(editingPost.slug), data) : api('POST', 'blog/posts', data);
+    return req.then(function (r) {
+      if (!r.ok) {
+        $('post-error').textContent = r.body.error || 'Could not save.';
+        return null;
+      }
+      editingPost = r.body.post;
+      return r.body.post;
+    });
+  }
+
+  $('post-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    savePost().then(function (p) {
+      if (!p) return;
+      toast(p.status === 'published' ? 'Saved. Live after the next site build.' : 'Draft saved.');
+      postView(p);
+    });
+  });
+
+  $('post-publish').addEventListener('click', function () {
+    var at = fromLocalInput($('p-publishedAt').value);
+    savePost().then(function (p) {
+      if (!p) return;
+      return api('POST', 'blog/posts/' + encodeURIComponent(p.slug) + '/publish', { publishedAt: at }).then(function (r) {
+        if (!r.ok) {
+          $('post-error').textContent = r.body.error || 'Could not publish.';
+          postView(p);
+          $('post-error').textContent = r.body.error || 'Could not publish.';
+          return;
+        }
+        var scheduled = Date.parse(r.body.post.publishedAt) > Date.now();
+        toast(scheduled ? 'Scheduled for ' + when(r.body.post.publishedAt) + '.' : 'Published. Use “Rebuild site now” to put it live immediately.');
+        postView(r.body.post);
+      });
+    });
+  });
+
+  $('post-unpublish').addEventListener('click', function () {
+    if (!confirm('Take this post off the site at the next build? It stays here as a draft.')) return;
+    api('POST', 'blog/posts/' + encodeURIComponent(editingPost.slug) + '/unpublish', {}).then(function (r) {
+      if (!r.ok) return toast(r.body.error || 'Could not unpublish.', true);
+      toast('Back to draft. It leaves the site at the next build.');
+      postView(r.body.post);
+    });
+  });
+
+  $('post-delete').addEventListener('click', function () {
+    var slug = editingPost.slug;
+    if (prompt('Delete this post for good? If it is live, its URL will 404 after the next build.\nType the URL slug to confirm:\n' + slug) !== slug) return;
+    api('DELETE', 'blog/posts/' + encodeURIComponent(slug)).then(function (r) {
+      if (!r.ok) return toast(r.body.error || 'Could not delete.', true);
+      toast('Post deleted.');
+      blogTab('posts');
+    });
+  });
+
+  /* ------------------------------------------------------------ authors */
+
+  var editingAuthor = null;
+  var AUTHOR_FIELDS = ['name', 'jobTitle', 'bio', 'photo', 'card'];
+
+  function renderAuthors() {
+    if (!authors.length) {
+      $('authors-list').replaceChildren(h('p', 'p-8 text-center text-sm text-slate-500', 'No authors yet. Add the first below.'));
+    } else {
+      var tbody = h('tbody', 'divide-y divide-slate-100');
+      authors.forEach(function (a) {
+        var actions = h('div', 'flex gap-2 justify-end', [button('Edit', BTN, function () { authorForm(a); })]);
+        if (state.user.role === 'admin') {
+          actions.appendChild(button('Delete', BTN_DANGER, function () {
+            if (!confirm('Delete ' + a.name + '?')) return;
+            api('DELETE', 'blog/authors/' + encodeURIComponent(a.slug)).then(function (r) {
+              if (!r.ok) return toast(r.body.error || 'Could not delete.', true);
+              toast('Author deleted.');
+              loadAuthors().then(renderAuthors);
+            });
+          }, 'delete'));
+        }
+        tbody.appendChild(h('tr', '', [
+          h('td', 'px-4 py-3 w-14', thumb(a.photo, 'w-10 h-10 rounded-full object-cover border border-slate-200')),
+          h('td', 'px-4 py-3', [h('span', 'block font-bold text-slate-900', a.name), h('span', 'block text-xs text-slate-500', (a.jobTitle ? a.jobTitle + ' · ' : '') + '/blogs/authors/' + a.slug + '/')]),
+          h('td', 'px-4 py-3', actions),
+        ]));
+      });
+      $('authors-list').replaceChildren(h('div', 'overflow-x-auto', h('table', 'w-full text-sm', tbody)));
+    }
+    authorForm(null);
+  }
+
+  function authorForm(a) {
+    editingAuthor = a;
+    $('author-error').textContent = '';
+    AUTHOR_FIELDS.forEach(function (f) { $('a-' + f).value = a ? a[f] || '' : ''; });
+    $('a-sameAs').value = a ? a.sameAs.join('\n') : '';
+    $('author-heading').textContent = a ? 'Edit ' + a.name : 'Add an author';
+    $('a-photo-preview').replaceChildren(thumb($('a-photo').value, 'w-20 h-20 rounded-full object-cover border border-slate-200') || h('p', 'text-xs text-slate-400', 'No photo.'));
+    if (a) $('a-name').focus();
+  }
+  $('author-cancel').addEventListener('click', function () { authorForm(null); });
+  onFile($('a-photo-file'), function (url) {
+    $('a-photo').value = url;
+    $('a-photo-preview').replaceChildren(thumb(url, 'w-20 h-20 rounded-full object-cover border border-slate-200'));
+  });
+
+  $('author-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var d = {};
+    AUTHOR_FIELDS.forEach(function (f) { d[f] = $('a-' + f).value; });
+    d.sameAs = $('a-sameAs').value.split(/\s+/).filter(Boolean);
+    var req = editingAuthor ? api('PATCH', 'blog/authors/' + encodeURIComponent(editingAuthor.slug), d) : api('POST', 'blog/authors', d);
+    req.then(function (r) {
+      if (!r.ok) {
+        $('author-error').textContent = r.body.error || 'Could not save.';
+        return;
+      }
+      toast('Author saved.');
+      loadAuthors().then(renderAuthors);
+    });
+  });
 
   boot();
 })();

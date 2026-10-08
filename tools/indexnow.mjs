@@ -89,6 +89,20 @@ if (all) {
   }
 }
 
+/* Blog posts are not in .lastmod.json: they come from the API at build time,
+   so git has no history of them. tools/fetch-blog.mjs compares what it fetched
+   with what the live site was built from and lists the posts that moved. */
+const blogChanged = path.join(ROOT, 'src/blog-data/changed.json');
+if (!all && fs.existsSync(blogChanged)) {
+  const extra = JSON.parse(fs.readFileSync(blogChanged, 'utf8'))
+    .map((u) => origin + u)
+    .filter((u) => sitemapUrls.includes(u) && !urls.includes(u));
+  if (extra.length) {
+    urls.push(...extra);
+    why += `, plus ${extra.length} blog URL(s) new or updated since the last deploy`;
+  }
+}
+
 if (!urls.length) {
   console.log('indexnow: no pages changed since the last commit, nothing to submit.');
   process.exit(0);

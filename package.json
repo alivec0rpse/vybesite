@@ -20,7 +20,7 @@
     "tailwindcss": "^3.4.17"
   },
   "scripts": {
-    "build": "node tools/vendor-gsap.mjs && node build.js && node tools/gen-empdir-photos.mjs && npm run css && node tools/stamp-assets.js",
+    "build": "node tools/fetch-blog.mjs && node tools/vendor-gsap.mjs && node build.js && node tools/gen-empdir-photos.mjs && npm run css && node tools/stamp-assets.js",
     "vendor": "node tools/vendor-gsap.mjs",
     "stage": "node tools/stage.js",
     "css": "tailwindcss -i src/input.css -o assets/site.css --minify",
@@ -31,10 +31,11 @@
     "fonts": "node tools/gen-fonts.mjs",
     "serve": "node tools/serve.js",
     "indexnow": "node tools/indexnow.mjs",
-    "validate": "html-validate index.html 404.html */index.html */*/index.html",
+    "validate": "html-validate index.html 404.html */index.html */*/index.html */*/*/index.html",
     "audit:seo": "node tools/audit-seo.js",
     "audit:mobile": "node tools/audit-mobile.js",
-    "audit:icons": "node tools/audit-icons.js"
+    "audit:icons": "node tools/audit-icons.js",
+    "blog": "node tools/fetch-blog.mjs"
   },
   "keywords": [],
   "author": "",

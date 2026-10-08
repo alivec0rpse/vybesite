@@ -802,6 +802,7 @@ function navbar(active) {
             <nav class="primary-nav hidden xl:flex items-center gap-6 text-sm font-medium text-slate-600" aria-label="Primary">
                 ${item('/', 'Home', 'home')}
                 ${NAV_GROUPS.map(group).join('\n                ')}
+                ${BLOG.posts.length ? item('/blogs/', 'Blog', 'blog') : ''}
                 ${item('/careers/', 'Careers', 'careers')}
                 ${item('/contact/', 'Contact', 'contact')}
             </nav>
@@ -819,6 +820,7 @@ function navbar(active) {
                     <nav class="absolute right-0 top-full mt-3 w-72 max-h-[75vh] overflow-y-auto overscroll-contain rounded-2xl border border-slate-200 bg-white shadow-xl p-2 flex flex-col text-base font-medium text-slate-700" aria-label="Mobile">
                         ${mobileItem('/', 'Home', 'home', active)}
                         ${NAV_GROUPS.map(mobileGroup).join('\n                        ')}
+                        ${BLOG.posts.length ? mobileItem('/blogs/', 'Blog', 'blog', active) : ''}
                         ${mobileItem('/careers/', 'Careers', 'careers', active)}
                         ${mobileItem('/contact/', 'Contact Us', 'contact', active)}
                     </nav>
@@ -907,6 +909,7 @@ function footer() {
                     ${link('/shipping-policy/', 'Shipping &amp; Exchange')}
                     ${link('/track/', 'Track an Order')}
                     ${link('/verify/', 'Verify a Certificate')}
+                    ${BLOG.posts.length ? link('/blogs/', 'Blog') : ''}
                     ${link('/careers/', 'Careers')}
                     ${link('/contact/', 'Contact Us')}
                 </ul>
@@ -1742,6 +1745,7 @@ function shell(page) {
     datePublished: ORG.foundingDate,
     dateModified: page.lastmod || BUILD_DATE,
     ...(page.trail.length > 1 ? { breadcrumb: { '@id': `${url}#breadcrumb` } } : {}),
+    ...(page.mainEntity ? { mainEntity: page.mainEntity } : {}),
     // Named third-party organisations on the page. `mentions` claims only
     // that the page refers to them, not a relationship.
     ...(page.mentions ? { mentions: page.mentions } : {}),
@@ -1752,6 +1756,16 @@ function shell(page) {
   const fq = faqSchema(url, page.faqs);
   if (fq) graph.push(fq);
   if (page.schema) graph.push(...[].concat(page.schema(url)));
+
+  // A page with its own picture (a blog post's cover) shares that; the rest
+  // share the site card.
+  const og = page.ogImage || {
+    url: `${SITE}/assets/og-image.png`,
+    type: 'image/png',
+    width: 1200,
+    height: 630,
+    alt: 'Vybe Technologies | Smart. Simple. Affordable.',
+  };
 
   const bodyClass = page.bodyClass || 'text-slate-900 selection:bg-brand/10 selection:text-brand flex flex-col min-h-screen relative z-0';
 
@@ -1785,26 +1799,26 @@ ${page.noindex ? '' : `<link rel="canonical" href="${url}">\n`}<meta name="robot
 <meta property="og:url" content="${url}">
 <meta property="og:title" content="${esc(page.ogTitle || page.title)}">
 <meta property="og:description" content="${esc(page.description)}">
-<meta property="og:image" content="${SITE}/assets/og-image.png">
-<meta property="og:image:secure_url" content="${SITE}/assets/og-image.png">
-<meta property="og:image:type" content="image/png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Vybe Technologies | Smart. Simple. Affordable.">
+<meta property="og:image" content="${og.url}">
+<meta property="og:image:secure_url" content="${og.url}">
+<meta property="og:image:type" content="${og.type}">
+<meta property="og:image:width" content="${og.width}">
+<meta property="og:image:height" content="${og.height}">
+<meta property="og:image:alt" content="${esc(og.alt)}">
 
 <!-- Twitter / X -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${esc(page.ogTitle || page.title)}">
 <meta name="twitter:description" content="${esc(page.description)}">
-<meta name="twitter:image" content="${SITE}/assets/og-image.png">
-<meta name="twitter:image:alt" content="Vybe Technologies | Smart. Simple. Affordable.">
+<meta name="twitter:image" content="${og.url}">
+<meta name="twitter:image:alt" content="${esc(og.alt)}">
 
 <meta name="author" content="${ORG.name}">
 <meta name="publisher" content="${ORG.name}">
 <meta name="geo.region" content="IN-KA">
 <meta name="geo.placename" content="Bengaluru">
 <meta name="format-detection" content="telephone=no">
-
+${page.extraHead ? page.extraHead + '\n' : ''}
 ${ld({ '@context': 'https://schema.org', '@graph': graph })}
 </head>
 <body class="${bodyClass}">
@@ -6640,38 +6654,13 @@ ${relatedSection('manufacturing', { dark: false })}
 /* --------------------------------------------------- certificate verification */
 
 /**
- * The certificate register. This array is the whole source of truth: it is
- * serialised into /assets/verify.js at build time and looked up client-side,
- * because Azure Static Web Apps serves files and nothing else — there is no
- * database to query and no API to call.
- *
- * Adding a certificate is a line here followed by `npm run build`. Never edit
- * assets/verify.js by hand; it is generated output like every other page.
- *
- * `status` is 'active' or 'withdrawn'. Expiry is not a status: it is derived
- * from `expires` against the day the visitor loads the page, so a certificate
- * cannot sit here reading "valid" a year after it lapsed.
- *
- * `specimen: true` marks a record that is not a real issued certificate. The
- * PDF it points at is watermarked SAMPLE and the result card says so, so that
- * a demonstration record can never be mistaken for a live one.
+ * The certificate register lives in the API now (api/src/lib/certs.js), kept
+ * from /vyb-admin/, and /verify/ looks a number up live. Issuing or
+ * withdrawing a certificate is a save in the admin page; it no longer needs a
+ * build. The seed record is read here only for the page's "see a specimen"
+ * link, which must point at a number the register actually holds.
  */
-const CERTIFICATES = [
-  {
-    number: 'VYB-QMS-2026-0417',
-    specimen: true,
-    holder: 'Sample Organisation Pvt Ltd',
-    address: '#00, Sample Building, Sample Road, Sample Layout, Bengaluru, Karnataka 560000, India',
-    scheme: 'Quality Management System',
-    standard: 'ISO 9001:2015',
-    scope: 'Distribution, supply and after-sales support of IT hardware, RFID and NFC access cards, and allied accessories.',
-    initial: '2026-09-15',
-    issued: '2026-09-15',
-    expires: '2029-09-14',
-    status: 'active',
-    pdf: '/assets/certificates/VYB-QMS-2026-0417.pdf',
-  },
-];
+const { SEED: CERTIFICATES } = require('./api/src/lib/certs');
 
 const SPECIMEN = CERTIFICATES.find((c) => c.specimen) || CERTIFICATES[0];
 
@@ -6683,7 +6672,7 @@ const SPECIMEN = CERTIFICATES.find((c) => c.specimen) || CERTIFICATES[0];
    "open_in_new" in place of the icons. */
 const VERIFY_ICONS = ['verified', 'info', 'gavel', 'search', 'description', 'open_in_new'];
 
-/* The lookup runs in the browser, so it ships as a real file rather than an
+/* The lookup is a fetch from the browser, so it ships as a real file rather than an
    inline <script>: the CSP is script-src 'self' with no 'unsafe-inline', and
    an inline block would be dropped by the browser before it ran. Because it
    lives under /assets/, tools/stamp-assets.js hashes its URL and a revised
@@ -6691,19 +6680,22 @@ const VERIFY_ICONS = ['verified', 'info', 'gavel', 'search', 'description', 'ope
 write(
   'assets/verify.js',
   `/*
- * GENERATED by build.js from the CERTIFICATES register. Do not edit.
+ * GENERATED by build.js. Do not edit.
  *
  * The certificate verifier behind /verify/. Progressive enhancement: the page,
  * the form and the guidance are all in the HTML before this deferred file
  * runs. Without it the form still submits, as a plain GET to /verify/?cert=…,
  * and the <noscript> panel tells the visitor how to check by email instead.
  *
+ * The register is not in this file: each number is looked up at
+ * /api/verify/{number}, so a certificate withdrawn in the admin page stops
+ * verifying on the next lookup, not at the next deploy.
+ *
  * material-symbols-outlined: ${VERIFY_ICONS.join(', ')}
  */
 (function () {
   'use strict';
 
-  var CERTS = ${JSON.stringify(CERTIFICATES, null, 2).replace(/</g, '\\u003c').split('\n').join('\n  ')};
   var LEGAL = ${JSON.stringify(ORG.legal)};
 
   var form = document.getElementById('verify-form');
@@ -6718,9 +6710,6 @@ write(
   var key = function (s) {
     return String(s).toUpperCase().replace(/[^A-Z0-9]/g, '');
   };
-
-  var index = {};
-  for (var i = 0; i < CERTS.length; i++) index[key(CERTS[i].number)] = CERTS[i];
 
   var esc = function (s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -6830,14 +6819,50 @@ write(
     );
   };
 
+  var unavailable = function () {
+    return (
+      '<div class="rounded-2xl border border-slate-200 bg-white p-8 md:p-10 shadow-xl">' +
+      '<div class="flex flex-wrap items-center gap-3">' + chip({ tone: 'slate', icon: 'info', label: 'Could not check right now' }) + '</div>' +
+      '<p class="mt-4 text-sm text-slate-600 leading-relaxed">The register did not answer. Check your connection and try again in a minute. ' +
+      'If it keeps happening, email the number to <a class="font-bold text-brand hover:underline" href="mailto:' + LEGAL + '?subject=Certificate%20verification">' + LEGAL + '</a> ' +
+      'and we will confirm in writing.</p>' +
+      '</div>'
+    );
+  };
+
+  /* Only the latest lookup may paint: a slow answer to an earlier number must
+     not overwrite the result for the one typed since. */
+  var seq = 0;
   var render = function (raw) {
     var n = String(raw).trim();
+    var mine = ++seq;
     if (!n) {
       out.innerHTML = '';
       return;
     }
-    var c = index[key(n)];
-    out.innerHTML = c ? found(c) : missing(n);
+    var k = key(n);
+    if (k.length < 4) {
+      out.innerHTML = missing(n);
+      return;
+    }
+    out.setAttribute('aria-busy', 'true');
+    fetch('/api/verify/' + encodeURIComponent(k), { headers: { Accept: 'application/json' }, cache: 'no-store' })
+      .then(function (r) {
+        if (r.status === 404) return null;
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(
+        function (b) {
+          if (mine === seq) out.innerHTML = b ? found(b.certificate) : missing(n);
+        },
+        function () {
+          if (mine === seq) out.innerHTML = unavailable();
+        }
+      )
+      .then(function () {
+        if (mine === seq) out.removeAttribute('aria-busy');
+      });
   };
 
   /* The number belongs in the URL: a verification result is the kind of thing
@@ -6891,7 +6916,7 @@ const verifyFaqs = [
   },
   {
     q: 'Do you charge to verify a certificate?',
-    a: 'No. Verification is free, needs no account, and is open to anybody holding a number — a customer, a tender committee, a parent body or an auditor. Nothing you type here is stored or sent anywhere: the register ships with the page and the lookup happens in your own browser.',
+    a: 'No. Verification is free, needs no account, and is open to anybody holding a number — a customer, a tender committee, a parent body or an auditor. The number you type is sent to our register to be looked up, and that is all: we do not record who checked what.',
   },
 ];
 
@@ -6925,7 +6950,7 @@ ${breadcrumbs([CRUMB_HOME, { name: 'Verify a certificate', url: '/verify/' }], f
                     <div class="mt-10 max-w-3xl">
                         ${noticePanel(
                           'The lookup needs JavaScript',
-                          `<p>The register is checked in your own browser, which is why nothing you type is stored or sent anywhere — and it is also why this one feature needs JavaScript switched on.</p>
+                          `<p>The lookup runs from your browser against our live register, which is why this one feature needs JavaScript switched on.</p>
                         <p>If you would rather not, email the certificate number, or a scan of the document, to <a class="font-bold text-brand hover:underline" href="mailto:${ORG.legal}">${ORG.legal}</a> and we will confirm in writing whether it came from us.</p>`
                         )}
                     </div>
@@ -6965,8 +6990,8 @@ ${proseSections({
       p: 'Then ours is not the certificate you are looking for, and we would rather say that here than have you discover it later. Tell the organisation you are assessing that you need a certificate from a body accredited under the International Accreditation Forum — in India, that means NABCB — and they will need to go to one. Everything they documented for us carries over to that audit, but the certificate itself does not.',
     },
     {
-      h: 'Nothing you type is collected',
-      p: `The register is compiled into the page assets and the lookup runs entirely in your browser. There is no form submission, no logging of who checked what, and no record kept of a number that was typed in. If you would prefer a written confirmation on our letterhead for a tender or an audit file, email <a class="text-brand font-bold" href="mailto:${ORG.legal}">${ORG.legal}</a> with the number and we will send one.`,
+      h: 'Nothing about you is collected',
+      p: `The number you type is sent to our register and checked against it, and nothing else is sent. We do not log who checked what, and no record is kept of a number that was typed in. If you would prefer a written confirmation on our letterhead for a tender or an audit file, email <a class="text-brand font-bold" href="mailto:${ORG.legal}">${ORG.legal}</a> with the number and we will send one.`,
     },
   ],
 })}
@@ -7475,7 +7500,7 @@ ${faqSection(careersFaqs, { dark: false })}
 /* ------------------------------------------------------------ order tracking */
 
 /**
- * /track/: the public half of order tracking. Unlike /verify/, the data is not
+ * /track/: the public half of order tracking. Like /verify/, the data is not
  * compiled into the page: orders change by the hour, so assets/track.js asks
  * the API (api/, deployed as the site's managed functions) for one order by
  * its code. Staff create and update orders at /vyb-admin/.
@@ -7662,8 +7687,10 @@ write(
     </section>
 
     <section id="view-app" hidden>
-        <div class="flex gap-2 mb-6" role="tablist">
+        <div class="flex flex-wrap gap-2 mb-6" role="tablist">
             <button id="tab-orders" type="button" role="tab" aria-selected="true">Orders</button>
+            <button id="tab-certs" type="button" role="tab" aria-selected="false">Certificates</button>
+            <button id="tab-blog" type="button" role="tab" aria-selected="false">Blog</button>
             <button id="tab-staff" type="button" role="tab" aria-selected="false" hidden>Staff</button>
         </div>
 
@@ -7769,6 +7796,196 @@ write(
             </div>
         </div>
 
+        <div id="panel-certs" role="tabpanel" aria-labelledby="tab-certs" hidden>
+            <div id="certs-list-view">
+                <div class="flex flex-col md:flex-row gap-3 md:items-center mb-4">
+                    <h1 class="text-2xl font-black font-display tracking-tight mr-auto">Certificates</h1>
+                    <label for="certs-q" class="sr-only">Search certificates</label>
+                    <input id="certs-q" type="search" placeholder="Number, holder, standard…" class="${ADMIN_INPUT} md:w-72 !mt-0">
+                    <button id="btn-new-cert" type="button" class="${ADMIN_BTN}"><span class="material-symbols-outlined text-[20px]" aria-hidden="true">add</span>Issue certificate</button>
+                </div>
+                <p class="mb-4 text-sm text-slate-600">This is the register behind <a href="/verify/" target="_blank" rel="noopener" class="font-bold text-brand hover:underline">/verify/</a>. Changes are live the moment you save. To revoke a certificate, set it to <strong>Withdrawn</strong> rather than deleting it, so the number keeps answering “withdrawn”.</p>
+                <div id="certs-list" class="rounded-2xl border border-slate-200 bg-white overflow-hidden"></div>
+            </div>
+
+            <form id="cert-form" class="${ADMIN_CARD}" hidden>
+                <button id="cert-back" type="button" class="${ADMIN_BTN_2} mb-4"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_back</span>All certificates</button>
+                <h2 id="cert-title" class="text-2xl font-black font-display tracking-tight">Certificate</h2>
+                <div class="mt-6 grid gap-4 md:grid-cols-2">
+                    ${field('c-number', 'Certificate number *', 'required maxlength="40" placeholder="VYB-QMS-2026-0418" autocomplete="off"')}
+                    <div>
+                        <label for="c-status" class="${ADMIN_LABEL}">Status</label>
+                        <select id="c-status" class="${ADMIN_INPUT}">
+                            <option value="active">Active</option>
+                            <option value="withdrawn">Withdrawn</option>
+                        </select>
+                    </div>
+                    ${field('c-holder', 'Holder (organisation) *', 'required maxlength="200" autocomplete="off"', true)}
+                    ${area('c-address', 'Holder address', '')}
+                    ${field('c-standard', 'Standard *', 'required maxlength="120" placeholder="ISO 9001:2015"')}
+                    ${field('c-scheme', 'Scheme', 'maxlength="120" placeholder="Quality Management System"')}
+                    ${area('c-scope', 'Scope of certification *', 'Printed exactly as on the certificate.')}
+                    ${field('c-initial', 'Initial certification', 'type="date"')}
+                    ${field('c-issued', 'Issue date *', 'type="date" required')}
+                    ${field('c-expires', 'Expiry date *', 'type="date" required')}
+                    <div class="flex items-end pb-2">
+                        <label class="inline-flex items-center gap-2 text-sm font-bold text-slate-700"><input id="c-specimen" type="checkbox" class="w-4 h-4 accent-brand">Specimen (demonstration record)</label>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="c-pdf" class="${ADMIN_LABEL}">Certificate PDF</label>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <input id="c-pdf" type="text" maxlength="500" placeholder="Upload, or paste a link" class="${ADMIN_INPUT}">
+                            <label class="${ADMIN_BTN_2} mt-1 cursor-pointer shrink-0"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">upload</span>Upload PDF<input id="c-pdf-file" type="file" accept="application/pdf" class="sr-only"></label>
+                        </div>
+                    </div>
+                    ${area('c-internalNote', 'Internal note', 'Staff only. Never shown on /verify/.')}
+                </div>
+                <p id="cert-error" class="mt-4 text-sm font-bold text-red-700" role="alert"></p>
+                <div class="mt-4 flex flex-wrap gap-3">
+                    <button id="cert-save" type="submit" class="${ADMIN_BTN}">Save</button>
+                    <a id="cert-open" href="/verify/" target="_blank" rel="noopener" class="${ADMIN_BTN_2}"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">open_in_new</span>Check on /verify/</a>
+                    <button id="cert-delete" type="button" class="ml-auto inline-flex items-center justify-center gap-1.5 rounded-full border border-red-200 bg-white hover:bg-red-50 px-4 py-2 text-xs font-bold text-red-700 transition-colors"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">delete</span>Delete</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="panel-blog" role="tabpanel" aria-labelledby="tab-blog" hidden>
+            <div class="flex flex-wrap gap-2 mb-6">
+                <button id="blog-tab-posts" type="button" class="${ADMIN_BTN_2}">Posts</button>
+                <button id="blog-tab-authors" type="button" class="${ADMIN_BTN_2}">Authors</button>
+                <button id="blog-deploy" type="button" class="${ADMIN_BTN_2} ml-auto"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">rocket_launch</span>Rebuild site now</button>
+            </div>
+
+            <div id="posts-list-view">
+                <div class="flex flex-col md:flex-row gap-3 md:items-center mb-4">
+                    <h1 class="text-2xl font-black font-display tracking-tight mr-auto">Blog posts</h1>
+                    <button id="btn-new-post" type="button" class="${ADMIN_BTN}"><span class="material-symbols-outlined text-[20px]" aria-hidden="true">add</span>New post</button>
+                </div>
+                <p class="mb-4 text-sm text-slate-600">Published posts go live at <a href="/blogs/" target="_blank" rel="noopener" class="font-bold text-brand hover:underline">/blogs/</a> when the site is next built: automatically within about 15 minutes, or straight away with <strong>Rebuild site now</strong>. A future publish date schedules the post.</p>
+                <div id="posts-list" class="rounded-2xl border border-slate-200 bg-white overflow-hidden"></div>
+            </div>
+
+            <form id="post-form" hidden>
+                <button id="post-back" type="button" class="${ADMIN_BTN_2} mb-4"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_back</span>All posts</button>
+                <div class="flex flex-wrap items-center gap-3">
+                    <h1 id="post-heading" class="text-2xl font-black font-display tracking-tight">Post</h1>
+                    <span id="post-state"></span>
+                </div>
+
+                <div class="mt-6 grid gap-6 lg:grid-cols-3">
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="${ADMIN_CARD} grid gap-4">
+                            ${field('p-title', 'Title *', 'required maxlength="120" autocomplete="off"')}
+                            <div>
+                                <label for="p-slug" class="${ADMIN_LABEL}">URL</label>
+                                <div class="mt-1 flex items-center rounded-xl border border-slate-300 bg-slate-50 text-sm overflow-hidden focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/30">
+                                    <span class="pl-4 text-slate-400 whitespace-nowrap">vybe.net.in/blogs/</span>
+                                    <input id="p-slug" type="text" maxlength="80" pattern="[a-z0-9]+(-[a-z0-9]+)*" class="flex-1 min-w-0 bg-transparent px-1 py-2.5 text-slate-900 focus:outline-none" autocomplete="off">
+                                </div>
+                                <p class="mt-1 text-xs text-slate-500">Fixed once the post is created: a published URL must never move.</p>
+                            </div>
+                            <div>
+                                <label for="p-description" class="${ADMIN_LABEL}">Meta description * <span id="p-description-count" class="normal-case tracking-normal font-normal"></span></label>
+                                <textarea id="p-description" rows="2" maxlength="200" class="${ADMIN_INPUT}"></textarea>
+                                <p class="mt-1 text-xs text-slate-500">The line under the title in Google. Aim for 120–160 characters that make someone want to click.</p>
+                            </div>
+                        </div>
+
+                        <div class="${ADMIN_CARD}">
+                            <div class="flex flex-wrap items-center gap-2 mb-2">
+                                <label for="p-body" class="${ADMIN_LABEL} mr-auto">Body * <span id="p-words" class="normal-case tracking-normal font-normal"></span></label>
+                                <label class="${ADMIN_BTN_2} cursor-pointer"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">image</span>Insert image<input id="p-body-image" type="file" accept="image/jpeg,image/png,image/webp" class="sr-only"></label>
+                                <button id="p-preview-toggle" type="button" class="${ADMIN_BTN_2}"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">visibility</span>Preview</button>
+                            </div>
+                            <textarea id="p-body" rows="24" class="${ADMIN_INPUT} font-mono text-[13px] leading-relaxed" spellcheck="true"></textarea>
+                            <details class="mt-2 text-xs text-slate-500">
+                                <summary class="cursor-pointer font-bold">Formatting help</summary>
+                                <pre class="mt-2 whitespace-pre-wrap font-mono">## Section heading      ### Sub-heading
+**bold**   *italic*   \`code\`   [link text](/erp/)   ![describe the image](upload)
+- bullet                1. numbered          &gt; quote
+| Column | Column |     then a line of  |---|---|   then rows
+\`\`\` on its own line starts and ends a code block.   --- draws a line.</pre>
+                            </details>
+                            <div id="p-preview" class="blog-prose mt-6 border-t border-slate-200 pt-6" hidden></div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="${ADMIN_CARD} grid gap-4">
+                            <div>
+                                <label for="p-author" class="${ADMIN_LABEL}">Author *</label>
+                                <select id="p-author" class="${ADMIN_INPUT}"></select>
+                                <p class="mt-1 text-xs text-slate-500">A named author with a bio is a real trust signal to Google. Add people under Authors.</p>
+                            </div>
+                            ${field('p-tags', 'Tags', 'maxlength="300" placeholder="RFID, Schools"')}
+                            <div>
+                                <p class="${ADMIN_LABEL}">Cover image</p>
+                                <div id="p-cover-preview" class="mt-1"></div>
+                                <input id="p-cover" type="hidden">
+                                <div class="mt-2 flex gap-2">
+                                    <label class="${ADMIN_BTN_2} cursor-pointer"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">upload</span>Upload<input id="p-cover-file" type="file" accept="image/jpeg,image/png,image/webp" class="sr-only"></label>
+                                    <button id="p-cover-clear" type="button" class="${ADMIN_BTN_2}">Remove</button>
+                                </div>
+                                <p class="mt-1 text-xs text-slate-500">1200×630 or larger, landscape. Also the picture when the post is shared.</p>
+                            </div>
+                            ${field('p-coverAlt', 'Cover alt text', 'maxlength="200" placeholder="What the image shows"')}
+                            ${field('p-seoTitle', 'Search title (optional)', 'maxlength="70" placeholder="Defaults to the title"')}
+                            ${field('p-publishedAt', 'Publish date', 'type="datetime-local"')}
+                        </div>
+
+                        <div class="${ADMIN_CARD}">
+                            <h2 class="text-base font-bold font-display">In Google</h2>
+                            <div class="mt-3 rounded-xl border border-slate-200 p-4">
+                                <p class="text-xs text-slate-500 truncate">vybe.net.in › blogs › <span id="serp-slug"></span></p>
+                                <p id="serp-title" class="mt-1 text-lg leading-snug text-[#1a0dab] line-clamp-2"></p>
+                                <p id="serp-desc" class="mt-1 text-sm text-slate-600 line-clamp-3"></p>
+                            </div>
+                            <h2 class="mt-6 text-base font-bold font-display">SEO checklist</h2>
+                            <ul id="seo-checks" class="mt-3 space-y-2 text-sm"></ul>
+                        </div>
+
+                        <div class="${ADMIN_CARD} space-y-3">
+                            <p id="post-error" class="text-sm font-bold text-red-700" role="alert"></p>
+                            <button id="post-save" type="submit" class="${ADMIN_BTN} w-full">Save draft</button>
+                            <button id="post-publish" type="button" class="${ADMIN_BTN_2} w-full !py-3 !text-sm">Publish</button>
+                            <button id="post-unpublish" type="button" class="${ADMIN_BTN_2} w-full">Unpublish (back to draft)</button>
+                            <a id="post-view" href="#" target="_blank" rel="noopener" class="${ADMIN_BTN_2} w-full"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">open_in_new</span>View live</a>
+                            <button id="post-delete" type="button" class="w-full inline-flex items-center justify-center gap-1.5 rounded-full border border-red-200 bg-white hover:bg-red-50 px-4 py-2 text-xs font-bold text-red-700 transition-colors"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">delete</span>Delete post</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <div id="authors-view" hidden>
+                <h1 class="text-2xl font-black font-display tracking-tight mb-4">Authors</h1>
+                <div id="authors-list" class="rounded-2xl border border-slate-200 bg-white overflow-hidden"></div>
+                <form id="author-form" class="mt-6 ${ADMIN_CARD}">
+                    <h2 id="author-heading" class="text-base font-bold font-display">Add an author</h2>
+                    <div class="mt-4 grid gap-4 md:grid-cols-2">
+                        ${field('a-name', 'Name *', 'required maxlength="100" autocomplete="off"')}
+                        ${field('a-jobTitle', 'Job title', 'maxlength="100" placeholder="Founder"')}
+                        ${area('a-bio', 'Short bio', 'Two or three sentences on what this person does and knows. Shown under every post they write.')}
+                        <div>
+                            <p class="${ADMIN_LABEL}">Photo</p>
+                            <div id="a-photo-preview" class="mt-1"></div>
+                            <input id="a-photo" type="hidden">
+                            <label class="${ADMIN_BTN_2} mt-2 cursor-pointer"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">upload</span>Upload<input id="a-photo-file" type="file" accept="image/jpeg,image/png,image/webp" class="sr-only"></label>
+                        </div>
+                        ${field('a-card', 'Visiting card on this site', 'maxlength="60" placeholder="/tejas/"')}
+                        <div class="md:col-span-2">
+                            <label for="a-sameAs" class="${ADMIN_LABEL}">Profile links, one per line</label>
+                            <textarea id="a-sameAs" rows="2" class="${ADMIN_INPUT}" placeholder="https://www.linkedin.com/in/…"></textarea>
+                        </div>
+                    </div>
+                    <p id="author-error" class="mt-4 text-sm font-bold text-red-700" role="alert"></p>
+                    <div class="mt-2 flex gap-3">
+                        <button type="submit" class="${ADMIN_BTN}">Save author</button>
+                        <button id="author-cancel" type="button" class="${ADMIN_BTN_2}">Clear</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <div id="panel-staff" role="tabpanel" aria-labelledby="tab-staff" hidden>
             <h1 class="text-2xl font-black font-display tracking-tight mb-4">Staff</h1>
             <div id="user-secret" class="mb-6 rounded-2xl border border-amber-300 bg-amber-50 p-5 flex gap-4 items-start" hidden>
@@ -7783,7 +8000,7 @@ write(
 
             <form id="user-form" class="mt-6 ${ADMIN_CARD}">
                 <h2 class="text-base font-bold font-display flex items-center gap-2"><span class="material-symbols-outlined text-[20px] text-brand" aria-hidden="true">person_add</span>Add a person</h2>
-                <p class="mt-1 text-sm text-slate-600"><strong>User</strong>: creates and updates orders. <strong>Admin</strong>: also deletes orders and manages staff.</p>
+                <p class="mt-1 text-sm text-slate-600"><strong>User</strong>: creates and updates orders, certificates and blog posts. <strong>Admin</strong>: also deletes them, and manages staff.</p>
                 <div class="mt-4 grid gap-4 md:grid-cols-2">
                     ${field('u-email', 'Email *', 'type="email" required maxlength="200" autocomplete="off"')}
                     ${field('u-name', 'Name', 'maxlength="120" autocomplete="off"')}
@@ -7815,6 +8032,362 @@ write(
 </body>
 </html>
 `
+);
+
+/* -------------------------------------------------------------------- blog */
+
+/**
+ * /blogs/: posts written and published at /vyb-admin/. tools/fetch-blog.mjs
+ * pulls the published set from the API into src/blog-data/blog.json before
+ * this runs, so every post below is a plain static page: its own canonical,
+ * title, description, BlogPosting + BreadcrumbList graph, og:image from its
+ * cover, a sitemap entry dated by its own last edit, and an RSS item. Nothing
+ * about a post needs JavaScript to be read or indexed.
+ *
+ * The markdown renderer is the API's own (api/src/lib/markdown.js), so the
+ * admin page's preview and the page built here cannot disagree.
+ *
+ * With no published posts there is no /blogs/ page at all and no nav link: an
+ * empty blog index is a thin page, and a link to it is a promise not kept.
+ */
+const blogMd = require('./api/src/lib/markdown');
+const BLOG = fs.existsSync(path.join(ROOT, 'src/blog-data/blog.json'))
+  ? JSON.parse(read('src/blog-data/blog.json'))
+  : { stamp: 'empty', posts: [], authors: [], images: {} };
+const blogAuthor = (slug) => BLOG.authors.find((a) => a.slug === slug) || null;
+const blogUrl = (p) => `/blogs/${p.slug}/`;
+const authorUrl = (a) => `/blogs/authors/${a.slug}/`;
+
+/* One Person per human. An author with a visiting card on this site (/tejas/)
+   is the Person that card already defines, so the blog adds posts to the
+   same entity rather than inventing a second one with the same name. */
+const authorId = (a) => (a.card ? personId(a.card.replace(/\//g, '')) : `${SITE}${authorUrl(a)}#person`);
+const authorPerson = (a) =>
+  defined({
+    '@type': 'Person',
+    '@id': authorId(a),
+    name: a.name,
+    jobTitle: a.jobTitle,
+    description: a.bio,
+    url: `${SITE}${a.card || authorUrl(a)}`,
+    image: a.photo && BLOG.images[a.photo] ? `${SITE}${BLOG.images[a.photo].jpg}` : '',
+    sameAs: a.sameAs,
+    worksFor: { '@id': `${SITE}/#organization` },
+  });
+
+const readMinutes = (words) => Math.max(1, Math.round(words / 200));
+const longDate = (iso) =>
+  new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Kolkata' });
+
+/** <picture> for an uploaded image, sized so the layout never shifts. */
+function blogPicture(src, alt, { eager = false, cls = '', sizes = '(min-width: 1024px) 768px, 100vw' } = {}) {
+  const img = BLOG.images[src];
+  if (!img) return '';
+  return `<picture><source srcset="${img.webp}" type="image/webp"><img src="${img.jpg}" alt="${esc(alt)}" width="${img.width}" height="${img.height}" sizes="${sizes}" class="${cls}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async"></picture>`;
+}
+
+const rendered = new Map();
+function renderPost(p) {
+  if (!rendered.has(p.slug)) {
+    rendered.set(
+      p.slug,
+      blogMd.render(p.body, {
+        site: SITE,
+        image: ({ src, alt }) => blogPicture(src, alt) || `<img src="${esc(src)}" alt="${esc(alt)}" loading="lazy" decoding="async">`,
+      })
+    );
+  }
+  return rendered.get(p.slug);
+}
+
+function byline(p, { photo = true } = {}) {
+  const a = blogAuthor(p.author);
+  const updated = p.updatedAt && p.updatedAt.slice(0, 10) > p.publishedAt.slice(0, 10);
+  return `<div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-slate-600">
+                        ${photo && a && a.photo ? blogPicture(a.photo, a.name, { cls: 'w-10 h-10 rounded-full object-cover', sizes: '40px' }) : ''}
+                        ${a ? `<a href="${authorUrl(a)}" class="font-bold text-slate-900 hover:text-brand transition-colors">${esc(a.name)}</a>` : ''}
+                        <span aria-hidden="true">&middot;</span>
+                        <time datetime="${p.publishedAt}">${longDate(p.publishedAt)}</time>
+                        ${updated ? `<span aria-hidden="true">&middot;</span><span>Updated <time datetime="${p.updatedAt}">${longDate(p.updatedAt)}</time></span>` : ''}
+                        <span aria-hidden="true">&middot;</span>
+                        <span>${readMinutes(renderPost(p).words)} min read</span>
+                    </div>`;
+}
+
+function postCard(p, { feature = false } = {}) {
+  const tag = p.tags[0];
+  return `<a href="${blogUrl(p)}" class="group flex flex-col rounded-2xl border border-slate-200 bg-white overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-brand/40${feature ? ' md:col-span-2 md:flex-row' : ''}">
+                        ${p.cover ? `<div class="${feature ? 'md:w-1/2 ' : ''}aspect-[1200/630] overflow-hidden bg-slate-100 shrink-0">${blogPicture(p.cover, p.coverAlt, { cls: 'w-full h-full object-cover transition-transform duration-500 group-hover:scale-105', sizes: feature ? '(min-width: 768px) 50vw, 100vw' : '(min-width: 768px) 33vw, 100vw' })}</div>` : ''}
+                        <div class="flex flex-col flex-1 p-6 md:p-8">
+                            ${tag ? `<p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-3">${esc(tag)}</p>` : ''}
+                            <h2 class="${feature ? 'text-2xl md:text-3xl' : 'text-xl'} font-bold font-display tracking-tight text-slate-900 group-hover:text-brand transition-colors">${esc(p.title)}</h2>
+                            <p class="mt-3 text-sm text-slate-600 leading-relaxed flex-1">${esc(p.description)}</p>
+                            <p class="mt-5 text-xs text-slate-500">${esc((blogAuthor(p.author) || {}).name || '')} &middot; <time datetime="${p.publishedAt}">${longDate(p.publishedAt)}</time> &middot; ${readMinutes(renderPost(p).words)} min read</p>
+                        </div>
+                    </a>`;
+}
+
+const feedLink = `<link rel="alternate" type="application/rss+xml" title="${ORG.name} blog" href="${SITE}/blogs/feed.xml">`;
+
+/** Up to three posts sharing a tag, topped up with the newest others. */
+function relatedPosts(p) {
+  const others = BLOG.posts.filter((o) => o.slug !== p.slug);
+  const shared = others
+    .map((o) => [o, o.tags.filter((t) => p.tags.includes(t)).length])
+    .filter(([, n]) => n > 0)
+    .sort((a, b) => b[1] - a[1])
+    .map(([o]) => o);
+  return [...new Set([...shared, ...others])].slice(0, 3);
+}
+
+for (const p of BLOG.posts) {
+  const url = blogUrl(p);
+  const a = blogAuthor(p.author);
+  const r = renderPost(p);
+  const toc = r.headings.filter((h) => h.level === 2);
+  const related = relatedPosts(p);
+  const cover = p.cover && BLOG.images[p.cover];
+
+  const body = `<div class="w-full bg-surface-main">
+${breadcrumbs([CRUMB_HOME, { name: 'Blog', url: '/blogs/' }, { name: p.title, url }], false)}
+
+        <article class="px-6 pt-10 pb-16 md:pb-20">
+            <header class="max-w-3xl mx-auto">
+                ${p.tags.length ? `<p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-3">${p.tags.map(esc).join(' &middot; ')}</p>` : ''}
+                <h1 class="text-4xl md:text-6xl font-black font-display tracking-tighter text-slate-900">${esc(p.title)}</h1>
+                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed">${esc(p.description)}</p>
+                <div class="mt-8">
+                    ${byline(p)}
+                </div>
+            </header>
+
+            ${cover ? `<figure class="max-w-5xl mx-auto mt-10">${blogPicture(p.cover, p.coverAlt, { eager: true, cls: 'w-full h-auto rounded-3xl border border-slate-200', sizes: '(min-width: 1024px) 1024px, 100vw' })}</figure>` : ''}
+
+            <div class="max-w-3xl mx-auto mt-10">
+                ${toc.length >= 3 ? `<nav class="rounded-2xl border border-slate-200 bg-white p-6 mb-10" aria-label="In this article">
+                    <p class="text-xs font-bold uppercase tracking-[0.15em] text-slate-400 mb-3">In this article</p>
+                    <ol class="space-y-2 text-sm list-decimal list-inside marker:text-slate-400">
+                        ${toc.map((h) => `<li><a href="#${h.id}" class="text-slate-700 hover:text-brand transition-colors">${esc(h.text)}</a></li>`).join('\n                        ')}
+                    </ol>
+                </nav>` : ''}
+
+                <div class="blog-prose">
+${r.html}
+                </div>
+
+                ${a ? `<aside class="mt-14 rounded-2xl border border-slate-200 bg-white p-6 md:p-8 flex flex-col sm:flex-row gap-5" aria-label="About the author">
+                    ${a.photo ? blogPicture(a.photo, a.name, { cls: 'w-20 h-20 rounded-full object-cover shrink-0', sizes: '80px' }) : ''}
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-[0.15em] text-slate-400">Written by</p>
+                        <p class="mt-1 text-lg font-bold font-display tracking-tight text-slate-900"><a href="${authorUrl(a)}" class="hover:text-brand transition-colors">${esc(a.name)}</a></p>
+                        ${a.jobTitle ? `<p class="text-sm text-slate-500">${esc(a.jobTitle)}, ${ORG.name}</p>` : ''}
+                        ${a.bio ? `<p class="mt-3 text-sm text-slate-600 leading-relaxed">${esc(a.bio)}</p>` : ''}
+                    </div>
+                </aside>` : ''}
+
+                <div class="mt-10 rounded-2xl bg-corporate text-white p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-5">
+                    <p class="flex-1 text-lg font-bold font-display tracking-tight">Want this done for your campus or business? Talk to the team that wrote it.</p>
+                    <a href="/contact/" class="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white px-6 py-3 rounded-full text-sm font-bold transition-all active:scale-95 whitespace-nowrap">Talk to us</a>
+                </div>
+            </div>
+        </article>
+
+        ${related.length ? `<section class="bg-white border-t border-slate-200 py-16 md:py-20 px-6" aria-labelledby="related-heading">
+            <div class="max-w-6xl mx-auto">
+                <h2 id="related-heading" class="text-2xl md:text-3xl font-black font-display tracking-tight text-slate-900 mb-8">Keep reading</h2>
+                <div class="grid gap-6 md:grid-cols-3">
+                    ${related.map((o) => postCard(o).replace(/<h2 /, '<h3 ').replace(/<\/h2>/, '</h3>')).join('\n                    ')}
+                </div>
+            </div>
+        </section>` : ''}
+</div>`;
+
+  DOCS.push({
+    file: `blogs/${p.slug}/index.html`,
+    priority: '0.6',
+    changefreq: 'monthly',
+    page: {
+      url,
+      nav: 'blog',
+      title: `${p.seoTitle || p.title} | ${ORG.name}`.length <= 70 ? `${p.seoTitle || p.title} | ${ORG.name}` : p.seoTitle || p.title,
+      ogTitle: p.title,
+      ogType: 'article',
+      ogImage: cover ? { url: `${SITE}${cover.jpg}`, type: 'image/jpeg', width: cover.width, height: cover.height, alt: p.coverAlt } : null,
+      description: p.description,
+      lastmod: (p.updatedAt || p.publishedAt).slice(0, 10),
+      trail: [CRUMB_HOME, { name: 'Blog', url: '/blogs/' }, { name: p.title, url }],
+      body,
+      extraHead: [
+        `<meta property="article:published_time" content="${p.publishedAt}">`,
+        `<meta property="article:modified_time" content="${p.updatedAt || p.publishedAt}">`,
+        a ? `<meta property="article:author" content="${SITE}${a.card || authorUrl(a)}">` : '',
+        ...p.tags.map((t) => `<meta property="article:tag" content="${esc(t)}">`),
+        feedLink,
+      ]
+        .filter(Boolean)
+        .join('\n'),
+      schema: (u) => [
+        defined({
+          '@type': 'BlogPosting',
+          '@id': `${u}#article`,
+          headline: p.title.slice(0, 110),
+          description: p.description,
+          url: u,
+          mainEntityOfPage: { '@id': `${u}#webpage` },
+          image: cover ? [{ '@type': 'ImageObject', url: `${SITE}${cover.jpg}`, width: cover.width, height: cover.height }] : `${SITE}/assets/og-image.png`,
+          datePublished: p.publishedAt,
+          dateModified: p.updatedAt || p.publishedAt,
+          author: a ? authorPerson(a) : { '@id': `${SITE}/#organization` },
+          publisher: { '@id': `${SITE}/#organization` },
+          isPartOf: { '@id': `${SITE}/blogs/#blog` },
+          keywords: p.tags.join(', '),
+          articleSection: p.tags[0] || '',
+          wordCount: r.words,
+          inLanguage: LOC.tag,
+        }),
+      ],
+    },
+  });
+}
+
+if (BLOG.posts.length) {
+  const url = '/blogs/';
+  const [first, ...rest] = BLOG.posts;
+  const body = `<div class="w-full bg-surface-main">
+${breadcrumbs([CRUMB_HOME, { name: 'Blog', url }], false)}
+
+        <section class="px-6 pt-12 pb-20 md:pb-24 relative overflow-hidden">
+            <div class="absolute inset-0 bg-grid-faint" aria-hidden="true"></div>
+            <div class="max-w-6xl mx-auto relative z-10">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-3">Blog</p>
+                <h1 class="text-5xl md:text-7xl font-black font-display tracking-tighter text-slate-900">Notes from the Vybe team.</h1>
+                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">Practical guides on campus software, cashless cafeterias, smart classrooms, printing, registrations and IT, written by the people who do the work.</p>
+                <p class="mt-4 text-sm"><a href="/blogs/feed.xml" class="font-bold text-brand hover:underline">Subscribe by RSS</a></p>
+
+                <div class="mt-12 grid gap-6 md:grid-cols-3">
+                    ${postCard(first, { feature: rest.length > 0 })}
+                    ${rest.map((p) => postCard(p)).join('\n                    ')}
+                </div>
+            </div>
+        </section>
+</div>`;
+
+  DOCS.push({
+    file: 'blogs/index.html',
+    priority: '0.7',
+    changefreq: 'weekly',
+    page: {
+      url,
+      nav: 'blog',
+      title: `Blog: Campus Tech, ERP & IT Guides | ${ORG.name}`,
+      ogTitle: `The ${ORG.name} blog`,
+      description: 'Guides and notes from Vybe Technologies on campus ERP, cashless cafeterias, smart classrooms, printing, business registrations and IT.',
+      lastmod: (BLOG.posts.map((p) => p.updatedAt || p.publishedAt).sort().pop() || BUILD_DATE).slice(0, 10),
+      trail: [CRUMB_HOME, { name: 'Blog', url }],
+      body,
+      extraHead: feedLink,
+      schema: (u) => ({
+        '@type': 'Blog',
+        '@id': `${u}#blog`,
+        name: `The ${ORG.name} blog`,
+        url: u,
+        publisher: { '@id': `${SITE}/#organization` },
+        inLanguage: LOC.tag,
+        blogPost: BLOG.posts.map((p) => ({ '@id': `${SITE}${blogUrl(p)}#article` })),
+      }),
+    },
+  });
+
+  for (const a of BLOG.authors) {
+    const aurl = authorUrl(a);
+    const posts = BLOG.posts.filter((p) => p.author === a.slug);
+    const body = `<div class="w-full bg-surface-main">
+${breadcrumbs([CRUMB_HOME, { name: 'Blog', url }, { name: a.name, url: aurl }], false)}
+
+        <section class="px-6 pt-12 pb-20 md:pb-24">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex flex-col md:flex-row gap-8 md:items-center">
+                    ${a.photo ? blogPicture(a.photo, a.name, { cls: 'w-32 h-32 rounded-full object-cover border border-slate-200', sizes: '128px', eager: true }) : ''}
+                    <div>
+                        <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-3">Author</p>
+                        <h1 class="text-4xl md:text-6xl font-black font-display tracking-tighter text-slate-900">${esc(a.name)}</h1>
+                        ${a.jobTitle ? `<p class="mt-2 text-lg text-slate-600">${esc(a.jobTitle)}, ${ORG.name}</p>` : ''}
+                    </div>
+                </div>
+                ${a.bio ? `<p class="mt-8 text-lg text-slate-600 leading-relaxed max-w-3xl">${esc(a.bio)}</p>` : ''}
+                ${a.card || a.sameAs.length ? `<ul class="mt-6 flex flex-wrap gap-3 text-sm">
+                    ${a.card ? `<li><a href="${a.card}" class="font-bold text-brand hover:underline">Visiting card</a></li>` : ''}
+                    ${a.sameAs.map((s) => `<li><a href="${esc(s)}" rel="me noopener" target="_blank" class="font-bold text-brand hover:underline">${esc(new URL(s).hostname.replace(/^www\./, ''))}</a></li>`).join('\n                    ')}
+                </ul>` : ''}
+
+                <h2 class="mt-14 text-2xl md:text-3xl font-black font-display tracking-tight text-slate-900">Posts by ${esc(a.name.split(' ')[0])}</h2>
+                <div class="mt-8 grid gap-6 md:grid-cols-3">
+                    ${posts.map((p) => postCard(p).replace(/<h2 /, '<h3 ').replace(/<\/h2>/, '</h3>')).join('\n                    ')}
+                </div>
+            </div>
+        </section>
+</div>`;
+
+    DOCS.push({
+      file: `blogs/authors/${a.slug}/index.html`,
+      priority: '0.4',
+      changefreq: 'monthly',
+      page: {
+        url: aurl,
+        nav: 'blog',
+        // A person with a visiting card already has their ProfilePage there;
+        // this page is then the collection of what they wrote.
+        pageType: a.card ? 'CollectionPage' : 'ProfilePage',
+        mainEntity: a.card ? null : { '@id': authorId(a) },
+        title: `${a.name}${a.jobTitle ? `, ${a.jobTitle}` : ''} | ${ORG.name} blog`,
+        description: (a.bio || `Articles by ${a.name} on the ${ORG.name} blog.`).slice(0, 160),
+        lastmod: (posts.map((p) => p.updatedAt || p.publishedAt).sort().pop() || BUILD_DATE).slice(0, 10),
+        trail: [CRUMB_HOME, { name: 'Blog', url }, { name: a.name, url: aurl }],
+        body,
+        extraHead: feedLink,
+        schema: () => [authorPerson(a)],
+      },
+    });
+  }
+
+  const rfc822 = (iso) => new Date(iso).toUTCString();
+  const x = (s) => esc(s).replace(/'/g, '&apos;');
+  write(
+    'blogs/feed.xml',
+    `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>${x(`The ${ORG.name} blog`)}</title>
+    <link>${SITE}/blogs/</link>
+    <atom:link href="${SITE}/blogs/feed.xml" rel="self" type="application/rss+xml"/>
+    <description>Guides and notes from ${x(ORG.name)}.</description>
+    <language>en-in</language>
+    <lastBuildDate>${rfc822(BLOG.posts[0].updatedAt || BLOG.posts[0].publishedAt)}</lastBuildDate>
+${BLOG.posts
+  .slice(0, 50)
+  .map(
+    (p) => `    <item>
+      <title>${x(p.title)}</title>
+      <link>${SITE}${blogUrl(p)}</link>
+      <guid isPermaLink="true">${SITE}${blogUrl(p)}</guid>
+      <pubDate>${rfc822(p.publishedAt)}</pubDate>
+      <description>${x(p.description)}</description>${blogAuthor(p.author) ? `\n      <dc:creator>${x(blogAuthor(p.author).name)}</dc:creator>` : ''}
+${p.tags.map((t) => `      <category>${x(t)}</category>`).join('\n')}
+    </item>`
+  )
+  .join('\n')}
+  </channel>
+</rss>
+`
+  );
+}
+
+/* What this build was made from. The scheduled workflow compares `stamp`
+   with /api/blog/stamp to decide whether the live site is behind, and
+   fetch-blog.mjs diffs `pages` to tell IndexNow which posts moved. */
+write(
+  'blogs/stamp.json',
+  JSON.stringify({ stamp: BLOG.stamp, pages: Object.fromEntries(BLOG.posts.map((p) => [blogUrl(p), p.updatedAt || p.publishedAt])) }) + '\n'
 );
 
 /* ------------------------------------------------------------------ 404 page */
@@ -8135,6 +8708,10 @@ function sitemapImages(url) {
   // A card's image is the person, not the company banner.
   const card = TEAM.find((m) => url === `/${m.slug}/`);
   if (card) return img(`${SITE}/${card.slug}/assets/og.png`, `${card.name}, ${card.role}, ${ORG.name}`);
+
+  // A post's image is its cover.
+  const post = BLOG.posts.find((p) => url === blogUrl(p));
+  if (post && post.cover && BLOG.images[post.cover]) return img(`${SITE}${BLOG.images[post.cover].jpg}`, post.coverAlt || post.title);
 
   let out = img(`${SITE}/assets/og-image.png`, `${ORG.name} | ${ORG.slogan}`);
   if (url === '/') {

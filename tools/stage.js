@@ -128,6 +128,22 @@ if (CDN) {
   console.log(`stage: pointed ${rewritten} pages at ${CDN}`);
 }
 
+/* Azure caps staticwebapp.config.json at 20 KB, and the source copy, kept
+   indented for people, is close to it. Whitespace is most of the difference,
+   so the deployed copy is minified; a config still over the cap after that
+   fails here, not halfway through a deploy. */
+{
+  const cfg = path.join(DIST, 'staticwebapp.config.json');
+  const min = JSON.stringify(JSON.parse(fs.readFileSync(cfg, 'utf8')));
+  fs.writeFileSync(cfg, min);
+  const kb = Buffer.byteLength(min) / 1024;
+  if (kb > 20) {
+    console.error(`stage: staticwebapp.config.json is ${kb.toFixed(1)} KB minified; Azure's limit is 20 KB.`);
+    process.exit(1);
+  }
+  console.log(`stage: staticwebapp.config.json ${kb.toFixed(1)} KB minified (limit 20 KB)`);
+}
+
 // Named for the key it holds, so matched by pattern.
 const hasIndexNowKey = fs.readdirSync(DIST).some((f) => /^[a-f0-9]{8,128}\.txt$/i.test(f));
 if (!hasIndexNowKey) console.warn('stage: no IndexNow key file in dist/, submissions will 403');
