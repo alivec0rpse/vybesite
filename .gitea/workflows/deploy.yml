@@ -9,9 +9,8 @@
 # it does anything; the API tests take two seconds once api/ is installed.
 #
 # Most of a run used to be installing tools, not building (the build is a few
-# seconds). So: npm is cached, the CDN upload is a Node script that sends only
-# changed files instead of the Azure CLI installed from scratch each run, and
-# the SWA deploy binary is cached between runs.
+# seconds). So the CDN upload is a Node script that sends only changed files,
+# instead of the Azure CLI installed from scratch on every run.
 #
 # Required secrets (Settings -> Actions -> Secrets):
 #   AZURE_STATIC_WEB_APPS_API_TOKEN
@@ -49,10 +48,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            api/package-lock.json
+          # No `cache: npm`. On this runner the job container cannot reach the
+          # act_runner cache server, and the restore waited minutes for a
+          # timeout before giving up. Re-enable only once the runner's
+          # cache.host is reachable from inside jobs.
 
       - name: Install dependencies
         # Puppeteer only drives the local screenshot scripts; skip the 170MB
@@ -94,14 +93,6 @@ jobs:
           AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
           AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         run: node tools/cdn-upload.mjs
-
-      - name: Cache the SWA deploy binary
-        # The SWA CLI downloads StaticSitesClient (~100MB) into ~/.swa on
-        # first use. Keep it between runs.
-        uses: actions/cache@v4
-        with:
-          path: ~/.swa
-          key: swa-deploy-cli2-${{ runner.os }}
 
       - name: Deploy to Azure
         env:
