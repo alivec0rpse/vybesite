@@ -274,6 +274,13 @@
     <image:image><image:loc>https://vybe.net.in/assets/og-image.png</image:loc><image:caption>Vybe Technologies | Smart. Simple. Affordable.</image:caption></image:image>
   </url>
   <url>
+    <loc>https://vybe.net.in/track/</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+    <image:image><image:loc>https://vybe.net.in/assets/og-image.png</image:loc><image:caption>Vybe Technologies | Smart. Simple. Affordable.</image:caption></image:image>
+  </url>
+  <url>
     <loc>https://vybe.net.in/ankit/</loc>
     <lastmod>2026-09-28</lastmod>
     <changefreq>yearly</changefreq>

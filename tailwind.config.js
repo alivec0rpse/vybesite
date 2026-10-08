@@ -6,6 +6,8 @@ module.exports = {
   // ./assets/site.js for the same reason as verify.js: `gsap-on` is set on
   // <html> from script and appears in no template, so without it here Tailwind
   // purges the rule that stops .reveal's CSS transition fighting the tween.
+  // ./assets/track.js and ./assets/admin.js build the tracking card and the
+  // order desk's lists in the browser, the same way verify.js does.
   content: [
     './index.html',
     './404.html',
@@ -13,6 +15,8 @@ module.exports = {
     './*/*/index.html',
     './assets/verify.js',
     './assets/site.js',
+    './assets/track.js',
+    './assets/admin.js',
   ],
   theme: {
     extend: {

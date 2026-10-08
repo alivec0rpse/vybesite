@@ -265,6 +265,28 @@
       }
     },
 
+    { "route": "/track", "redirect": "/track/", "statusCode": 301 },
+    { "route": "/tracking", "redirect": "/track/", "statusCode": 301 },
+    { "route": "/track-order", "redirect": "/track/", "statusCode": 301 },
+    {
+      "route": "/track/*",
+      "rewrite": "/track/index.html",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "Referrer-Policy": "no-referrer"
+      }
+    },
+    { "route": "/vyb-admin", "redirect": "/vyb-admin/", "statusCode": 301 },
+    {
+      "route": "/vyb-admin/*",
+      "headers": {
+        "Cache-Control": "no-store",
+        "X-Robots-Tag": "noindex, nofollow, noarchive",
+        "Referrer-Policy": "no-referrer",
+        "X-Frame-Options": "DENY"
+      }
+    },
+    { "route": "/api/*", "headers": { "Cache-Control": "no-store", "X-Robots-Tag": "noindex, nofollow" } },
     { "route": "/src/*", "statusCode": 404 },
     { "route": "/tools/*", "statusCode": 404 },
     { "route": "/node_modules/*", "statusCode": 404 },
@@ -393,6 +415,10 @@
       "headers": { "Cache-Control": "public, max-age=0, must-revalidate" }
     }
   ],
+
+  "platform": {
+    "apiRuntime": "node:22"
+  },
 
   "responseOverrides": {
     "404": { "rewrite": "/404.html", "statusCode": 404 }

@@ -4,3 +4,6 @@ dist/
 employee-ids/
 *.log
 .DS_Store
+
+api/node_modules/
+api/local.settings.json

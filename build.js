@@ -905,6 +905,7 @@ function footer() {
                     ${link('/terms/', 'Terms of Service')}
                     ${link('/refund-policy/', 'Cancellation &amp; Refund')}
                     ${link('/shipping-policy/', 'Shipping &amp; Exchange')}
+                    ${link('/track/', 'Track an Order')}
                     ${link('/verify/', 'Verify a Certificate')}
                     ${link('/careers/', 'Careers')}
                     ${link('/contact/', 'Contact Us')}
@@ -7471,6 +7472,351 @@ ${faqSection(careersFaqs, { dark: false })}
   });
 }
 
+/* ------------------------------------------------------------ order tracking */
+
+/**
+ * /track/: the public half of order tracking. Unlike /verify/, the data is not
+ * compiled into the page: orders change by the hour, so assets/track.js asks
+ * the API (api/, deployed as the site's managed functions) for one order by
+ * its code. Staff create and update orders at /vyb-admin/.
+ *
+ * Tracking links are /track/VYB-XXXXX-XXXXX. staticwebapp.config.json rewrites
+ * every /track/* path to this one file and the script reads the code off the
+ * path; the canonical stays /track/, so no single order's URL competes in
+ * search with the page itself.
+ */
+const trackFaqs = [
+  {
+    q: 'Where do I find my tracking code?',
+    a: 'In the message we send when your payment is confirmed, usually on WhatsApp. It starts with VYB, for example VYB-7K2MQ-9XAP3, and the link in that message opens this page with the code already filled in.',
+  },
+  {
+    q: 'How often is the status updated?',
+    a: 'Every time your order moves: when it is prepared, packed, handed to a courier or rider, and delivered. Our team updates it by hand, so it is current to the last step we took, not to the minute.',
+  },
+  {
+    q: 'My order went by courier. Can I track it with them too?',
+    a: 'Yes. Once it is dispatched, the delivery section shows the courier and the AWB or consignment number, and a link to the courier\'s own tracking where they offer one.',
+  },
+  {
+    q: 'Is my information safe on this page?',
+    a: `The tracking page shows your items, the delivery details and the progress of the order, with your first name only. It never shows your phone number, email or address. Treat the code like a receipt number: anybody you share it with can see the order's progress. If you think a code has been shared by mistake, write to <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a>.`,
+  },
+];
+
+const trackBody = `<div class="w-full bg-surface-main">
+${breadcrumbs([CRUMB_HOME, { name: 'Track an order', url: '/track/' }], false)}
+
+        <section class="px-6 pt-12 pb-20 md:pb-24 relative overflow-hidden">
+            <div class="absolute inset-0 bg-grid-faint" aria-hidden="true"></div>
+            <div class="max-w-6xl mx-auto relative z-10">
+                <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-3">Order tracking</p>
+                <h1 class="text-5xl md:text-7xl font-black font-display tracking-tighter text-slate-900">Track your order.</h1>
+                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">From payment confirmed to delivered: see what you ordered, how it is reaching you and exactly where it has got to. Enter the tracking code from your message, or open the link we sent you.</p>
+
+                <form id="track-form" action="/track/" method="get" class="mt-10 max-w-2xl">
+                    <label for="track-code" class="block text-xs font-bold uppercase tracking-[0.15em] text-slate-400">Tracking code</label>
+                    <div class="mt-3 flex flex-col sm:flex-row gap-3">
+                        <input id="track-code" name="code" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false"
+                               placeholder="VYB-7K2MQ-9XAP3"
+                               class="flex-1 rounded-full border border-slate-300 bg-white px-6 py-4 text-sm font-bold text-slate-900 placeholder:font-normal placeholder:text-slate-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30">
+                        <button type="submit" class="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white px-7 py-4 rounded-full text-sm font-bold transition-all active:scale-95">
+                            <span class="material-symbols-outlined text-[20px]" aria-hidden="true">search</span>
+                            Track
+                        </button>
+                    </div>
+                    <p class="mt-3 text-xs text-slate-500 leading-relaxed">Spaces, dashes and capitals do not matter.</p>
+                </form>
+
+                <div id="track-result" class="mt-10 max-w-4xl" role="status" aria-live="polite"></div>
+
+                <noscript>
+                    <div class="mt-10 max-w-3xl">
+                        ${noticePanel(
+                          'Tracking needs JavaScript',
+                          `<p>This page looks your order up live, which needs JavaScript switched on.</p>
+                        <p>If you would rather not, call us on <a class="font-bold text-brand hover:underline" href="${telHref(ORG.phoneSupport)}">${telText(ORG.phoneSupport)}</a> or email <a class="font-bold text-brand hover:underline" href="mailto:${ORG.sales}">${ORG.sales}</a> with your tracking code and we will tell you where it is.</p>`
+                        )}
+                    </div>
+                </noscript>
+            </div>
+        </section>
+
+${faqSection(trackFaqs, { dark: false })}
+</div>`;
+
+{
+  const url = '/track/';
+  const lastmod = lastmodFor(url, trackBody);
+  DOCS.push({
+    file: 'track/index.html',
+    priority: '0.4',
+    changefreq: 'monthly',
+    page: {
+      url,
+      nav: null,
+      title: 'Track Your Order | Vybe Technologies',
+      ogTitle: 'Track your Vybe order',
+      description:
+        'Track a Vybe Technologies order with your tracking code: items, delivery mode and every step from payment confirmed to delivered.',
+      lastmod,
+      trail: [CRUMB_HOME, { name: 'Track an order', url }],
+      faqs: trackFaqs,
+      body: trackBody,
+      scripts: ['/assets/track.js'],
+      schema: () => [],
+    },
+  });
+}
+
+/* --------------------------------------------------------------- order desk */
+
+/**
+ * /vyb-admin/: where staff create orders and move them along. A bare page, not
+ * shell(): no navigation, no footer, no structured data, nothing for a crawler,
+ * and it is not in the sitemap. It is noindex here and in its route headers.
+ *
+ * The page is only the forms. Who may use them is decided by the API on every
+ * call (see api/src/lib/auth.js), so the page itself holds nothing secret and
+ * needs no protection of its own.
+ */
+const ADMIN_INPUT =
+  'mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30';
+const ADMIN_LABEL = 'block text-xs font-bold uppercase tracking-[0.12em] text-slate-500';
+const ADMIN_BTN =
+  'inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark disabled:opacity-50 text-white px-6 py-3 rounded-full text-sm font-bold transition-all active:scale-95';
+const ADMIN_BTN_2 =
+  'inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white hover:border-brand hover:text-brand px-4 py-2 text-xs font-bold text-slate-900 transition-colors';
+const ADMIN_CARD = 'rounded-2xl border border-slate-200 bg-white p-6 md:p-8';
+
+const field = (id, label, attrs = '', wide = false) =>
+  `<div${wide ? ' class="md:col-span-2"' : ''}>
+                                <label for="${id}" class="${ADMIN_LABEL}">${label}</label>
+                                <input id="${id}" class="${ADMIN_INPUT}" ${/\btype=/.test(attrs) ? attrs : `type="text" ${attrs}`}>
+                            </div>`;
+const area = (id, label, hint, wide = true) =>
+  `<div${wide ? ' class="md:col-span-2"' : ''}>
+                                <label for="${id}" class="${ADMIN_LABEL}">${label}</label>
+                                <textarea id="${id}" rows="2" class="${ADMIN_INPUT}"></textarea>
+                                ${hint ? `<p class="mt-1 text-xs text-slate-500">${hint}</p>` : ''}
+                            </div>`;
+
+write(
+  'vyb-admin/index.html',
+  `<!DOCTYPE html>
+<html lang="${LOC.tag}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Order desk | Vybe Technologies</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<link rel="preload" href="/assets/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/material-symbols-subset.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<meta name="theme-color" content="#0f172a">
+</head>
+<body id="vyb-admin" class="bg-surface-main text-slate-900 min-h-screen">
+
+<header class="bg-corporate text-white">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-3">
+        <p class="font-black font-display tracking-tight text-lg">Vybe <span class="text-brand">Order desk</span></p>
+        <div id="who" class="flex flex-wrap items-center gap-2 text-xs" hidden>
+            <span id="who-name" class="text-slate-300 mr-2"></span>
+            <button id="btn-password" type="button" class="inline-flex items-center gap-1.5 rounded-full border border-white/20 hover:border-white px-3 py-1.5 font-bold"><span class="material-symbols-outlined text-[16px]" aria-hidden="true">key</span>Password</button>
+            <button id="btn-logout" type="button" class="inline-flex items-center gap-1.5 rounded-full border border-white/20 hover:border-white px-3 py-1.5 font-bold"><span class="material-symbols-outlined text-[16px]" aria-hidden="true">logout</span>Sign out</button>
+        </div>
+    </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 py-8">
+    <noscript><p class="${ADMIN_CARD} text-sm">The order desk needs JavaScript.</p></noscript>
+
+    <p id="view-loading" class="text-sm text-slate-500">Loading…</p>
+
+    <section id="view-login" class="max-w-md mx-auto mt-10 ${ADMIN_CARD}" hidden>
+        <h1 class="text-2xl font-black font-display tracking-tight">Sign in</h1>
+        <p class="mt-2 text-sm text-slate-600">Staff only. Accounts are created by an admin.</p>
+        <form id="login-form" class="mt-6 space-y-4">
+            ${field('login-email', 'Email', 'type="email" autocomplete="username" required')}
+            ${field('login-password', 'Password', 'type="password" autocomplete="current-password" required')}
+            <p id="login-error" class="text-sm font-bold text-red-700" role="alert"></p>
+            <button type="submit" class="${ADMIN_BTN} w-full">Sign in</button>
+        </form>
+    </section>
+
+    <section id="view-password" class="max-w-md mx-auto mt-10 ${ADMIN_CARD}" hidden>
+        <h1 class="text-2xl font-black font-display tracking-tight">Choose a new password</h1>
+        <p id="password-intro" class="mt-2 text-sm text-slate-600"></p>
+        <form id="password-form" class="mt-6 space-y-4">
+            ${field('password-current', 'Current password', 'type="password" autocomplete="current-password" required')}
+            ${field('password-next', 'New password', 'type="password" autocomplete="new-password" minlength="10" required')}
+            ${field('password-confirm', 'New password again', 'type="password" autocomplete="new-password" minlength="10" required')}
+            <p id="password-error" class="text-sm font-bold text-red-700" role="alert"></p>
+            <div class="flex gap-3">
+                <button type="submit" class="${ADMIN_BTN} flex-1">Change password</button>
+                <button id="password-cancel" type="button" class="${ADMIN_BTN_2}">Cancel</button>
+            </div>
+        </form>
+    </section>
+
+    <section id="view-app" hidden>
+        <div class="flex gap-2 mb-6" role="tablist">
+            <button id="tab-orders" type="button" role="tab" aria-selected="true">Orders</button>
+            <button id="tab-staff" type="button" role="tab" aria-selected="false" hidden>Staff</button>
+        </div>
+
+        <div id="panel-orders" role="tabpanel" aria-labelledby="tab-orders">
+            <div id="orders-list-view">
+                <div class="flex flex-col md:flex-row gap-3 md:items-center mb-4">
+                    <h1 class="text-2xl font-black font-display tracking-tight mr-auto">Orders</h1>
+                    <label for="orders-q" class="sr-only">Search orders</label>
+                    <input id="orders-q" type="search" placeholder="Code, customer, phone, reference…" class="${ADMIN_INPUT} md:w-72 !mt-0">
+                    <label for="orders-show" class="sr-only">Show</label>
+                    <select id="orders-show" class="${ADMIN_INPUT} md:w-40 !mt-0">
+                        <option value="open">Open</option>
+                        <option value="closed">Delivered &amp; cancelled</option>
+                        <option value="all">All</option>
+                    </select>
+                    <button id="orders-refresh" type="button" class="${ADMIN_BTN_2}" aria-label="Refresh"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">refresh</span></button>
+                    <button id="btn-new-order" type="button" class="${ADMIN_BTN}"><span class="material-symbols-outlined text-[20px]" aria-hidden="true">add</span>New order</button>
+                </div>
+                <div id="orders-list" class="rounded-2xl border border-slate-200 bg-white overflow-hidden"></div>
+            </div>
+
+            <div id="order-view" hidden>
+                <button id="order-back" type="button" class="${ADMIN_BTN_2} mb-4"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_back</span>All orders</button>
+                <h1 id="order-title" class="text-2xl font-black font-display tracking-tight">Order</h1>
+                <p id="order-sub" class="mt-1 text-sm text-slate-500"></p>
+
+                <div id="order-live" class="mt-6 grid gap-6 lg:grid-cols-2">
+                    <div class="${ADMIN_CARD}">
+                        <h2 class="text-base font-bold font-display">Customer tracking link</h2>
+                        <div class="mt-3 flex gap-2">
+                            <label for="share-link" class="sr-only">Tracking link</label>
+                            <input id="share-link" type="text" readonly class="${ADMIN_INPUT} !mt-0 font-mono text-xs">
+                        </div>
+                        <div class="mt-3 flex flex-wrap gap-2">
+                            <button id="share-copy" type="button" class="${ADMIN_BTN_2}"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">content_copy</span>Copy link</button>
+                            <a id="share-whatsapp" href="#" target="_blank" rel="noopener noreferrer" class="${ADMIN_BTN_2}"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">chat</span>Send on WhatsApp</a>
+                            <a id="share-open" href="#" target="_blank" rel="noopener" class="${ADMIN_BTN_2}"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">open_in_new</span>Open</a>
+                        </div>
+
+                        <h2 class="mt-8 text-base font-bold font-display flex items-center gap-3">Status <span id="order-status-now"></span></h2>
+                        <form id="status-form" class="mt-3 space-y-3">
+                            <div>
+                                <label for="status-select" class="${ADMIN_LABEL}">Move to</label>
+                                <select id="status-select" class="${ADMIN_INPUT}"></select>
+                            </div>
+                            <div>
+                                <label for="status-note" class="${ADMIN_LABEL}">Note for the customer (optional)</label>
+                                <textarea id="status-note" rows="2" maxlength="1000" class="${ADMIN_INPUT}" placeholder="e.g. AWB D12345678 with DTDC, or rider Suresh 98xxxxxx"></textarea>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <button id="status-submit" type="submit" class="${ADMIN_BTN}">Update status</button>
+                                <button id="status-undo" type="button" class="${ADMIN_BTN_2}"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">undo</span>Undo latest</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="${ADMIN_CARD}">
+                        <h2 class="text-base font-bold font-display mb-4">History</h2>
+                        <div id="order-history"></div>
+                    </div>
+                </div>
+
+                <form id="order-form" class="mt-6 ${ADMIN_CARD}">
+                    <h2 class="text-base font-bold font-display">Order details</h2>
+                    <div class="mt-4 grid gap-4 md:grid-cols-2">
+                        ${field('f-customerName', 'Customer name *', 'required maxlength="120" autocomplete="off"')}
+                        ${field('f-customerPhone', 'Phone (WhatsApp)', 'type="tel" maxlength="30" autocomplete="off"')}
+                        ${field('f-customerEmail', 'Email', 'type="email" maxlength="200" autocomplete="off"')}
+                        ${field('f-reference', 'Reference / invoice no.', 'maxlength="60" autocomplete="off"')}
+                        ${area('f-address', 'Delivery address', 'Staff only. Never shown on the tracking page.')}
+
+                        <div class="md:col-span-2">
+                            <p class="${ADMIN_LABEL}">Items *</p>
+                            <div id="items" class="mt-1 space-y-2"></div>
+                            <button id="add-item" type="button" class="${ADMIN_BTN_2} mt-2"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">add</span>Add item</button>
+                        </div>
+
+                        <div>
+                            <label for="f-deliveryMode" class="${ADMIN_LABEL}">Delivery mode *</label>
+                            <select id="f-deliveryMode" class="${ADMIN_INPUT}"></select>
+                        </div>
+                        ${field('f-expectedBy', 'Expected by', 'type="date"')}
+                        ${field('f-partner', 'Courier / partner / rider', 'maxlength="120" placeholder="DTDC, Porter, Suresh…"')}
+                        ${field('f-partnerRef', 'AWB / booking reference', 'maxlength="120"')}
+                        ${field('f-partnerUrl', 'Partner tracking link', 'type="url" maxlength="500" placeholder="https://…"', true)}
+                        ${area('f-publicNote', 'Note on the tracking page', 'The customer sees this, e.g. collection hours or "call before arriving".')}
+                        ${area('f-internalNote', 'Internal note', 'Staff only: payment details, special handling.')}
+                    </div>
+
+                    <div id="order-first" class="mt-6 grid gap-4 md:grid-cols-2 border-t border-slate-100 pt-6">
+                        <div>
+                            <label for="f-status" class="${ADMIN_LABEL}">Starting status</label>
+                            <select id="f-status" class="${ADMIN_INPUT}"></select>
+                        </div>
+                        ${field('f-note', 'First update note (optional)', 'maxlength="1000"')}
+                    </div>
+
+                    <p id="order-error" class="mt-4 text-sm font-bold text-red-700" role="alert"></p>
+                    <div class="mt-4 flex flex-wrap gap-3">
+                        <button id="order-save" type="submit" class="${ADMIN_BTN}">Save</button>
+                        <button id="order-delete" type="button" class="ml-auto inline-flex items-center justify-center gap-1.5 rounded-full border border-red-200 bg-white hover:bg-red-50 px-4 py-2 text-xs font-bold text-red-700 transition-colors"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">delete</span>Delete order</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="panel-staff" role="tabpanel" aria-labelledby="tab-staff" hidden>
+            <h1 class="text-2xl font-black font-display tracking-tight mb-4">Staff</h1>
+            <div id="user-secret" class="mb-6 rounded-2xl border border-amber-300 bg-amber-50 p-5 flex gap-4 items-start" hidden>
+                <div class="flex-1 text-sm">
+                    <p class="font-bold text-amber-900">Share this once, privately. It is not shown again.</p>
+                    <p id="user-secret-text" class="mt-1 font-mono text-slate-900 break-all select-all"></p>
+                    <p class="mt-1 text-xs text-amber-900">They will be asked to choose their own password when they sign in.</p>
+                </div>
+                <button id="user-secret-close" type="button" class="rounded-full p-1 text-amber-900 hover:bg-amber-100" aria-label="Dismiss"><span class="material-symbols-outlined text-[20px]" aria-hidden="true">close</span></button>
+            </div>
+            <div id="users-list" class="rounded-2xl border border-slate-200 bg-white overflow-hidden"></div>
+
+            <form id="user-form" class="mt-6 ${ADMIN_CARD}">
+                <h2 class="text-base font-bold font-display flex items-center gap-2"><span class="material-symbols-outlined text-[20px] text-brand" aria-hidden="true">person_add</span>Add a person</h2>
+                <p class="mt-1 text-sm text-slate-600"><strong>User</strong>: creates and updates orders. <strong>Admin</strong>: also deletes orders and manages staff.</p>
+                <div class="mt-4 grid gap-4 md:grid-cols-2">
+                    ${field('u-email', 'Email *', 'type="email" required maxlength="200" autocomplete="off"')}
+                    ${field('u-name', 'Name', 'maxlength="120" autocomplete="off"')}
+                    <div>
+                        <label for="u-role" class="${ADMIN_LABEL}">Role</label>
+                        <select id="u-role" class="${ADMIN_INPUT}">
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="u-password" class="${ADMIN_LABEL}">Temporary password *</label>
+                        <div class="flex gap-2">
+                            <input id="u-password" type="text" required minlength="10" maxlength="200" autocomplete="off" class="${ADMIN_INPUT}">
+                            <button id="user-generate" type="button" class="${ADMIN_BTN_2} mt-1 shrink-0">Generate</button>
+                        </div>
+                    </div>
+                </div>
+                <p id="user-error" class="mt-4 text-sm font-bold text-red-700" role="alert"></p>
+                <button type="submit" class="${ADMIN_BTN} mt-2">Create account</button>
+            </form>
+        </div>
+    </section>
+
+    <div id="toast" role="status" aria-live="polite" hidden></div>
+</main>
+
+<script src="/assets/admin.js" defer></script>
+</body>
+</html>
+`
+);
+
 /* ------------------------------------------------------------------ 404 page */
 
 const notFoundLink = (href, label, desc) =>
@@ -7829,6 +8175,9 @@ Allow: /
 Disallow: /src/
 Disallow: /tools/
 Disallow: /node_modules/
+
+# JSON for the order tracker and the order desk, not pages.
+Disallow: /api/
 
 Sitemap: ${SITE}/sitemap.xml
 `

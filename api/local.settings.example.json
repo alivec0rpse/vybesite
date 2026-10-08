@@ -1,0 +1,11 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "VYB_TABLES_CONNECTION": "UseDevelopmentStorage=true",
+    "VYB_SESSION_SECRET": "change-me-to-64-random-hex-characters",
+    "VYB_ADMIN_EMAIL": "you@vybe.net.in",
+    "VYB_ADMIN_PASSWORD": "a-long-first-password"
+  }
+}

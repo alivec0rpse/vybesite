@@ -33,13 +33,16 @@ for (const file of htmlFiles()) {
   }
 }
 
-/* The verify card's icons are concatenated in JS rather than written into the
-   HTML, so they are declared in the generated file's header instead. Same list
-   tools/gen-fonts.mjs subsets against — checked here so the two cannot drift. */
-for (const m of fs.readFileSync(path.join(ROOT, 'assets/verify.js'), 'utf8').matchAll(/material-symbols-outlined:\s*([a-z0-9_,\s]+)/g)) {
-  for (const n of m[1].split(/[,\s]+/).filter(Boolean)) {
-    if (!used.has(n)) used.set(n, new Set());
-    used.get(n).add('assets/verify.js');
+/* The verify card, the tracking page and the admin page concatenate their
+   icons in JS rather than writing them into the HTML, so each declares them in
+   its header instead. Same lists tools/gen-fonts.mjs subsets against — checked
+   here so the two cannot drift. */
+for (const f of fs.readdirSync(path.join(ROOT, 'assets')).filter((f) => f.endsWith('.js'))) {
+  for (const m of fs.readFileSync(path.join(ROOT, 'assets', f), 'utf8').matchAll(/material-symbols-outlined:\s*([a-z0-9_,\s]+)/g)) {
+    for (const n of m[1].split(/[,\s]+/).filter(Boolean)) {
+      if (!used.has(n)) used.set(n, new Set());
+      used.get(n).add(`assets/${f}`);
+    }
   }
 }
 

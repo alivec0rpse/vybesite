@@ -416,3 +416,12 @@ body {
   header, footer, canvas, .no-print { display: none !important; }
   body { background: #fff; }
 }
+
+/* The order desk (/vyb-admin/) shows and hides panels with the `hidden`
+   attribute, and many of them also carry a display utility (flex, grid,
+   inline-flex). Utilities come after preflight's [hidden] rule and win the
+   tie, so without this a "hidden" grid stays on screen. Scoped to that page
+   so nothing else on the site changes. */
+#vyb-admin [hidden] {
+  display: none !important;
+}

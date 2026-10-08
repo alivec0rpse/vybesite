@@ -7,6 +7,12 @@
 # Required secrets (Settings -> Actions -> Secrets):
 #   AZURE_STATIC_WEB_APPS_API_TOKEN
 #   AZURE_CLIENT_ID / AZURE_CLIENT_SECRET / AZURE_TENANT_ID
+#
+# The order-tracking API in api/ ships in the same deploy, as the site's
+# managed functions. Its own settings (VYB_TABLES_CONNECTION,
+# VYB_SESSION_SECRET, VYB_ADMIN_EMAIL, VYB_ADMIN_PASSWORD) are not secrets
+# here: they live on the Static Web App itself, under Settings -> Environment
+# variables, so CI never holds the database key. See README.md.
 name: Deploy to Azure Static Web Apps
 
 on:
@@ -36,6 +42,20 @@ jobs:
         env:
           PUPPETEER_SKIP_DOWNLOAD: 'true'
         run: npm ci
+
+      - name: Test the API
+        # The handlers run against an in-memory table, so this needs no Azure
+        # credentials. A failing test stops the run before anything deploys.
+        working-directory: api
+        run: |
+          npm ci
+          npm test
+
+      - name: Install API runtime dependencies
+        # The SWA CLI uploads api/ as it is and does not build it, so it has to
+        # carry its node_modules. Production dependencies only.
+        working-directory: api
+        run: npm ci --omit=dev
 
       - name: Build
         run: npm run build
@@ -106,6 +126,9 @@ jobs:
             --deployment-token "$SWA_CLI_DEPLOYMENT_TOKEN" \
             --env production \
             --swa-config-location ./dist \
+            --api-location ./api \
+            --api-language node \
+            --api-version 22 \
             --no-use-keychain
 
       - name: Ping IndexNow

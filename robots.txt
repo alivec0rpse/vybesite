@@ -7,4 +7,7 @@ Disallow: /src/
 Disallow: /tools/
 Disallow: /node_modules/
 
+# JSON for the order tracker and the order desk, not pages.
+Disallow: /api/
+
 Sitemap: https://vybe.net.in/sitemap.xml

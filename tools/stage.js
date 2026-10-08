@@ -14,6 +14,8 @@ const DIST = path.join(ROOT, 'dist');
 
 const DENY = new Set([
   'dist',
+  // Deployed separately, as the site's managed functions (--api-location).
+  'api',
   'node_modules',
   'src',
   'tools',

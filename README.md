@@ -12,6 +12,7 @@ build.js              emits every page, sitemap.xml, robots.txt, manifest, 404
 tailwind.config.js    theme (brand colours, font stacks)
 tools/                image, font-subset, preview-server and screenshot scripts
 staticwebapp.config.json   routes, 301s, cache and security headers
+api/                  order-tracking API (Azure Functions, deployed as SWA managed functions)
 ```
 
 Everything else in the repo root is **generated output** — `index.html`,
@@ -179,6 +180,80 @@ or sent by the site. The send button ships disabled and the script enables it:
 the CSP's `form-action 'self'` blocks posting a form to a mailto: URL, and a
 plain GET would put the applicant's details in the URL. A "Copy my details"
 button covers people whose browser has no email app set up.
+
+## Order tracking
+
+`/track/` is the customer's side, `/vyb-admin/` is staff's. Both pages are
+built by `build.js` like everything else; what they talk to is `api/`, a small
+Azure Functions app (Node 22, programming model v4) that the deploy ships as
+this Static Web App's **managed functions**, so it is served at `/api/*` on
+the same origin and the CSP's `connect-src 'self'` already covers it. The data
+lives in **Azure Table Storage**: an `orders` table and a `users` table, both
+created on first use.
+
+- **Customers** open `/track/VYB-XXXXX-XXXXX` (the link staff send, usually by
+  WhatsApp) or type the code at `/track/`. They see items and quantities, the
+  delivery mode, courier/partner and AWB, a stepper from *payment confirmed* to
+  *delivered* (or *collected*), and every update with its note. Never the
+  phone, email, address, internal note or staff names; only the first name.
+  Codes are random (~49 bits), not sequential, so they cannot be walked.
+- **Staff** sign in at `/vyb-admin/`, create an order once payment is in, and
+  move it along. Any status can be set at any time; each delivery mode only
+  decides which steps the customer's stepper draws ahead. Modes and statuses
+  are defined once, in `api/src/lib/catalog.js`.
+- **Roles.** `user` creates and updates orders. `admin` also deletes orders and
+  manages staff accounts. Nobody signs up; only an admin creates accounts,
+  of either role, with a temporary password the person must replace at first
+  sign-in.
+- **The owner** is the first admin, created on first sign-in from the
+  `VYB_ADMIN_EMAIL` / `VYB_ADMIN_PASSWORD` settings, and only while no owner
+  exists. The owner cannot be demoted, disabled or deleted, and no admin can
+  demote, disable or delete themselves, so there is always an admin.
+- **Sessions** are an HttpOnly, `SameSite=Strict` cookie scoped to `/api`,
+  HMAC-signed with `VYB_SESSION_SECRET`, 12 hours. Signing out, a password
+  change or reset, a role change or disabling an account ends every session
+  for that person. Five wrong passwords lock an account for 15 minutes; an
+  admin's password reset lifts the lock.
+
+`cd api && npm test` runs the handlers end to end against an in-memory table,
+no Azure needed. CI runs it before every deploy.
+
+### Azure setup (once)
+
+1. **A storage account** for the tables (keep it separate from `vybecdn`,
+   whose `$web` container is public):
+
+   ```sh
+   az storage account create -g <resource-group> -n vybeorders -l centralindia \
+     --sku Standard_LRS --kind StorageV2 --min-tls-version TLS1_2 --allow-blob-public-access false
+   az storage account show-connection-string -g <resource-group> -n vybeorders -o tsv
+   ```
+
+2. **Four environment variables on the Static Web App** (Portal: the Static Web
+   App -> Settings -> Environment variables -> Production):
+
+   | Name | Value |
+   | --- | --- |
+   | `VYB_TABLES_CONNECTION` | the connection string from step 1 |
+   | `VYB_SESSION_SECRET` | `openssl rand -hex 32` |
+   | `VYB_ADMIN_EMAIL` | the owner's email |
+   | `VYB_ADMIN_PASSWORD` | a one-time first password |
+
+   ```sh
+   az staticwebapp appsettings set -n <static-web-app> -g <resource-group> --setting-names \
+     VYB_TABLES_CONNECTION="<connection string>" VYB_SESSION_SECRET="$(openssl rand -hex 32)" \
+     VYB_ADMIN_EMAIL="you@vybe.net.in" VYB_ADMIN_PASSWORD="<first password>"
+   ```
+
+3. **Push.** The Gitea workflow deploys `api/` with the site. Nothing else to
+   create: managed functions come with the Static Web App, Free plan included.
+
+4. **Sign in** at `/vyb-admin/` with the email and password from step 2,
+   choose a new password, then add staff from the Staff tab. Once the owner
+   exists, `VYB_ADMIN_PASSWORD` does nothing and can be deleted.
+
+Changing `VYB_SESSION_SECRET` signs everybody out; that is the emergency
+switch.
 
 ## SEO notes
 

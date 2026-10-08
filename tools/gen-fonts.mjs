@@ -35,13 +35,15 @@ for (const file of htmlFiles()) {
   }
 }
 
-/* assets/verify.js builds the certificate result card by concatenation, so its
-   ligature names never sit next to the class name in any file the walk above
-   reads. build.js writes them into a `material-symbols-outlined:` line in that
-   file's header for exactly this reason; drop it and those glyphs get subset
+/* assets/verify.js, track.js and admin.js build their markup in the browser,
+   so their ligature names never sit next to the class name in any file the
+   walk above reads. Each declares them on a `material-symbols-outlined:` line
+   in its header for exactly this reason; drop it and those glyphs get subset
    out and render as their literal names. */
-for (const m of readFileSync(join(ROOT, 'assets/verify.js'), 'utf8').matchAll(/material-symbols-outlined:\s*([a-z0-9_,\s]+)/g)) {
-  for (const n of m[1].split(/[,\s]+/).filter(Boolean)) icons.add(n);
+for (const f of readdirSync(join(ROOT, 'assets')).filter((f) => f.endsWith('.js'))) {
+  for (const m of readFileSync(join(ROOT, 'assets', f), 'utf8').matchAll(/material-symbols-outlined:\s*([a-z0-9_,\s]+)/g)) {
+    for (const n of m[1].split(/[,\s]+/).filter(Boolean)) icons.add(n);
+  }
 }
 
 /* The /empdir/ pages exist only for employees who are in src/empdir.json, so
