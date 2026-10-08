@@ -4,6 +4,15 @@
 # calls GitHub's API for commit statuses and PR preview environments, which a
 # Gitea runner has nowhere to send.
 #
+# One job, deliberately. build -> CDN -> deploy is a strict sequence, and
+# every extra job pays a container start, a checkout and an npm install before
+# it does anything; the API tests take two seconds once api/ is installed.
+#
+# Most of a run used to be installing tools, not building (the build is a few
+# seconds). So: npm is cached, the CDN upload is a Node script that sends only
+# changed files instead of the Azure CLI installed from scratch each run, and
+# the SWA deploy binary is cached between runs.
+#
 # Required secrets (Settings -> Actions -> Secrets):
 #   AZURE_STATIC_WEB_APPS_API_TOKEN
 #   AZURE_CLIENT_ID / AZURE_CLIENT_SECRET / AZURE_TENANT_ID
@@ -18,12 +27,17 @@ name: Deploy to Azure Static Web Apps
 on:
   push:
     branches: [main]
+    # Nothing in these reaches the site, so a push touching only them is not
+    # worth a deploy. Any other file in the same push still triggers one.
+    paths-ignore:
+      - 'README.md'
+      - 'shots/**'
+      - 'employee-ids/**'
   workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
@@ -35,27 +49,26 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            api/package-lock.json
 
       - name: Install dependencies
         # Puppeteer only drives the local screenshot scripts; skip the 170MB
         # Chromium download CI never opens.
         env:
           PUPPETEER_SKIP_DOWNLOAD: 'true'
-        run: npm ci
+        run: |
+          npm ci --no-audit --no-fund
+          # The SWA CLI uploads api/ as it is and does not build it, so it has
+          # to carry its node_modules. Production dependencies only.
+          npm ci --prefix api --omit=dev --no-audit --no-fund
 
       - name: Test the API
-        # The handlers run against an in-memory table, so this needs no Azure
-        # credentials. A failing test stops the run before anything deploys.
-        working-directory: api
-        run: |
-          npm ci
-          npm test
-
-      - name: Install API runtime dependencies
-        # The SWA CLI uploads api/ as it is and does not build it, so it has to
-        # carry its node_modules. Production dependencies only.
-        working-directory: api
-        run: npm ci --omit=dev
+        # The handlers run against an in-memory table: no Azure credentials,
+        # and the failure stops the run before anything is published.
+        run: npm test --prefix api
 
       - name: Build
         run: npm run build
@@ -68,7 +81,7 @@ jobs:
       - name: Stage the deploy artifact
         run: npm run stage
 
-      - name: Upload assets to the CDN origin
+      - name: Upload changed assets to the CDN origin
         # Before the site deploy, never after: the staged pages reference
         # cdn.vybe.net.in, so an asset missing from the container is a 404 on a
         # live page for the length of the deploy.
@@ -80,38 +93,15 @@ jobs:
           AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
           AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-        run: |
-          for v in AZURE_CLIENT_ID AZURE_CLIENT_SECRET AZURE_TENANT_ID; do
-            if [ -z "$(eval echo \$$v)" ]; then
-              echo "$v is not set."
-              echo "Add it under Settings -> Actions -> Secrets in this repository."
-              exit 1
-            fi
-          done
-          command -v az >/dev/null || curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-          # --allow-no-subscriptions: the principal is scoped to one storage
-          # account and cannot enumerate subscriptions.
-          az login --service-principal \
-            --username "$AZURE_CLIENT_ID" \
-            --password "$AZURE_CLIENT_SECRET" \
-            --tenant "$AZURE_TENANT_ID" \
-            --allow-no-subscriptions --output none
-          az storage blob upload-batch \
-            --account-name vybecdn --auth-mode login \
-            --destination '$web' --destination-path assets \
-            --source ./dist/assets \
-            --overwrite --no-progress \
-            --content-cache 'public, max-age=31536000, immutable'
-          # Re-upload the fonts with an explicit type: the CLI has no entry for
-          # .woff2 and they would land as application/octet-stream.
-          az storage blob upload-batch \
-            --account-name vybecdn --auth-mode login \
-            --destination '$web' --destination-path assets \
-            --source ./dist/assets \
-            --pattern '**/*.woff2' \
-            --overwrite --no-progress \
-            --content-type 'font/woff2' \
-            --content-cache 'public, max-age=31536000, immutable'
+        run: node tools/cdn-upload.mjs
+
+      - name: Cache the SWA deploy binary
+        # The SWA CLI downloads StaticSitesClient (~100MB) into ~/.swa on
+        # first use. Keep it between runs.
+        uses: actions/cache@v4
+        with:
+          path: ~/.swa
+          key: swa-deploy-cli2-${{ runner.os }}
 
       - name: Deploy to Azure
         env:
