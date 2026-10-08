@@ -7594,10 +7594,11 @@ ${faqSection(trackFaqs, { dark: false })}
   });
 }
 
-/* --------------------------------------------------------------- order desk */
+/* -------------------------------------------------------------- admin panel */
 
 /**
- * /vyb-admin/: where staff create orders and move them along. A bare page, not
+ * /vyb-admin/: the admin panel, where staff run orders, certificates and the
+ * blog, and admins manage staff accounts. A bare page, not
  * shell(): no navigation, no footer, no structured data, nothing for a crawler,
  * and it is not in the sitemap. It is noindex here and in its route headers.
  *
@@ -7633,7 +7634,7 @@ write(
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Order desk | Vybe Technologies</title>
+<title>Admin panel | Vybe Technologies</title>
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
 <link rel="preload" href="/assets/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
@@ -7646,7 +7647,7 @@ write(
 
 <header class="bg-corporate text-white">
     <div class="max-w-6xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-3">
-        <p class="font-black font-display tracking-tight text-lg">Vybe <span class="text-brand">Order desk</span></p>
+        <p class="font-black font-display tracking-tight text-lg">Vybe <span class="text-brand">Admin panel</span></p>
         <div id="who" class="flex flex-wrap items-center gap-2 text-xs" hidden>
             <span id="who-name" class="text-slate-300 mr-2"></span>
             <button id="btn-password" type="button" class="inline-flex items-center gap-1.5 rounded-full border border-white/20 hover:border-white px-3 py-1.5 font-bold"><span class="material-symbols-outlined text-[16px]" aria-hidden="true">key</span>Password</button>
@@ -7656,7 +7657,7 @@ write(
 </header>
 
 <main class="max-w-6xl mx-auto px-4 py-8">
-    <noscript><p class="${ADMIN_CARD} text-sm">The order desk needs JavaScript.</p></noscript>
+    <noscript><p class="${ADMIN_CARD} text-sm">The admin panel needs JavaScript.</p></noscript>
 
     <p id="view-loading" class="text-sm text-slate-500">Loading…</p>
 
@@ -8753,7 +8754,7 @@ Disallow: /src/
 Disallow: /tools/
 Disallow: /node_modules/
 
-# JSON for the order tracker and the order desk, not pages.
+# The API: JSON for order tracking, verification and the admin panel.
 Disallow: /api/
 
 Sitemap: ${SITE}/sitemap.xml

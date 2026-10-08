@@ -1,6 +1,7 @@
 /*
- * The order desk behind /vyb-admin/. The page's HTML (built in build.js)
- * carries every form; this file signs staff in, fills the lists, and talks to
+ * The admin panel behind /vyb-admin/: orders, certificates, the blog and
+ * staff. The page's HTML (built in build.js) carries every form; this file
+ * signs staff in, fills the lists, and talks to
  * /api/*. Nothing here is trusted: the API checks the session and the role on
  * every call, so hiding the Staff tab from a `user` is tidiness, not security.
  *
