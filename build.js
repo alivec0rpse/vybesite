@@ -7513,11 +7513,15 @@ ${faqSection(careersFaqs, { dark: false })}
 const trackFaqs = [
   {
     q: 'Where do I find my tracking code?',
-    a: 'In the message we send when your payment is confirmed, usually on WhatsApp. It starts with VYB, for example VYB-7K2MQ-9XAP3, and the link in that message opens this page with the code already filled in.',
+    a: 'In the message we send when your order is confirmed, usually on WhatsApp. It starts with VYB, for example VYB-7K2MQ-9XAP3, and the link in that message opens this page with the code already filled in.',
   },
   {
     q: 'How often is the status updated?',
     a: 'Every time your order moves: when it is prepared, packed, handed to a courier or rider, and delivered. Our team updates it by hand, so it is current to the last step we took, not to the minute.',
+  },
+  {
+    q: 'I chose cash on delivery or credit. How do I know what to pay?',
+    a: 'The tracking page shows the amount and, for credit, the date it is due. Once we record your payment the page says so, with the date. Pay only the amount shown there or on your invoice, and only to our delivery staff or our official bank account.',
   },
   {
     q: 'My order went by courier. Can I track it with them too?',
@@ -7525,7 +7529,7 @@ const trackFaqs = [
   },
   {
     q: 'Is my information safe on this page?',
-    a: `The tracking page shows your items, the delivery details and the progress of the order, with your first name only. It never shows your phone number, email or address. Treat the code like a receipt number: anybody you share it with can see the order's progress. If you think a code has been shared by mistake, write to <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a>.`,
+    a: `The tracking page shows your items, the delivery details and the progress of the order, with your name. It never shows your phone number, email or address. Treat the code like a receipt number: anybody you share it with can see the order's progress. If you think a code has been shared by mistake, write to <a class="text-brand font-bold" href="mailto:${ORG.sales}">${ORG.sales}</a>.`,
   },
 ];
 
@@ -7537,7 +7541,7 @@ ${breadcrumbs([CRUMB_HOME, { name: 'Track an order', url: '/track/' }], false)}
             <div class="max-w-6xl mx-auto relative z-10">
                 <p class="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-3">Order tracking</p>
                 <h1 class="text-5xl md:text-7xl font-black font-display tracking-tighter text-slate-900">Track your order.</h1>
-                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">From payment confirmed to delivered: see what you ordered, how it is reaching you and exactly where it has got to. Enter the tracking code from your message, or open the link we sent you.</p>
+                <p class="mt-6 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">From the moment your order is confirmed to the moment it is delivered: see what you ordered, how it is reaching you, what is left to pay and exactly where it has got to. Enter the tracking code from your message, or open the link we sent you.</p>
 
                 <form id="track-form" action="/track/" method="get" class="mt-10 max-w-2xl">
                     <label for="track-code" class="block text-xs font-bold uppercase tracking-[0.15em] text-slate-400">Tracking code</label>
@@ -7583,7 +7587,7 @@ ${faqSection(trackFaqs, { dark: false })}
       title: 'Track Your Order | Vybe Technologies',
       ogTitle: 'Track your Vybe order',
       description:
-        'Track a Vybe Technologies order with your tracking code: items, delivery mode and every step from payment confirmed to delivered.',
+        'Track a Vybe Technologies order with your tracking code: items, delivery mode, payment and every step from order confirmed to delivered.',
       lastmod,
       trail: [CRUMB_HOME, { name: 'Track an order', url }],
       faqs: trackFaqs,
@@ -7776,6 +7780,25 @@ write(
                         ${field('f-partner', 'Courier / partner / rider', 'maxlength="120" placeholder="DTDC, Porter, Suresh…"')}
                         ${field('f-partnerRef', 'AWB / booking reference', 'maxlength="120"')}
                         ${field('f-partnerUrl', 'Partner tracking link', 'type="url" maxlength="500" placeholder="https://…"', true)}
+
+                        <div class="md:col-span-2 grid gap-4 md:grid-cols-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <div>
+                                <label for="f-payment" class="${ADMIN_LABEL}">Payment *</label>
+                                <select id="f-payment" class="${ADMIN_INPUT}"></select>
+                            </div>
+                            <div id="f-amount-wrap">
+                                <label for="f-amount" class="${ADMIN_LABEL}">Amount to collect (₹)</label>
+                                <input id="f-amount" type="text" inputmode="decimal" maxlength="15" placeholder="1250" autocomplete="off" class="${ADMIN_INPUT}">
+                            </div>
+                            <div id="f-dueBy-wrap">
+                                <label for="f-dueBy" class="${ADMIN_LABEL}">Payment due by</label>
+                                <input id="f-dueBy" type="date" class="${ADMIN_INPUT}">
+                            </div>
+                            <div id="f-paid-wrap" class="flex items-end pb-2">
+                                <label class="inline-flex items-center gap-2 text-sm font-bold text-slate-700"><input id="f-paid" type="checkbox" class="w-4 h-4 accent-brand">Payment received</label>
+                            </div>
+                            <p class="md:col-span-4 text-xs text-slate-500">Cash on delivery and credit orders start at <strong>Order confirmed</strong>, not Payment confirmed, and the customer sees the amount to pay. A delivered order stays under <strong>Open</strong> until you tick Payment received.</p>
+                        </div>
                         ${area('f-publicNote', 'Note on the tracking page', 'The customer sees this, e.g. collection hours or "call before arriving".')}
                         ${area('f-internalNote', 'Internal note', 'Staff only: payment details, special handling.')}
                     </div>

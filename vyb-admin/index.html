@@ -7,8 +7,8 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
 <link rel="preload" href="/assets/fonts/inter-var.woff2?v=3100e775" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/assets/fonts/material-symbols-subset.woff2?v=0dbc1b62" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=f7a079d6">
+<link rel="preload" href="/assets/fonts/material-symbols-subset.woff2?v=7c8745e3" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css?v=89ec0dee">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <meta name="theme-color" content="#0f172a">
 </head>
@@ -188,6 +188,25 @@
                                 <label for="f-partnerUrl" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Partner tracking link</label>
                                 <input id="f-partnerUrl" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="url" maxlength="500" placeholder="https://…">
                             </div>
+
+                        <div class="md:col-span-2 grid gap-4 md:grid-cols-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <div>
+                                <label for="f-payment" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Payment *</label>
+                                <select id="f-payment" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"></select>
+                            </div>
+                            <div id="f-amount-wrap">
+                                <label for="f-amount" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Amount to collect (₹)</label>
+                                <input id="f-amount" type="text" inputmode="decimal" maxlength="15" placeholder="1250" autocomplete="off" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30">
+                            </div>
+                            <div id="f-dueBy-wrap">
+                                <label for="f-dueBy" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Payment due by</label>
+                                <input id="f-dueBy" type="date" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30">
+                            </div>
+                            <div id="f-paid-wrap" class="flex items-end pb-2">
+                                <label class="inline-flex items-center gap-2 text-sm font-bold text-slate-700"><input id="f-paid" type="checkbox" class="w-4 h-4 accent-brand">Payment received</label>
+                            </div>
+                            <p class="md:col-span-4 text-xs text-slate-500">Cash on delivery and credit orders start at <strong>Order confirmed</strong>, not Payment confirmed, and the customer sees the amount to pay. A delivered order stays under <strong>Open</strong> until you tick Payment received.</p>
+                        </div>
                         <div class="md:col-span-2">
                                 <label for="f-publicNote" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Note on the tracking page</label>
                                 <textarea id="f-publicNote" rows="2" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"></textarea>
@@ -519,6 +538,6 @@
     <div id="toast" role="status" aria-live="polite" hidden></div>
 </main>
 
-<script src="/assets/admin.js?v=980ff3e8" defer></script>
+<script src="/assets/admin.js?v=059875d7" defer></script>
 </body>
 </html>

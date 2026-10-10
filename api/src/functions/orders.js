@@ -2,9 +2,10 @@
  * The order book, for signed-in staff.
  *
  *   GET    /api/orders?q=&show=open|closed|all   list, newest activity first
- *   POST   /api/orders                           create; starts at `status` (default payment confirmed)
+ *   POST   /api/orders                           create; starts at `status` (default: payment confirmed,
+ *                                                 or order confirmed for cash on delivery and credit)
  *   GET    /api/orders/{code}                    one order, everything
- *   PATCH  /api/orders/{code}                    edit details (items, mode, partner, notes…)
+ *   PATCH  /api/orders/{code}                    edit details (items, mode, partner, payment, notes…)
  *   POST   /api/orders/{code}/status             { status, note } — the update the customer sees
  *   DELETE /api/orders/{code}/status             undo the latest update
  *   DELETE /api/orders/{code}                    admin only
@@ -18,7 +19,7 @@ const { json, body, route, HttpError } = require('../lib/http');
 const store = require('../lib/store');
 const auth = require('../lib/auth');
 const orders = require('../lib/orders');
-const { isFinal } = require('../lib/catalog');
+const { isFinal, firstStatus } = require('../lib/catalog');
 
 const NOT_FOUND = 'No order with that tracking code.';
 
@@ -51,7 +52,9 @@ async function list(req) {
   const { orders: table } = await store.tables();
 
   const rows = (await store.list(table, store.ORDER_PK))
-    .filter((e) => show === 'all' || (show === 'closed') === isFinal(e.status))
+    // Delivered but not yet paid (cash on delivery, credit) is still open:
+    // the order is not done until the money is in.
+    .filter((e) => show === 'all' || (show === 'closed') === (isFinal(e.status) && (e.status === 'cancelled' || orders.isPaid(e))))
     .map(orders.staffView)
     .filter(
       (o) =>
@@ -72,8 +75,9 @@ async function create(req, ctx) {
   const user = await auth.requireStaff(req);
   const input = await body(req);
   const fields = orders.details(input);
-  const first = orders.status(input.status || 'payment_confirmed');
+  const first = orders.status(input.status || firstStatus(fields.payment));
   const now = new Date().toISOString();
+  if (fields.paid && fields.payment !== 'prepaid') fields.paidAt = now;
   const { orders: table } = await store.tables();
 
   // A clash on a random 49-bit code is next to impossible, but createEntity
@@ -109,7 +113,15 @@ async function getOne(req) {
 async function edit(req) {
   await auth.requireStaff(req);
   const fields = orders.details(await body(req), { partial: true });
-  const saved = await mutate(req, (e) => ({ ...store.strip(e), ...fields, updatedAt: new Date().toISOString() }));
+  const saved = await mutate(req, (e) => {
+    const now = new Date().toISOString();
+    const next = { ...store.strip(e), ...fields, updatedAt: now };
+    // Stamp the moment a COD or credit payment was marked received, once;
+    // un-marking it (a mistake, a bounced cheque) clears the stamp.
+    if (next.paid && !e.paid) next.paidAt = now;
+    if (!next.paid) next.paidAt = '';
+    return next;
+  });
   return json(200, { order: orders.staffView(saved) });
 }
 

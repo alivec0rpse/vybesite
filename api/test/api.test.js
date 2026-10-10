@@ -113,11 +113,11 @@ test('staff create an order and the public view hides private fields', async () 
   const t = await call(track, { params: { code: code.toLowerCase() } });
   assert.equal(t.status, 200);
   assert.equal(t.headers['Cache-Control'], 'no-store');
-  assert.equal(t.body.firstName, 'Ramesh');
+  assert.equal(t.body.customerName, 'Ramesh Kumar');
   assert.equal(t.body.items.length, 2);
   assert.equal(t.body.deliveryMode.label, 'Courier');
   const text = JSON.stringify(t.body);
-  for (const secret of ['98450', 'ramesh@example.com', 'Jayanagar', 'Paid by UPI', 'staff@vybe.net.in', 'Kumar'])
+  for (const secret of ['98450', 'ramesh@example.com', 'Jayanagar', 'Paid by UPI', 'staff@vybe.net.in'])
     assert.ok(!text.includes(secret), `public view leaks ${secret}`);
   assert.deepEqual(
     t.body.steps.map((s) => [s.key, s.done, s.current]),
@@ -199,6 +199,55 @@ test('list filters open and closed orders and searches', async () => {
   assert.equal((await call(orderFns.list, { cookie: staff })).body.orders.length, 0);
   assert.equal((await call(orderFns.list, { cookie: staff, query: { show: 'closed' } })).body.orders.length, 1);
   assert.equal((await call(orderFns.list, { cookie: staff, query: { show: 'all', q: code.replace(/-/g, '') } })).body.orders.length, 1);
+});
+
+test('cash on delivery: order confirmed, amount shown, open until paid', async () => {
+  const r = await call(orderFns.create, { cookie: staff, body: { ...ORDER, payment: 'cod', amount: '₹1,250.5', deliveryMode: 'hand_delivery' } });
+  assert.equal(r.status, 201, JSON.stringify(r.body));
+  const o = r.body.order;
+  assert.equal(o.status, 'order_confirmed');
+  assert.equal(o.amount, '1250.50');
+  assert.equal(o.paid, false);
+  const p = { code: o.code };
+
+  let t = (await call(track, { params: p })).body;
+  assert.equal(t.steps[0].key, 'order_confirmed');
+  assert.ok(!t.steps.some((s) => s.key === 'payment_confirmed'), 'COD must not claim payment');
+  assert.deepEqual([t.payment.key, t.payment.label, t.payment.amount, t.payment.paid], ['cod', 'Cash on delivery', '1250.50', false]);
+
+  // Delivered but unpaid stays in the open list.
+  await call(orderFns.setStatus, { cookie: staff, params: p, body: { status: 'delivered' } });
+  const open = (await call(orderFns.list, { cookie: staff })).body.orders.map((x) => x.code);
+  assert.ok(open.includes(o.code));
+
+  const paid = await call(orderFns.edit, { cookie: staff, params: p, body: { paid: true } });
+  assert.equal(paid.body.order.paid, true);
+  assert.ok(paid.body.order.paidAt);
+  t = (await call(track, { params: p })).body;
+  assert.equal(t.payment.paid, true);
+  assert.ok(t.payment.paidAt);
+  assert.ok(!(await call(orderFns.list, { cookie: staff })).body.orders.some((x) => x.code === o.code), 'paid and delivered is closed');
+
+  // Un-marking clears the stamp.
+  assert.equal((await call(orderFns.edit, { cookie: staff, params: p, body: { paid: false } })).body.order.paidAt, '');
+  await call(orderFns.remove, { cookie: owner, params: p });
+});
+
+test('credit carries a due date; bad payment input is refused', async () => {
+  const r = await call(orderFns.create, { cookie: staff, body: { ...ORDER, payment: 'credit', amount: 50000, dueBy: '2026-11-30' } });
+  assert.equal(r.status, 201);
+  const t = (await call(track, { params: { code: r.body.order.code } })).body;
+  assert.deepEqual([t.payment.key, t.payment.dueBy, t.payment.amount], ['credit', '2026-11-30', '50000.00']);
+  assert.equal(t.steps[0].key, 'order_confirmed');
+
+  for (const b of [{ payment: 'barter' }, { amount: '12abc' }, { amount: '-5' }, { amount: '1.234' }, { dueBy: '30/11/2026' }])
+    assert.equal((await call(orderFns.create, { cookie: staff, body: { ...ORDER, ...b } })).status, 400, JSON.stringify(b));
+
+  // Prepaid is always paid and says nothing about a due date.
+  const pre = await call(orderFns.create, { cookie: staff, body: ORDER });
+  const pt = (await call(track, { params: { code: pre.body.order.code } })).body;
+  assert.deepEqual([pt.payment.key, pt.payment.paid, pt.steps[0].key], ['prepaid', true, 'payment_confirmed']);
+  for (const c of [r.body.order.code, pre.body.order.code]) await call(orderFns.remove, { cookie: owner, params: { code: c } });
 });
 
 test('only admins delete orders', async () => {

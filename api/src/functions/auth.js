@@ -10,7 +10,7 @@ const { app } = require('@azure/functions');
 const { json, body, route, HttpError } = require('../lib/http');
 const store = require('../lib/store');
 const auth = require('../lib/auth');
-const { STATUSES, MODES, ROLES } = require('../lib/catalog');
+const { STATUSES, MODES, PAYMENTS, ROLES } = require('../lib/catalog');
 
 async function login(req) {
   const { email, password } = await body(req);
@@ -41,7 +41,7 @@ async function logout(req) {
 /** The account plus the catalog the admin page builds its forms from. */
 async function me(req) {
   const user = await auth.requireStaff(req, { passwordChange: true });
-  return json(200, { user: auth.publicUser(user), meta: { statuses: STATUSES, modes: MODES, roles: ROLES } });
+  return json(200, { user: auth.publicUser(user), meta: { statuses: STATUSES, modes: MODES, payments: PAYMENTS, roles: ROLES } });
 }
 
 async function password(req) {

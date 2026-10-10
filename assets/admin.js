@@ -205,6 +205,9 @@
     var mode = $('f-deliveryMode');
     mode.replaceChildren();
     Object.keys(modes).forEach(function (k) { mode.appendChild(option(k, modes[k].label)); });
+    var pay = $('f-payment');
+    pay.replaceChildren();
+    Object.keys(state.meta.payments).forEach(function (k) { pay.appendChild(option(k, state.meta.payments[k].label)); });
     [$('f-status'), $('status-select')].forEach(function (sel) {
       sel.replaceChildren();
       Object.keys(state.meta.statuses).forEach(function (k) { sel.appendChild(option(k, state.meta.statuses[k].label)); });
@@ -259,7 +262,12 @@
           h('td', 'px-4 py-3', [h('span', 'block font-bold text-slate-900', o.customerName), o.reference ? h('span', 'block text-xs text-slate-500', o.reference) : null]),
           h('td', 'px-4 py-3 text-slate-600 max-w-xs truncate', items),
           h('td', 'px-4 py-3 text-slate-600 whitespace-nowrap', (state.meta.modes[o.deliveryMode] || {}).label || o.deliveryMode),
-          h('td', 'px-4 py-3', statusPill(o.status)),
+          h('td', 'px-4 py-3', [
+            statusPill(o.status),
+            o.payment !== 'prepaid' && !o.paid
+              ? h('span', 'block mt-1 text-xs font-bold text-amber-700 whitespace-nowrap', (o.payment === 'cod' ? 'COD' : 'Credit') + (o.amount ? ' ' + rupees(o.amount) : '') + ' unpaid')
+              : null,
+          ]),
           h('td', 'px-4 py-3 text-xs text-slate-500 whitespace-nowrap', when(o.updatedAt)),
         ]);
         tr.tabIndex = 0;
@@ -281,7 +289,25 @@
 
   /* -------------------------------------------------------- order form */
 
-  var FIELDS = ['customerName', 'customerPhone', 'customerEmail', 'address', 'reference', 'deliveryMode', 'partner', 'partnerRef', 'partnerUrl', 'expectedBy', 'publicNote', 'internalNote'];
+  var FIELDS = ['customerName', 'customerPhone', 'customerEmail', 'address', 'reference', 'deliveryMode', 'partner', 'partnerRef', 'partnerUrl', 'expectedBy', 'payment', 'amount', 'dueBy', 'publicNote', 'internalNote'];
+
+  /* Prepaid needs none of the payment fields; credit is the only one with a
+     due date. On a new order the starting status follows the payment type
+     until staff pick one themselves. */
+  var startTouched = false;
+  function paymentChanged() {
+    var p = $('f-payment').value;
+    $('f-amount-wrap').hidden = p === 'prepaid';
+    $('f-dueBy-wrap').hidden = p !== 'credit';
+    $('f-paid-wrap').hidden = p === 'prepaid';
+    if (state.creating && !startTouched) $('f-status').value = p === 'prepaid' ? 'payment_confirmed' : 'order_confirmed';
+  }
+  $('f-payment').addEventListener('change', paymentChanged);
+  $('f-status').addEventListener('change', function () { startTouched = true; });
+
+  function rupees(a) {
+    return '₹' + Number(a).toLocaleString('en-IN', { maximumFractionDigits: 2 });
+  }
 
   function itemRow(it) {
     var name = h('input', 'flex-1 min-w-0 rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30');
@@ -316,6 +342,12 @@
   function collect() {
     var data = {};
     FIELDS.forEach(function (f) { data[f] = $('f-' + f).value; });
+    data.paid = $('f-paid').checked;
+    if (data.payment === 'prepaid') {
+      data.amount = '';
+      data.dueBy = '';
+    }
+    if (data.payment !== 'credit') data.dueBy = '';
     data.items = Array.prototype.map.call($('items').children, function (row) {
       return { name: row.querySelector('[data-role=name]').value, qty: Number(row.querySelector('[data-role=qty]').value) };
     });
@@ -331,17 +363,22 @@
     $('order-error').textContent = '';
 
     FIELDS.forEach(function (f) { $('f-' + f).value = o ? o[f] || '' : ''; });
-    if (!o) $('f-deliveryMode').value = 'courier';
+    if (!o) {
+      $('f-deliveryMode').value = 'courier';
+      $('f-payment').value = 'prepaid';
+    }
+    $('f-paid').checked = !!(o && o.paid && o.payment !== 'prepaid');
+    startTouched = false;
     $('items').replaceChildren.apply($('items'), (o ? o.items : [null]).map(itemRow));
 
     $('order-title').textContent = o ? o.code : 'New order';
-    $('order-sub').textContent = o ? 'Created ' + when(o.createdAt) + ' by ' + o.createdBy : 'Create the order once payment is confirmed. The customer can track it as soon as you save.';
+    $('order-sub').textContent = o ? 'Created ' + when(o.createdAt) + ' by ' + o.createdBy : 'Create the order once it is paid for, or agreed as cash on delivery or credit. The customer can track it as soon as you save.';
     $('order-first').hidden = !!o;
     $('order-live').hidden = !o;
     $('order-save').textContent = o ? 'Save details' : 'Create order';
     $('order-delete').hidden = !o || state.user.role !== 'admin';
+    paymentChanged();
     if (!o) {
-      $('f-status').value = 'payment_confirmed';
       $('f-customerName').focus();
       return;
     }
@@ -352,6 +389,8 @@
     var phone = String(o.customerPhone || '').replace(/\D/g, '');
     if (phone.length === 10) phone = '91' + phone;
     var msg = 'Hi ' + (o.customerName.split(' ')[0] || '') + ', thank you for your order with Vybe Technologies. Track it here: ' + link;
+    if (o.payment === 'cod' && !o.paid && o.amount) msg += '\nPlease keep ' + rupees(o.amount) + ' ready to pay on delivery.';
+    if (o.payment === 'credit' && !o.paid && o.amount) msg += '\nAmount due: ' + rupees(o.amount) + (o.dueBy ? ', by ' + o.dueBy : '') + '.';
     $('share-whatsapp').href = 'https://wa.me/' + (phone.length >= 11 ? phone : '') + '?text=' + encodeURIComponent(msg);
 
     $('order-status-now').replaceChildren(statusPill(o.status));

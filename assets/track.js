@@ -10,7 +10,7 @@
  * Markup is built with DOM calls and textContent, never innerHTML: every
  * string in an order was typed by a person, and some of it by a customer.
  *
- * material-symbols-outlined: check_circle, radio_button_checked, radio_button_unchecked, local_shipping, inventory_2, schedule, open_in_new, refresh, info, pause_circle, cancel, storefront, two_wheeler, person, location_city, error
+ * material-symbols-outlined: payments, check_circle, radio_button_checked, radio_button_unchecked, local_shipping, inventory_2, schedule, open_in_new, refresh, info, pause_circle, cancel, storefront, two_wheeler, person, location_city, error
  */
 (function () {
   'use strict';
@@ -120,11 +120,12 @@
         h('div', '', [
           h('p', 'text-xs font-bold uppercase tracking-[0.15em] text-slate-400', 'Tracking code'),
           h('p', 'mt-1 text-lg font-black font-display tracking-tight text-slate-900', o.code),
+          o.customerName ? h('p', 'mt-1 text-sm font-bold text-slate-700', 'For ' + o.customerName) : null,
           o.reference ? h('p', 'mt-1 text-xs text-slate-500', 'Reference ' + o.reference) : null,
         ]),
         h('span', 'inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold ' + tone(o), [icon(statusIcon, 'text-[18px]'), o.status.label]),
       ]),
-      h('p', 'mt-5 text-base text-slate-700 leading-relaxed', (o.firstName ? o.firstName + ', ' : '') + o.status.hint.charAt(0).toLowerCase() + o.status.hint.slice(1)),
+      h('p', 'mt-5 text-base text-slate-700 leading-relaxed', o.status.hint),
       o.updatedAt ? h('p', 'mt-1 text-xs text-slate-500', 'Last updated ' + when(o.updatedAt)) : null,
     ]);
 
@@ -143,6 +144,7 @@
       fact('Expected by', day(o.expectedBy)),
       fact(o.deliveryMode.key === 'courier' ? 'Courier' : 'Delivery partner', o.partner),
       fact(o.deliveryMode.key === 'courier' ? 'AWB / consignment no.' : 'Partner reference', o.partnerRef),
+      fact('Payment', paymentText(o)),
       fact('Order placed', when(o.placedAt)),
     ]);
     if (partnerLink) facts.appendChild(h('div', 'col-span-2', partnerLink));
@@ -156,6 +158,14 @@
       tbody.appendChild(h('tr', '', [h('td', 'py-2 pr-4 text-slate-800', it.name), h('td', 'py-2 text-right font-bold text-slate-900 tabular-nums', String(it.qty))]));
     });
     table.appendChild(tbody);
+
+    var due = paymentDue(o);
+    var dueBox = due
+      ? h('div', 'mx-6 md:mx-8 mt-6 rounded-xl border border-amber-300 bg-amber-50 p-4 flex gap-3 text-sm text-amber-900 leading-relaxed', [
+          icon('payments', 'text-amber-700 text-[20px] shrink-0'),
+          h('p', 'font-bold', due),
+        ])
+      : null;
 
     var note = o.publicNote
       ? h('div', 'mx-6 md:mx-8 mt-6 rounded-xl border border-brand/30 bg-brand/5 p-4 flex gap-3 text-sm text-slate-700 leading-relaxed', [
@@ -189,6 +199,7 @@
 
     return h('article', 'rounded-3xl border border-slate-200 bg-white shadow-sm overflow-hidden', [
       head,
+      dueBox,
       note,
       h('div', 'grid md:grid-cols-2 gap-8 p-6 md:p-8', [
         h('section', '', [h('h2', 'text-base font-bold font-display tracking-tight text-slate-900 mb-4', 'Progress'), stepper(o)]),
@@ -202,6 +213,28 @@
         history,
       ]),
     ]);
+  }
+
+  function rupees(a) {
+    return '\u20b9' + Number(a).toLocaleString('en-IN', { maximumFractionDigits: 2 });
+  }
+
+  /* Payment, in the delivery facts. Prepaid just says so; cash on delivery and
+     credit say whether the money is still owed. */
+  function paymentText(o) {
+    var p = o.payment;
+    if (!p || p.key === 'prepaid') return 'Prepaid';
+    if (p.paid) return p.label + ' \u00b7 paid' + (p.paidAt ? ' ' + day(p.paidAt.slice(0, 10)) : '');
+    return p.label + (p.amount ? ' \u00b7 ' + rupees(p.amount) + ' due' : '');
+  }
+
+  /** The one sentence a customer who still owes money needs to read, or null. */
+  function paymentDue(o) {
+    var p = o.payment;
+    if (!p || p.paid || p.key === 'prepaid' || o.status.key === 'cancelled') return null;
+    var amt = p.amount ? rupees(p.amount) : 'the order amount';
+    if (p.key === 'cod') return o.deliveryMode.key === 'pickup' ? 'Please pay ' + amt + ' when you collect your order.' : 'Cash on delivery: please keep ' + amt + ' ready when your order arrives.';
+    return 'Payment of ' + amt + ' is due' + (p.dueBy ? ' by ' + day(p.dueBy) : '') + '.';
   }
 
   function message(kind, title, text) {

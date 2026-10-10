@@ -9,7 +9,7 @@
  * phone survives the trip.
  */
 const crypto = require('node:crypto');
-const { STATUSES, MODES } = require('./catalog');
+const { STATUSES, MODES, PAYMENTS, flowFor } = require('./catalog');
 const { HttpError } = require('./http');
 
 const ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
@@ -77,6 +77,19 @@ function mode(v) {
   return v;
 }
 
+function payment(v) {
+  if (!Object.hasOwn(PAYMENTS, v)) throw new HttpError(400, 'Choose how the customer pays.');
+  return v;
+}
+
+/** Rupees, up to two decimals. Blank means "not stated". Stored as a string: Table Storage doubles are not money. */
+function amount(v) {
+  if (v === undefined || v === null || String(v).trim() === '') return '';
+  const s = String(v).replace(/[₹,\s]/g, '');
+  if (!/^\d{1,9}(\.\d{1,2})?$/.test(s)) throw new HttpError(400, 'Amount must be a number of rupees, e.g. 1250 or 1250.50.');
+  return Number(s).toFixed(2);
+}
+
 function status(v) {
   if (!Object.hasOwn(STATUSES, v)) throw new HttpError(400, 'Choose a status.');
   return v;
@@ -105,6 +118,10 @@ function details(input, { partial = false } = {}) {
   if (has('expectedBy')) out.expectedBy = date(input.expectedBy);
   if (has('publicNote')) out.publicNote = str(input.publicNote, 1000, 'Note for the customer');
   if (has('internalNote')) out.internalNote = str(input.internalNote, 2000, 'Internal note');
+  if (has('payment')) out.payment = payment(input.payment ?? 'prepaid');
+  if (has('amount')) out.amount = amount(input.amount);
+  if (has('dueBy')) out.dueBy = date(input.dueBy);
+  if (has('paid')) out.paid = !!input.paid;
   return out;
 }
 
@@ -119,6 +136,9 @@ const parse = (s, fallback) => {
 };
 
 const events = (e) => parse(e.events, []);
+
+// Orders from before payment types existed were all prepaid.
+const isPaid = (e) => !e.payment || e.payment === 'prepaid' || !!e.paid;
 
 /** Everything, for signed-in staff. */
 const staffView = (e) => ({
@@ -136,6 +156,11 @@ const staffView = (e) => ({
   expectedBy: e.expectedBy || '',
   publicNote: e.publicNote || '',
   internalNote: e.internalNote || '',
+  payment: e.payment || 'prepaid',
+  amount: e.amount || '',
+  dueBy: e.dueBy || '',
+  paid: isPaid(e),
+  paidAt: e.paidAt || '',
   status: e.status,
   events: events(e),
   createdAt: e.createdAt,
@@ -145,11 +170,12 @@ const staffView = (e) => ({
 
 /**
  * What anybody holding the code sees. No phone, email, address or internal
- * note, no staff names, and only the customer's first name — enough for them
- * to recognise the order as theirs, not enough to tell a stranger who it is.
+ * note and no staff names. The customer's name is shown in full, so they can
+ * tell at a glance the order is theirs; the code is what keeps it private.
  */
 function publicView(e) {
   const m = MODES[e.deliveryMode] || MODES.other;
+  const pay = e.payment || 'prepaid';
   const history = events(e);
   const current = e.status;
 
@@ -157,7 +183,7 @@ function publicView(e) {
   const reached = {};
   for (const ev of history) reached[ev.status] = ev.at;
 
-  const flow = m.flow;
+  const flow = flowFor(e.deliveryMode, pay);
   const at = flow.indexOf(current);
   // An exception status (on hold, cancelled) or an off-flow one leaves the
   // stepper where the last on-flow status put it.
@@ -166,7 +192,7 @@ function publicView(e) {
 
   return {
     code: formatCode(e.rowKey),
-    firstName: String(e.customerName || '').split(/\s+/)[0] || '',
+    customerName: e.customerName || '',
     reference: e.reference || '',
     items: parse(e.items, []),
     deliveryMode: { key: e.deliveryMode, label: m.label },
@@ -175,6 +201,14 @@ function publicView(e) {
     partnerUrl: e.partnerUrl || '',
     expectedBy: e.expectedBy || '',
     publicNote: e.publicNote || '',
+    payment: {
+      key: pay,
+      label: PAYMENTS[pay].label,
+      amount: e.amount || '',
+      dueBy: pay === 'credit' ? e.dueBy || '' : '',
+      paid: isPaid(e),
+      paidAt: pay === 'prepaid' ? '' : e.paidAt || '',
+    },
     status: { key: current, ...STATUSES[current] },
     steps: flow.map((key, i) => ({
       key,
@@ -191,4 +225,4 @@ function publicView(e) {
   };
 }
 
-module.exports = { newCode, parseCode, formatCode, details, status, events, staffView, publicView };
+module.exports = { newCode, parseCode, formatCode, details, status, events, isPaid, staffView, publicView };

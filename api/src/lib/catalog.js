@@ -12,6 +12,7 @@
 
 const STATUSES = {
   payment_confirmed: { label: 'Payment confirmed', hint: 'We have your payment and the order is booked.' },
+  order_confirmed: { label: 'Order confirmed', hint: 'Your order is booked.' },
   processing: { label: 'Processing', hint: 'Your order is being prepared.' },
   packed: { label: 'Packed', hint: 'Packed and waiting to leave.' },
   ready_for_pickup: { label: 'Ready for pickup', hint: 'Ready to collect from our office.' },
@@ -35,9 +36,29 @@ const MODES = {
   other: { label: 'Other', flow: [...BASE, 'dispatched', 'out_for_delivery', 'delivered'] },
 };
 
+/*
+ * How the customer pays. A prepaid order opens at "Payment confirmed"; cash on
+ * delivery and credit open at "Order confirmed" instead, because no money has
+ * changed hands yet and the tracking page must not say it has.
+ */
+const PAYMENTS = {
+  prepaid: { label: 'Prepaid' },
+  cod: { label: 'Cash on delivery' },
+  credit: { label: 'Credit (pay later)' },
+};
+
+/** The stepper for a mode and a payment type: the mode's path, opened by the right first step. */
+const flowFor = (mode, payment) => {
+  const flow = (MODES[mode] || MODES.other).flow.slice();
+  if (payment === 'cod' || payment === 'credit') flow[0] = 'order_confirmed';
+  return flow;
+};
+
+const firstStatus = (payment) => (payment === 'cod' || payment === 'credit' ? 'order_confirmed' : 'payment_confirmed');
+
 const ROLES = ['user', 'admin'];
 
 /** Statuses that close an order: nothing further is expected to happen. */
 const isFinal = (status) => status === 'delivered' || status === 'picked_up' || status === 'cancelled';
 
-module.exports = { STATUSES, MODES, ROLES, isFinal };
+module.exports = { STATUSES, MODES, PAYMENTS, ROLES, isFinal, flowFor, firstStatus };

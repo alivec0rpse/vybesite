@@ -228,8 +228,15 @@ created on first use.
   WhatsApp) or type the code at `/track/`. They see items and quantities, the
   delivery mode, courier/partner and AWB, a stepper from *payment confirmed* to
   *delivered* (or *collected*), and every update with its note. Never the
-  phone, email, address, internal note or staff names; only the first name.
+  phone, email, address, internal note or staff names. The customer's full
+  name is shown, so they can tell the order is theirs.
   Codes are random (~49 bits), not sequential, so they cannot be walked.
+- **Payment.** Each order is Prepaid, Cash on delivery or Credit. Prepaid
+  orders open at *payment confirmed*; COD and credit open at *order confirmed*
+  instead, so the page never claims money that has not arrived. COD and credit
+  carry an amount (and credit a due date); the customer sees what is owed until
+  staff tick *Payment received*. A delivered order that is still unpaid stays
+  in the **Open** list.
 - **Staff** sign in at `/vyb-admin/`, create an order once payment is in, and
   move it along. Any status can be set at any time; each delivery mode only
   decides which steps the customer's stepper draws ahead. Modes and statuses
