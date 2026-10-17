@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Order desk | Vybe Technologies</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<link rel="preconnect" href="https://cdn.vybe.net.in">
+<link rel="preconnect" href="https://cdn.vybe.net.in" crossorigin>
+<link rel="preload" href="https://cdn.vybe.net.in/assets/fonts/inter-var.woff2?v=3100e775" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="https://cdn.vybe.net.in/assets/fonts/material-symbols-subset.woff2?v=0dbc1b62" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="https://cdn.vybe.net.in/assets/site.css?v=f7a079d6">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<meta name="theme-color" content="#0f172a">
+</head>
+<body id="vyb-admin" class="bg-surface-main text-slate-900 min-h-screen">
+
+<header class="bg-corporate text-white">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-3">
+        <p class="font-black font-display tracking-tight text-lg">Vybe <span class="text-brand">Order desk</span></p>
+        <div id="who" class="flex flex-wrap items-center gap-2 text-xs" hidden>
+            <span id="who-name" class="text-slate-300 mr-2"></span>
+            <button id="btn-password" type="button" class="inline-flex items-center gap-1.5 rounded-full border border-white/20 hover:border-white px-3 py-1.5 font-bold"><span class="material-symbols-outlined text-[16px]" aria-hidden="true">key</span>Password</button>
+            <button id="btn-logout" type="button" class="inline-flex items-center gap-1.5 rounded-full border border-white/20 hover:border-white px-3 py-1.5 font-bold"><span class="material-symbols-outlined text-[16px]" aria-hidden="true">logout</span>Sign out</button>
+        </div>
+    </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 py-8">
+    <noscript><p class="rounded-2xl border border-slate-200 bg-white p-6 md:p-8 text-sm">The order desk needs JavaScript.</p></noscript>
+
+    <p id="view-loading" class="text-sm text-slate-500">Loading…</p>
+
+    <section id="view-login" class="max-w-md mx-auto mt-10 rounded-2xl border border-slate-200 bg-white p-6 md:p-8" hidden>
+        <h1 class="text-2xl font-black font-display tracking-tight">Sign in</h1>
+        <p class="mt-2 text-sm text-slate-600">Staff only. Accounts are created by an admin.</p>
+        <form id="login-form" class="mt-6 space-y-4">
+            <div>
+                                <label for="login-email" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Email</label>
+                                <input id="login-email" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="email" autocomplete="username" required>
+                            </div>
+            <div>
+                                <label for="login-password" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Password</label>
+                                <input id="login-password" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="password" autocomplete="current-password" required>
+                            </div>
+            <p id="login-error" class="text-sm font-bold text-red-700" role="alert"></p>
+            <button type="submit" class="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark disabled:opacity-50 text-white px-6 py-3 rounded-full text-sm font-bold transition-all active:scale-95 w-full">Sign in</button>
+        </form>
+    </section>
+
+    <section id="view-password" class="max-w-md mx-auto mt-10 rounded-2xl border border-slate-200 bg-white p-6 md:p-8" hidden>
+        <h1 class="text-2xl font-black font-display tracking-tight">Choose a new password</h1>
+        <p id="password-intro" class="mt-2 text-sm text-slate-600"></p>
+        <form id="password-form" class="mt-6 space-y-4">
+            <div>
+                                <label for="password-current" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Current password</label>
+                                <input id="password-current" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="password" autocomplete="current-password" required>
+                            </div>
+            <div>
+                                <label for="password-next" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">New password</label>
+                                <input id="password-next" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="password" autocomplete="new-password" minlength="10" required>
+                            </div>
+            <div>
+                                <label for="password-confirm" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">New password again</label>
+                                <input id="password-confirm" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="password" autocomplete="new-password" minlength="10" required>
+                            </div>
+            <p id="password-error" class="text-sm font-bold text-red-700" role="alert"></p>
+            <div class="flex gap-3">
+                <button type="submit" class="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark disabled:opacity-50 text-white px-6 py-3 rounded-full text-sm font-bold transition-all active:scale-95 flex-1">Change password</button>
+                <button id="password-cancel" type="button" class="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white hover:border-brand hover:text-brand px-4 py-2 text-xs font-bold text-slate-900 transition-colors">Cancel</button>
+            </div>
+        </form>
+    </section>
+
+    <section id="view-app" hidden>
+        <div class="flex flex-wrap gap-2 mb-6" role="tablist">
+            <button id="tab-orders" type="button" role="tab" aria-selected="true">Orders</button>
+            <button id="tab-certs" type="button" role="tab" aria-selected="false">Certificates</button>
+            <button id="tab-blog" type="button" role="tab" aria-selected="false">Blog</button>
+            <button id="tab-staff" type="button" role="tab" aria-selected="false" hidden>Staff</button>
+        </div>
+
+        <div id="panel-orders" role="tabpanel" aria-labelledby="tab-orders">
+            <div id="orders-list-view">
+                <div class="flex flex-col md:flex-row gap-3 md:items-center mb-4">
+                    <h1 class="text-2xl font-black font-display tracking-tight mr-auto">Orders</h1>
+                    <label for="orders-q" class="sr-only">Search orders</label>
+                    <input id="orders-q" type="search" placeholder="Code, customer, phone, reference…" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30 md:w-72 !mt-0">
+                    <label for="orders-show" class="sr-only">Show</label>
+                    <select id="orders-show" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30 md:w-40 !mt-0">
+                        <option value="open">Open</option>
+                        <option value="closed">Delivered &amp; cancelled</option>
+                        <option value="all">All</option>
+                    </select>
+                    <button id="orders-refresh" type="button" class="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white hover:border-brand hover:text-brand px-4 py-2 text-xs font-bold text-slate-900 transition-colors" aria-label="Refresh"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">refresh</span></button>
+                    <button id="btn-new-order" type="button" class="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark disabled:opacity-50 text-white px-6 py-3 rounded-full text-sm font-bold transition-all active:scale-95"><span class="material-symbols-outlined text-[20px]" aria-hidden="true">add</span>New order</button>
+                </div>
+                <div id="orders-list" class="rounded-2xl border border-slate-200 bg-white overflow-hidden"></div>
+            </div>
+
+            <div id="order-view" hidden>
+                <button id="order-back" type="button" class="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white hover:border-brand hover:text-brand px-4 py-2 text-xs font-bold text-slate-900 transition-colors mb-4"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_back</span>All orders</button>
+                <h1 id="order-title" class="text-2xl font-black font-display tracking-tight">Order</h1>
+                <p id="order-sub" class="mt-1 text-sm text-slate-500"></p>
+
+                <div id="order-live" class="mt-6 grid gap-6 lg:grid-cols-2">
+                    <div class="rounded-2xl border border-slate-200 bg-white p-6 md:p-8">
+                        <h2 class="text-base font-bold font-display">Customer tracking link</h2>
+                        <div class="mt-3 flex gap-2">
+                            <label for="share-link" class="sr-only">Tracking link</label>
+                            <input id="share-link" type="text" readonly class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30 !mt-0 font-mono text-xs">
+                        </div>
+                        <div class="mt-3 flex flex-wrap gap-2">
+                            <button id="share-copy" type="button" class="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white hover:border-brand hover:text-brand px-4 py-2 text-xs font-bold text-slate-900 transition-colors"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">content_copy</span>Copy link</button>
+                            <a id="share-whatsapp" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white hover:border-brand hover:text-brand px-4 py-2 text-xs font-bold text-slate-900 transition-colors"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">chat</span>Send on WhatsApp</a>
+                            <a id="share-open" href="#" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white hover:border-brand hover:text-brand px-4 py-2 text-xs font-bold text-slate-900 transition-colors"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">open_in_new</span>Open</a>
+                        </div>
+
+                        <h2 class="mt-8 text-base font-bold font-display flex items-center gap-3">Status <span id="order-status-now"></span></h2>
+                        <form id="status-form" class="mt-3 space-y-3">
+                            <div>
+                                <label for="status-select" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Move to</label>
+                                <select id="status-select" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"></select>
+                            </div>
+                            <div>
+                                <label for="status-note" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Note for the customer (optional)</label>
+                                <textarea id="status-note" rows="2" maxlength="1000" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" placeholder="e.g. AWB D12345678 with DTDC, or rider Suresh 98xxxxxx"></textarea>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <button id="status-submit" type="submit" class="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark disabled:opacity-50 text-white px-6 py-3 rounded-full text-sm font-bold transition-all active:scale-95">Update status</button>
+                                <button id="status-undo" type="button" class="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white hover:border-brand hover:text-brand px-4 py-2 text-xs font-bold text-slate-900 transition-colors"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">undo</span>Undo latest</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="rounded-2xl border border-slate-200 bg-white p-6 md:p-8">
+                        <h2 class="text-base font-bold font-display mb-4">History</h2>
+                        <div id="order-history"></div>
+                    </div>
+                </div>
+
+                <form id="order-form" class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 md:p-8">
+                    <h2 class="text-base font-bold font-display">Order details</h2>
+                    <div class="mt-4 grid gap-4 md:grid-cols-2">
+                        <div>
+                                <label for="f-customerName" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Customer name *</label>
+                                <input id="f-customerName" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="text" required maxlength="120" autocomplete="off">
+                            </div>
+                        <div>
+                                <label for="f-customerPhone" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Phone (WhatsApp)</label>
+                                <input id="f-customerPhone" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="tel" maxlength="30" autocomplete="off">
+                            </div>
+                        <div>
+                                <label for="f-customerEmail" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Email</label>
+                                <input id="f-customerEmail" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="email" maxlength="200" autocomplete="off">
+                            </div>
+                        <div>
+                                <label for="f-reference" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Reference / invoice no.</label>
+                                <input id="f-reference" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="text" maxlength="60" autocomplete="off">
+                            </div>
+                        <div class="md:col-span-2">
+                                <label for="f-address" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Delivery address</label>
+                                <textarea id="f-address" rows="2" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"></textarea>
+                                <p class="mt-1 text-xs text-slate-500">Staff only. Never shown on the tracking page.</p>
+                            </div>
+
+                        <div class="md:col-span-2">
+                            <p class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Items *</p>
+                            <div id="items" class="mt-1 space-y-2"></div>
+                            <button id="add-item" type="button" class="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white hover:border-brand hover:text-brand px-4 py-2 text-xs font-bold text-slate-900 transition-colors mt-2"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">add</span>Add item</button>
+                        </div>
+
+                        <div>
+                            <label for="f-deliveryMode" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Delivery mode *</label>
+                            <select id="f-deliveryMode" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"></select>
+                        </div>
+                        <div>
+                                <label for="f-expectedBy" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Expected by</label>
+                                <input id="f-expectedBy" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="date">
+                            </div>
+                        <div>
+                                <label for="f-partner" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Courier / partner / rider</label>
+                                <input id="f-partner" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="text" maxlength="120" placeholder="DTDC, Porter, Suresh…">
+                            </div>
+                        <div>
+                                <label for="f-partnerRef" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">AWB / booking reference</label>
+                                <input id="f-partnerRef" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="text" maxlength="120">
+                            </div>
+                        <div class="md:col-span-2">
+                                <label for="f-partnerUrl" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Partner tracking link</label>
+                                <input id="f-partnerUrl" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="url" maxlength="500" placeholder="https://…">
+                            </div>
+                        <div class="md:col-span-2">
+                                <label for="f-publicNote" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Note on the tracking page</label>
+                                <textarea id="f-publicNote" rows="2" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"></textarea>
+                                <p class="mt-1 text-xs text-slate-500">The customer sees this, e.g. collection hours or "call before arriving".</p>
+                            </div>
+                        <div class="md:col-span-2">
+                                <label for="f-internalNote" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Internal note</label>
+                                <textarea id="f-internalNote" rows="2" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"></textarea>
+                                <p class="mt-1 text-xs text-slate-500">Staff only: payment details, special handling.</p>
+                            </div>
+                    </div>
+
+                    <div id="order-first" class="mt-6 grid gap-4 md:grid-cols-2 border-t border-slate-100 pt-6">
+                        <div>
+                            <label for="f-status" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Starting status</label>
+                            <select id="f-status" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"></select>
+                        </div>
+                        <div>
+                                <label for="f-note" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">First update note (optional)</label>
+                                <input id="f-note" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="text" maxlength="1000">
+                            </div>
+                    </div>
+
+                    <p id="order-error" class="mt-4 text-sm font-bold text-red-700" role="alert"></p>
+                    <div class="mt-4 flex flex-wrap gap-3">
+                        <button id="order-save" type="submit" class="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark disabled:opacity-50 text-white px-6 py-3 rounded-full text-sm font-bold transition-all active:scale-95">Save</button>
+                        <button id="order-delete" type="button" class="ml-auto inline-flex items-center justify-center gap-1.5 rounded-full border border-red-200 bg-white hover:bg-red-50 px-4 py-2 text-xs font-bold text-red-700 transition-colors"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">delete</span>Delete order</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="panel-certs" role="tabpanel" aria-labelledby="tab-certs" hidden>
+            <div id="certs-list-view">
+                <div class="flex flex-col md:flex-row gap-3 md:items-center mb-4">
+                    <h1 class="text-2xl font-black font-display tracking-tight mr-auto">Certificates</h1>
+                    <label for="certs-q" class="sr-only">Search certificates</label>
+                    <input id="certs-q" type="search" placeholder="Number, holder, standard…" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30 md:w-72 !mt-0">
+                    <button id="btn-new-cert" type="button" class="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark disabled:opacity-50 text-white px-6 py-3 rounded-full text-sm font-bold transition-all active:scale-95"><span class="material-symbols-outlined text-[20px]" aria-hidden="true">add</span>Issue certificate</button>
+                </div>
+                <p class="mb-4 text-sm text-slate-600">This is the register behind <a href="/verify/" target="_blank" rel="noopener" class="font-bold text-brand hover:underline">/verify/</a>. Changes are live the moment you save. To revoke a certificate, set it to <strong>Withdrawn</strong> rather than deleting it, so the number keeps answering “withdrawn”.</p>
+                <div id="certs-list" class="rounded-2xl border border-slate-200 bg-white overflow-hidden"></div>
+            </div>
+
+            <form id="cert-form" class="rounded-2xl border border-slate-200 bg-white p-6 md:p-8" hidden>
+                <button id="cert-back" type="button" class="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white hover:border-brand hover:text-brand px-4 py-2 text-xs font-bold text-slate-900 transition-colors mb-4"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_back</span>All certificates</button>
+                <h2 id="cert-title" class="text-2xl font-black font-display tracking-tight">Certificate</h2>
+                <div class="mt-6 grid gap-4 md:grid-cols-2">
+                    <div>
+                                <label for="c-number" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Certificate number *</label>
+                                <input id="c-number" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="text" required maxlength="40" placeholder="VYB-QMS-2026-0418" autocomplete="off">
+                            </div>
+                    <div>
+                        <label for="c-status" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Status</label>
+                        <select id="c-status" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30">
+                            <option value="active">Active</option>
+                            <option value="withdrawn">Withdrawn</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                                <label for="c-holder" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Holder (organisation) *</label>
+                                <input id="c-holder" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="text" required maxlength="200" autocomplete="off">
+                            </div>
+                    <div class="md:col-span-2">
+                                <label for="c-address" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Holder address</label>
+                                <textarea id="c-address" rows="2" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"></textarea>
+                                
+                            </div>
+                    <div>
+                                <label for="c-standard" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Standard *</label>
+                                <input id="c-standard" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="text" required maxlength="120" placeholder="ISO 9001:2015">
+                            </div>
+                    <div>
+                                <label for="c-scheme" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Scheme</label>
+                                <input id="c-scheme" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="text" maxlength="120" placeholder="Quality Management System">
+                            </div>
+                    <div class="md:col-span-2">
+                                <label for="c-scope" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Scope of certification *</label>
+                                <textarea id="c-scope" rows="2" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"></textarea>
+                                <p class="mt-1 text-xs text-slate-500">Printed exactly as on the certificate.</p>
+                            </div>
+                    <div>
+                                <label for="c-initial" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Initial certification</label>
+                                <input id="c-initial" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="date">
+                            </div>
+                    <div>
+                                <label for="c-issued" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Issue date *</label>
+                                <input id="c-issued" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="date" required>
+                            </div>
+                    <div>
+                                <label for="c-expires" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Expiry date *</label>
+                                <input id="c-expires" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="date" required>
+                            </div>
+                    <div class="flex items-end pb-2">
+                        <label class="inline-flex items-center gap-2 text-sm font-bold text-slate-700"><input id="c-specimen" type="checkbox" class="w-4 h-4 accent-brand">Specimen (demonstration record)</label>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="c-pdf" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Certificate PDF</label>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <input id="c-pdf" type="text" maxlength="500" placeholder="Upload, or paste a link" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30">
+                            <label class="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white hover:border-brand hover:text-brand px-4 py-2 text-xs font-bold text-slate-900 transition-colors mt-1 cursor-pointer shrink-0"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">upload</span>Upload PDF<input id="c-pdf-file" type="file" accept="application/pdf" class="sr-only"></label>
+                        </div>
+                    </div>
+                    <div class="md:col-span-2">
+                                <label for="c-internalNote" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Internal note</label>
+                                <textarea id="c-internalNote" rows="2" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"></textarea>
+                                <p class="mt-1 text-xs text-slate-500">Staff only. Never shown on /verify/.</p>
+                            </div>
+                </div>
+                <p id="cert-error" class="mt-4 text-sm font-bold text-red-700" role="alert"></p>
+                <div class="mt-4 flex flex-wrap gap-3">
+                    <button id="cert-save" type="submit" class="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark disabled:opacity-50 text-white px-6 py-3 rounded-full text-sm font-bold transition-all active:scale-95">Save</button>
+                    <a id="cert-open" href="/verify/" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white hover:border-brand hover:text-brand px-4 py-2 text-xs font-bold text-slate-900 transition-colors"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">open_in_new</span>Check on /verify/</a>
+                    <button id="cert-delete" type="button" class="ml-auto inline-flex items-center justify-center gap-1.5 rounded-full border border-red-200 bg-white hover:bg-red-50 px-4 py-2 text-xs font-bold text-red-700 transition-colors"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">delete</span>Delete</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="panel-blog" role="tabpanel" aria-labelledby="tab-blog" hidden>
+            <div class="flex flex-wrap gap-2 mb-6">
+                <button id="blog-tab-posts" type="button" class="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white hover:border-brand hover:text-brand px-4 py-2 text-xs font-bold text-slate-900 transition-colors">Posts</button>
+                <button id="blog-tab-authors" type="button" class="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white hover:border-brand hover:text-brand px-4 py-2 text-xs font-bold text-slate-900 transition-colors">Authors</button>
+                <button id="blog-deploy" type="button" class="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white hover:border-brand hover:text-brand px-4 py-2 text-xs font-bold text-slate-900 transition-colors ml-auto"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">rocket_launch</span>Rebuild site now</button>
+            </div>
+
+            <div id="posts-list-view">
+                <div class="flex flex-col md:flex-row gap-3 md:items-center mb-4">
+                    <h1 class="text-2xl font-black font-display tracking-tight mr-auto">Blog posts</h1>
+                    <button id="btn-new-post" type="button" class="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark disabled:opacity-50 text-white px-6 py-3 rounded-full text-sm font-bold transition-all active:scale-95"><span class="material-symbols-outlined text-[20px]" aria-hidden="true">add</span>New post</button>
+                </div>
+                <p class="mb-4 text-sm text-slate-600">Published posts go live at <a href="/blogs/" target="_blank" rel="noopener" class="font-bold text-brand hover:underline">/blogs/</a> when the site is next built: automatically within about 15 minutes, or straight away with <strong>Rebuild site now</strong>. A future publish date schedules the post.</p>
+                <div id="posts-list" class="rounded-2xl border border-slate-200 bg-white overflow-hidden"></div>
+            </div>
+
+            <form id="post-form" hidden>
+                <button id="post-back" type="button" class="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white hover:border-brand hover:text-brand px-4 py-2 text-xs font-bold text-slate-900 transition-colors mb-4"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_back</span>All posts</button>
+                <div class="flex flex-wrap items-center gap-3">
+                    <h1 id="post-heading" class="text-2xl font-black font-display tracking-tight">Post</h1>
+                    <span id="post-state"></span>
+                </div>
+
+                <div class="mt-6 grid gap-6 lg:grid-cols-3">
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="rounded-2xl border border-slate-200 bg-white p-6 md:p-8 grid gap-4">
+                            <div>
+                                <label for="p-title" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Title *</label>
+                                <input id="p-title" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="text" required maxlength="120" autocomplete="off">
+                            </div>
+                            <div>
+                                <label for="p-slug" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">URL</label>
+                                <div class="mt-1 flex items-center rounded-xl border border-slate-300 bg-slate-50 text-sm overflow-hidden focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/30">
+                                    <span class="pl-4 text-slate-400 whitespace-nowrap">vybe.net.in/blogs/</span>
+                                    <input id="p-slug" type="text" maxlength="80" pattern="[a-z0-9]+(-[a-z0-9]+)*" class="flex-1 min-w-0 bg-transparent px-1 py-2.5 text-slate-900 focus:outline-none" autocomplete="off">
+                                </div>
+                                <p class="mt-1 text-xs text-slate-500">Fixed once the post is created: a published URL must never move.</p>
+                            </div>
+                            <div>
+                                <label for="p-description" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Meta description * <span id="p-description-count" class="normal-case tracking-normal font-normal"></span></label>
+                                <textarea id="p-description" rows="2" maxlength="200" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"></textarea>
+                                <p class="mt-1 text-xs text-slate-500">The line under the title in Google. Aim for 120–160 characters that make someone want to click.</p>
+                            </div>
+                        </div>
+
+                        <div class="rounded-2xl border border-slate-200 bg-white p-6 md:p-8">
+                            <div class="flex flex-wrap items-center gap-2 mb-2">
+                                <label for="p-body" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500 mr-auto">Body * <span id="p-words" class="normal-case tracking-normal font-normal"></span></label>
+                                <label class="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white hover:border-brand hover:text-brand px-4 py-2 text-xs font-bold text-slate-900 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">image</span>Insert image<input id="p-body-image" type="file" accept="image/jpeg,image/png,image/webp" class="sr-only"></label>
+                                <button id="p-preview-toggle" type="button" class="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white hover:border-brand hover:text-brand px-4 py-2 text-xs font-bold text-slate-900 transition-colors"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">visibility</span>Preview</button>
+                            </div>
+                            <textarea id="p-body" rows="24" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30 font-mono text-[13px] leading-relaxed" spellcheck="true"></textarea>
+                            <details class="mt-2 text-xs text-slate-500">
+                                <summary class="cursor-pointer font-bold">Formatting help</summary>
+                                <pre class="mt-2 whitespace-pre-wrap font-mono">## Section heading      ### Sub-heading
+**bold**   *italic*   `code`   [link text](/erp/)   ![describe the image](upload)
+- bullet                1. numbered          &gt; quote
+| Column | Column |     then a line of  |---|---|   then rows
+``` on its own line starts and ends a code block.   --- draws a line.</pre>
+                            </details>
+                            <div id="p-preview" class="blog-prose mt-6 border-t border-slate-200 pt-6" hidden></div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="rounded-2xl border border-slate-200 bg-white p-6 md:p-8 grid gap-4">
+                            <div>
+                                <label for="p-author" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Author *</label>
+                                <select id="p-author" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"></select>
+                                <p class="mt-1 text-xs text-slate-500">A named author with a bio is a real trust signal to Google. Add people under Authors.</p>
+                            </div>
+                            <div>
+                                <label for="p-tags" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Tags</label>
+                                <input id="p-tags" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="text" maxlength="300" placeholder="RFID, Schools">
+                            </div>
+                            <div>
+                                <p class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Cover image</p>
+                                <div id="p-cover-preview" class="mt-1"></div>
+                                <input id="p-cover" type="hidden">
+                                <div class="mt-2 flex gap-2">
+                                    <label class="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white hover:border-brand hover:text-brand px-4 py-2 text-xs font-bold text-slate-900 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">upload</span>Upload<input id="p-cover-file" type="file" accept="image/jpeg,image/png,image/webp" class="sr-only"></label>
+                                    <button id="p-cover-clear" type="button" class="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white hover:border-brand hover:text-brand px-4 py-2 text-xs font-bold text-slate-900 transition-colors">Remove</button>
+                                </div>
+                                <p class="mt-1 text-xs text-slate-500">1200×630 or larger, landscape. Also the picture when the post is shared.</p>
+                            </div>
+                            <div>
+                                <label for="p-coverAlt" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Cover alt text</label>
+                                <input id="p-coverAlt" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="text" maxlength="200" placeholder="What the image shows">
+                            </div>
+                            <div>
+                                <label for="p-seoTitle" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Search title (optional)</label>
+                                <input id="p-seoTitle" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="text" maxlength="70" placeholder="Defaults to the title">
+                            </div>
+                            <div>
+                                <label for="p-publishedAt" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Publish date</label>
+                                <input id="p-publishedAt" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="datetime-local">
+                            </div>
+                        </div>
+
+                        <div class="rounded-2xl border border-slate-200 bg-white p-6 md:p-8">
+                            <h2 class="text-base font-bold font-display">In Google</h2>
+                            <div class="mt-3 rounded-xl border border-slate-200 p-4">
+                                <p class="text-xs text-slate-500 truncate">vybe.net.in › blogs › <span id="serp-slug"></span></p>
+                                <p id="serp-title" class="mt-1 text-lg leading-snug text-[#1a0dab] line-clamp-2"></p>
+                                <p id="serp-desc" class="mt-1 text-sm text-slate-600 line-clamp-3"></p>
+                            </div>
+                            <h2 class="mt-6 text-base font-bold font-display">SEO checklist</h2>
+                            <ul id="seo-checks" class="mt-3 space-y-2 text-sm"></ul>
+                        </div>
+
+                        <div class="rounded-2xl border border-slate-200 bg-white p-6 md:p-8 space-y-3">
+                            <p id="post-error" class="text-sm font-bold text-red-700" role="alert"></p>
+                            <button id="post-save" type="submit" class="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark disabled:opacity-50 text-white px-6 py-3 rounded-full text-sm font-bold transition-all active:scale-95 w-full">Save draft</button>
+                            <button id="post-publish" type="button" class="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white hover:border-brand hover:text-brand px-4 py-2 text-xs font-bold text-slate-900 transition-colors w-full !py-3 !text-sm">Publish</button>
+                            <button id="post-unpublish" type="button" class="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white hover:border-brand hover:text-brand px-4 py-2 text-xs font-bold text-slate-900 transition-colors w-full">Unpublish (back to draft)</button>
+                            <a id="post-view" href="#" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white hover:border-brand hover:text-brand px-4 py-2 text-xs font-bold text-slate-900 transition-colors w-full"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">open_in_new</span>View live</a>
+                            <button id="post-delete" type="button" class="w-full inline-flex items-center justify-center gap-1.5 rounded-full border border-red-200 bg-white hover:bg-red-50 px-4 py-2 text-xs font-bold text-red-700 transition-colors"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">delete</span>Delete post</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <div id="authors-view" hidden>
+                <h1 class="text-2xl font-black font-display tracking-tight mb-4">Authors</h1>
+                <div id="authors-list" class="rounded-2xl border border-slate-200 bg-white overflow-hidden"></div>
+                <form id="author-form" class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 md:p-8">
+                    <h2 id="author-heading" class="text-base font-bold font-display">Add an author</h2>
+                    <div class="mt-4 grid gap-4 md:grid-cols-2">
+                        <div>
+                                <label for="a-name" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Name *</label>
+                                <input id="a-name" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="text" required maxlength="100" autocomplete="off">
+                            </div>
+                        <div>
+                                <label for="a-jobTitle" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Job title</label>
+                                <input id="a-jobTitle" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="text" maxlength="100" placeholder="Founder">
+                            </div>
+                        <div class="md:col-span-2">
+                                <label for="a-bio" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Short bio</label>
+                                <textarea id="a-bio" rows="2" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"></textarea>
+                                <p class="mt-1 text-xs text-slate-500">Two or three sentences on what this person does and knows. Shown under every post they write.</p>
+                            </div>
+                        <div>
+                            <p class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Photo</p>
+                            <div id="a-photo-preview" class="mt-1"></div>
+                            <input id="a-photo" type="hidden">
+                            <label class="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white hover:border-brand hover:text-brand px-4 py-2 text-xs font-bold text-slate-900 transition-colors mt-2 cursor-pointer"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">upload</span>Upload<input id="a-photo-file" type="file" accept="image/jpeg,image/png,image/webp" class="sr-only"></label>
+                        </div>
+                        <div>
+                                <label for="a-card" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Visiting card on this site</label>
+                                <input id="a-card" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="text" maxlength="60" placeholder="/tejas/">
+                            </div>
+                        <div class="md:col-span-2">
+                            <label for="a-sameAs" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Profile links, one per line</label>
+                            <textarea id="a-sameAs" rows="2" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" placeholder="https://www.linkedin.com/in/…"></textarea>
+                        </div>
+                    </div>
+                    <p id="author-error" class="mt-4 text-sm font-bold text-red-700" role="alert"></p>
+                    <div class="mt-2 flex gap-3">
+                        <button type="submit" class="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark disabled:opacity-50 text-white px-6 py-3 rounded-full text-sm font-bold transition-all active:scale-95">Save author</button>
+                        <button id="author-cancel" type="button" class="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white hover:border-brand hover:text-brand px-4 py-2 text-xs font-bold text-slate-900 transition-colors">Clear</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="panel-staff" role="tabpanel" aria-labelledby="tab-staff" hidden>
+            <h1 class="text-2xl font-black font-display tracking-tight mb-4">Staff</h1>
+            <div id="user-secret" class="mb-6 rounded-2xl border border-amber-300 bg-amber-50 p-5 flex gap-4 items-start" hidden>
+                <div class="flex-1 text-sm">
+                    <p class="font-bold text-amber-900">Share this once, privately. It is not shown again.</p>
+                    <p id="user-secret-text" class="mt-1 font-mono text-slate-900 break-all select-all"></p>
+                    <p class="mt-1 text-xs text-amber-900">They will be asked to choose their own password when they sign in.</p>
+                </div>
+                <button id="user-secret-close" type="button" class="rounded-full p-1 text-amber-900 hover:bg-amber-100" aria-label="Dismiss"><span class="material-symbols-outlined text-[20px]" aria-hidden="true">close</span></button>
+            </div>
+            <div id="users-list" class="rounded-2xl border border-slate-200 bg-white overflow-hidden"></div>
+
+            <form id="user-form" class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 md:p-8">
+                <h2 class="text-base font-bold font-display flex items-center gap-2"><span class="material-symbols-outlined text-[20px] text-brand" aria-hidden="true">person_add</span>Add a person</h2>
+                <p class="mt-1 text-sm text-slate-600"><strong>User</strong>: creates and updates orders, certificates and blog posts. <strong>Admin</strong>: also deletes them, and manages staff.</p>
+                <div class="mt-4 grid gap-4 md:grid-cols-2">
+                    <div>
+                                <label for="u-email" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Email *</label>
+                                <input id="u-email" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="email" required maxlength="200" autocomplete="off">
+                            </div>
+                    <div>
+                                <label for="u-name" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Name</label>
+                                <input id="u-name" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" type="text" maxlength="120" autocomplete="off">
+                            </div>
+                    <div>
+                        <label for="u-role" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Role</label>
+                        <select id="u-role" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30">
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="u-password" class="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Temporary password *</label>
+                        <div class="flex gap-2">
+                            <input id="u-password" type="text" required minlength="10" maxlength="200" autocomplete="off" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30">
+                            <button id="user-generate" type="button" class="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white hover:border-brand hover:text-brand px-4 py-2 text-xs font-bold text-slate-900 transition-colors mt-1 shrink-0">Generate</button>
+                        </div>
+                    </div>
+                </div>
+                <p id="user-error" class="mt-4 text-sm font-bold text-red-700" role="alert"></p>
+                <button type="submit" class="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark disabled:opacity-50 text-white px-6 py-3 rounded-full text-sm font-bold transition-all active:scale-95 mt-2">Create account</button>
+            </form>
+        </div>
+    </section>
+
+    <div id="toast" role="status" aria-live="polite" hidden></div>
+</main>
+
+<script src="https://cdn.vybe.net.in/assets/admin.js?v=4d5d0d2d" defer></script>
+</body>
+</html>
